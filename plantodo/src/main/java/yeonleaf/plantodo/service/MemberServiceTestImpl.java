@@ -1,21 +1,17 @@
 package yeonleaf.plantodo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.DuplicatedMemberException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryMemberRepository;
-import yeonleaf.plantodo.validator.JoinFormatCheckValidator;
-
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class MemberServiceTestImpl implements MemberService {
-
     private final MemoryMemberRepository memberRepository;
 
     @Override
@@ -41,5 +37,15 @@ public class MemberServiceTestImpl implements MemberService {
             throw new ArgumentValidationException("password", "password가 일치하지 않습니다.");
         }
         return true;
+    }
+
+    @Override
+    public Optional<Member> findById(Long id) {
+        return memberRepository.findById(id);
+    }
+
+    @Override
+    public void delete(Member member) {
+        memberRepository.delete(member);
     }
 }

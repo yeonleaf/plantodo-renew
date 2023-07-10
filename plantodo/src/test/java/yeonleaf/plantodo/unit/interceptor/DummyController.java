@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DummyController {
-
     @GetMapping("/ping")
     public ResponseEntity<?> ping() {
         return ResponseEntity.status(HttpStatus.OK).body("pong");

@@ -50,7 +50,6 @@ public class JoinFormatCheckValidator implements Validator {
         if (exMarks.contains(firstChar) || exMarks.contains(lastChar)) {
             errors.rejectValue("email", "format","email에서 @를 기준으로 나뉜 각 부분에 특수문자를 맨 앞, 혹은 맨 뒤에 넣을 수 없습니다.");
         }
-
         if (containsConsecutiveDots(part)) {
             errors.rejectValue("email", "format", "email에서 @를 기준으로 나뉜 각 부분에 특수기호 .을 연속해서 사용할 수 없습니다.");
         }
@@ -58,7 +57,7 @@ public class JoinFormatCheckValidator implements Validator {
 
     private boolean containsConsecutiveDots(String word) {
         int cnt = 0;
-        for (int i=0; i<word.length(); i++) {
+        for (int i = 0; i < word.length(); i++) {
             if (word.charAt(i) == '.') {
                 cnt++;
                 if (cnt >= 2) {
@@ -119,7 +118,7 @@ public class JoinFormatCheckValidator implements Validator {
         char[] chars = password.toCharArray();
         char pv = ' ';
         int cnt = 0;
-        for (int i=0; i<chars.length; i++) {
+        for (int i = 0; i < chars.length; i++) {
             if (i == 0) {
                 pv = chars[i];
                 cnt = 1;
@@ -150,7 +149,7 @@ public class JoinFormatCheckValidator implements Validator {
         char[] chars = password.toCharArray();
         char pv = ' ';
         int cnt = 0;
-        for (int i=0; i<chars.length; i++) {
+        for (int i = 0; i < chars.length; i++) {
             if (i == 0) {
                 pv = chars[i];
                 cnt = 1;

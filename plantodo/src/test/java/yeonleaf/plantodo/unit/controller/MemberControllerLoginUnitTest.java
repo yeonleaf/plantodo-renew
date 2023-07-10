@@ -6,7 +6,6 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.service.MemberService;
-
 import java.time.Duration;
 import java.util.Date;
 
@@ -79,12 +77,10 @@ public class MemberControllerLoginUnitTest {
         when(memberService.login(any())).thenReturn(true);
         when(jwtBuilder.claim(anyString(), anyString())).thenReturn(jwtTestBuilder().claim("email", memberReqDto.getEmail()));
 
-        /*상태코드 확인*/
         MvcResult mvcResult = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
 
-        /*내용 확인*/
         JwtTokenDto body = (JwtTokenDto) parseResult(mvcResult.getResponse().getContentAsString(), new JwtTokenDto(""));
         assertThat(body.getToken()).isNotBlank();
     }
@@ -101,6 +97,7 @@ public class MemberControllerLoginUnitTest {
         MvcResult mvcResult = mockMvc.perform(request)
                 .andExpect(status().isBadRequest())
                 .andReturn();
+
         ApiBindingError body = (ApiBindingError) parseResult(mvcResult.getResponse().getContentAsString(), new ApiBindingError());
         assertThat(body.getErrors().get("email").size()).isEqualTo(1);
     }

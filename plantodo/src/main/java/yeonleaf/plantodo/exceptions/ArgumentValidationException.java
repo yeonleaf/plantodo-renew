@@ -3,7 +3,6 @@ package yeonleaf.plantodo.exceptions;
 import lombok.Getter;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.Map;
 public class ArgumentValidationException extends RuntimeException {
     private String message;
     private Map<String, List<String>> errors = new HashMap<>();
+
     public ArgumentValidationException(String message, BindingResult bindingResult) {
         super();
         this.message = message;

@@ -20,7 +20,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.interceptor.LoginCheckInterceptor;
-
 import javax.crypto.SecretKey;
 import java.io.UnsupportedEncodingException;
 import java.time.Duration;

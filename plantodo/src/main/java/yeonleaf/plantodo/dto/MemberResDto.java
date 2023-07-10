@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import yeonleaf.plantodo.domain.Member;
 
-import java.util.Random;
-
 @Getter
 @Setter
 @NoArgsConstructor

@@ -2,27 +2,28 @@ package yeonleaf.plantodo.controller;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.JwtTokenDto;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.dto.MemberResDto;
+import yeonleaf.plantodo.exceptions.ApiBindingError;
+import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.MemberService;
-import yeonleaf.plantodo.service.MemberServiceImpl;
 import yeonleaf.plantodo.validator.JoinFormatCheckValidator;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/member")
@@ -30,42 +31,73 @@ import yeonleaf.plantodo.validator.JoinFormatCheckValidator;
 public class MemberController {
     private final MemberService memberService;
     private final JoinFormatCheckValidator joinFormatCheckValidator = new JoinFormatCheckValidator();
-
     private final JwtBuilder jwtBuilder;
 
+    @Operation(description = "회원가입", responses = {
+            @ApiResponse(responseCode = "201", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MemberResDto.class))),
+            @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "409", description = "duplicated member", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "X", content = @Content)
+    })
     @PostMapping
-    @Operation(description = "회원가입")
     public ResponseEntity<?> save(@Valid @RequestBody MemberReqDto memberReqDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
+
         joinFormatCheckValidator.validate(memberReqDto, bindingResult);
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 형식 오류", bindingResult);
         }
+
         Member member = memberService.save(memberReqDto);
+
         MemberResDto memberResDto = new MemberResDto(member);
         return ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(memberResDto));
     }
 
+    @Operation(description = "로그인", responses = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = JwtTokenDto.class))),
+            @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "401", description = "invalid Authorization header or jwt token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "409", description = "X", content = @Content)
+    })
     @PostMapping("/login")
-    @Operation(description = "로그인")
     public ResponseEntity<?> login(@Valid @RequestBody MemberReqDto memberReqDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
+
         boolean canLogin = memberService.login(memberReqDto);
+
         if (canLogin) {
-            String jwtKey = buildKey(memberReqDto.getEmail());
-            JwtTokenDto token = new JwtTokenDto(jwtKey);
+            JwtTokenDto token = buildKey(memberReqDto.getEmail());
             return ResponseEntity.status(HttpStatus.OK).body(EntityModel.of(token));
         } else {
             throw new ResourceNotFoundException();
         }
     }
 
-    private String buildKey(String value) {
-        return jwtBuilder.claim("email", value)
-                .compact();
+    private JwtTokenDto buildKey(String value) {
+        return new JwtTokenDto(jwtBuilder.claim("email", value).compact());
+    }
+
+    @Operation(description = "회원 삭제", responses = {
+            @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "400", description = "X", content = @Content),
+            @ApiResponse(responseCode = "409", description = "X", content = @Content)
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Optional<Member> candidates = memberService.findById(id);
+
+        if (candidates.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        memberService.delete(candidates.get());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

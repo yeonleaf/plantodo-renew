@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerInterceptor;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.CustomJwtException;
-
 import javax.crypto.SecretKey;
 import java.io.IOException;
 
@@ -56,7 +55,6 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         } catch (ExpiredJwtException eje) {
             throw new CustomJwtException("JWT TOKEN이 만료 (재로그인 필요)");
         }
-
     }
 
     private void validateToken(String header) {
@@ -72,5 +70,4 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     private String extractToken(String header) {
         return header.substring("Bearer ".length());
     }
-
 }

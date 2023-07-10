@@ -1,13 +1,16 @@
 package yeonleaf.plantodo.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+
+import java.util.Optional;
 
 @Service
 public interface MemberService {
     Member save(MemberReqDto memberReqDto);
+    Optional<Member> findById(Long id);
     boolean isNotNewMember(String email);
     boolean login(MemberReqDto memberReqDto);
+    void delete(Member member);
 }

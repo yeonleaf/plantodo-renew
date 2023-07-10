@@ -3,19 +3,15 @@ package yeonleaf.plantodo.unit.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.validation.BindingResult;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.exceptions.DuplicatedMemberException;
 import yeonleaf.plantodo.repository.MemoryMemberRepository;
 import yeonleaf.plantodo.service.MemberServiceTestImpl;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 public class MemberServiceSaveUnitTest {
-
     private MemoryMemberRepository memberRepository;
     private MemberServiceTestImpl memberService;
 

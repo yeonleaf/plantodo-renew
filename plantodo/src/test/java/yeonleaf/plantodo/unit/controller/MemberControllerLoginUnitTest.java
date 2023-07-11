@@ -21,13 +21,14 @@ import yeonleaf.plantodo.dto.JwtTokenDto;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
+import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.MemberService;
 import java.time.Duration;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,8 +75,8 @@ public class MemberControllerLoginUnitTest {
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "13za$%a1");
         MockHttpServletRequestBuilder request = makeLoginRequest(memberReqDto);
 
-        when(memberService.login(any())).thenReturn(true);
-        when(jwtBuilder.claim(anyString(), anyString())).thenReturn(jwtTestBuilder().claim("email", memberReqDto.getEmail()));
+        when(memberService.login(any())).thenReturn(1L);
+        when(jwtBuilder.claim(any(), any())).thenReturn(jwtTestBuilder().claim("id", 1L));
 
         MvcResult mvcResult = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -91,8 +92,8 @@ public class MemberControllerLoginUnitTest {
         MemberReqDto memberReqDto = new MemberReqDto("", "13za$%a1");
         MockHttpServletRequestBuilder request = makeLoginRequest(memberReqDto);
 
-        when(memberService.login(any())).thenReturn(true);
-        when(jwtBuilder.claim(anyString(), anyString())).thenReturn(jwtTestBuilder().claim("email", memberReqDto.getEmail()));
+        when(memberService.login(any())).thenReturn(1L);
+        when(jwtBuilder.claim(any(), any())).thenReturn(jwtTestBuilder().claim("id", 1L));
 
         MvcResult mvcResult = mockMvc.perform(request)
                 .andExpect(status().isBadRequest())
@@ -108,8 +109,8 @@ public class MemberControllerLoginUnitTest {
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "13za$%a1");
         MockHttpServletRequestBuilder request = makeLoginRequest(memberReqDto);
 
-        when(memberService.login(any())).thenReturn(false);
-        when(jwtBuilder.claim(anyString(), anyString())).thenReturn(jwtTestBuilder().claim("email", memberReqDto.getEmail()));
+        doThrow(ResourceNotFoundException.class).when(memberService).login(any());
+        when(jwtBuilder.claim(any(), any())).thenReturn(jwtTestBuilder().claim("id", 1L));
 
         MvcResult mvcResult = mockMvc.perform(request)
                 .andExpect(status().isNotFound())

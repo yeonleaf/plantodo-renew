@@ -3,6 +3,7 @@ package yeonleaf.plantodo.unit.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
@@ -30,8 +31,8 @@ public class MemberServiceLoginUnitTest {
     @DisplayName("정상 로그인")
     void loginTest_normal() {
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "13az$@fq");
-        memberService.save(memberReqDto);
-        assertThat(memberService.login(memberReqDto)).isTrue();
+        Member member = memberService.save(memberReqDto);
+        assertThat(memberService.login(memberReqDto)).isEqualTo(member.getId());
     }
 
     @Test

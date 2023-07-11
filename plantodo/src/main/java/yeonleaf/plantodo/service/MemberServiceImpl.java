@@ -30,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean login(MemberReqDto memberReqDto) {
+    public Long login(MemberReqDto memberReqDto) {
         List<Member> candidates = memberRepository.findByEmail(memberReqDto.getEmail());
         if (candidates.isEmpty()) {
             throw new ResourceNotFoundException();
@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
         if (!candidates.get(0).getPassword().equals(memberReqDto.getPassword())) {
             throw new ArgumentValidationException("password", "password가 일치하지 않습니다.");
         }
-        return true;
+        return candidates.get(0).getId();
     }
 
     @Override

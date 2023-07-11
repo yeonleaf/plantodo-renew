@@ -11,6 +11,6 @@ public interface MemberService {
     Member save(MemberReqDto memberReqDto);
     Optional<Member> findById(Long id);
     boolean isNotNewMember(String email);
-    boolean login(MemberReqDto memberReqDto);
+    Long login(MemberReqDto memberReqDto);
     void delete(Member member);
 }

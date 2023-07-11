@@ -69,18 +69,13 @@ public class MemberController {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
 
-        boolean canLogin = memberService.login(memberReqDto);
-
-        if (canLogin) {
-            JwtTokenDto token = buildKey(memberReqDto.getEmail());
-            return ResponseEntity.status(HttpStatus.OK).body(EntityModel.of(token));
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        Long memberId = memberService.login(memberReqDto);
+        JwtTokenDto token = buildKey(memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(EntityModel.of(token));
     }
 
-    private JwtTokenDto buildKey(String value) {
-        return new JwtTokenDto(jwtBuilder.claim("email", value).compact());
+    private JwtTokenDto buildKey(Long value) {
+        return new JwtTokenDto(jwtBuilder.claim("id", value).compact());
     }
 
     @Operation(description = "회원 삭제", responses = {

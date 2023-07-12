@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class JoinValidatorTest {
+
     private JoinFormatCheckValidator validator;
     private BindingResult bindingResult;
 
@@ -237,4 +238,5 @@ public class JoinValidatorTest {
         validateThrowException("test@abc.co..kr", "a1b2#3d4");
         validateThrowException("test@abc..co.kr", "a1b2#3d4");
     }
+
 }

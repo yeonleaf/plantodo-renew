@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ApiSimpleError {
+
     private String message;
     private String detail;
 
@@ -15,4 +16,5 @@ public class ApiSimpleError {
         this.message = message;
         this.detail = detail;
     }
+
 }

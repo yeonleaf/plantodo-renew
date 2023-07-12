@@ -1,4 +1,4 @@
-package yeonleaf.plantodo.unit.controller;
+package yeonleaf.plantodo.unit.controller.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -138,4 +138,5 @@ public class MemberControllerSaveUnitTest {
         assertThat(apiError.getErrors().get("email").size()).isEqualTo(2);
         assertThat(apiError.getErrors().get("password").size()).isEqualTo(2);
     }
+
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 public class LoginCheckInterceptor implements HandlerInterceptor {
+
     private final SecretKey jwtSecretKey;
     private final ObjectMapper objectMapper;
 
@@ -70,4 +71,5 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     private String extractToken(String header) {
         return header.substring("Bearer ".length());
     }
+
 }

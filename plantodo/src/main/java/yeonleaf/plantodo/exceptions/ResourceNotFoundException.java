@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResourceNotFoundException extends RuntimeException {
+
     public ResourceNotFoundException() {
     }
 
@@ -16,4 +17,5 @@ public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

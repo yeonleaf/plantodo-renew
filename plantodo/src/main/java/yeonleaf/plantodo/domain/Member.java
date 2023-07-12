@@ -14,6 +14,7 @@ import yeonleaf.plantodo.dto.MemberReqDto;
 @Setter
 @NoArgsConstructor
 public class Member {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
@@ -28,4 +29,5 @@ public class Member {
         this.email = email;
         this.password = password;
     }
+
 }

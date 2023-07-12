@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MemoryMemberRepository {
+
     private Map<Long, Member> members = new HashMap<>();
     private Long id = 1L;
 
@@ -30,4 +31,5 @@ public class MemoryMemberRepository {
     public void delete(Member member) {
         members.remove(member.getId());
     }
+
 }

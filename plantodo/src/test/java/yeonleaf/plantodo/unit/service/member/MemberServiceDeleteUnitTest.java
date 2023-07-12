@@ -1,4 +1,4 @@
-package yeonleaf.plantodo.unit.service;
+package yeonleaf.plantodo.unit.service.member;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +11,7 @@ import yeonleaf.plantodo.service.MemberServiceTestImpl;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MemberServiceDeleteUnitTest {
+
     private MemoryMemberRepository memberRepository;
     private MemberServiceTestImpl memberService;
 
@@ -30,4 +31,5 @@ public class MemberServiceDeleteUnitTest {
 
         assertFalse(memberService.findById(member.getId()).isPresent());
     }
+
 }

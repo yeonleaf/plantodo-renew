@@ -1,4 +1,4 @@
-package yeonleaf.plantodo.unit.controller;
+package yeonleaf.plantodo.unit.controller.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -119,4 +119,5 @@ public class MemberControllerLoginUnitTest {
         ApiSimpleError apiSimpleError = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ApiSimpleError.class);
         assertThat(apiSimpleError.getMessage()).isEqualTo("Resource not found");
     }
+
 }

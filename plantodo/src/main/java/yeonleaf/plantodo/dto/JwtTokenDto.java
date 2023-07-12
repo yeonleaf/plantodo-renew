@@ -9,9 +9,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class JwtTokenDto {
+
     private String token;
 
     public JwtTokenDto(String token) {
         this.token = token;
     }
+
 }

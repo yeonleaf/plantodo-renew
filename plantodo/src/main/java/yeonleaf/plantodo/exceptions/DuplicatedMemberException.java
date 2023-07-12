@@ -8,10 +8,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class DuplicatedMemberException extends RuntimeException {
+
     private String message;
 
     public DuplicatedMemberException(String message) {
         super();
         this.message = message;
     }
+
 }

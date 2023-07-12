@@ -2,24 +2,19 @@ package yeonleaf.plantodo.unit.interceptor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import yeonleaf.plantodo.TestWithInterceptorConfig;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
-import yeonleaf.plantodo.interceptor.LoginCheckInterceptor;
+import yeonleaf.plantodo.provider.JwtTestProvider;
 import javax.crypto.SecretKey;
 import java.io.UnsupportedEncodingException;
 import java.time.Duration;
@@ -31,53 +26,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import({TestWithInterceptorConfig.class})
 @WebMvcTest(DummyController.class)
 public class LoginCheckInterceptorTest {
 
-    @TestConfiguration
-    static class TestConfig {
-        private SecretKey key;
-        private ObjectMapper objectMapper;
-
-        public TestConfig() {
-            this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-            this.objectMapper = new ObjectMapper();
-        }
-
-        @Bean
-        public ObjectMapper objectMapper() {
-            return objectMapper;
-        }
-
-        @Bean
-        public SecretKey jwtTestSecretKey() {
-            return key;
-        }
-
-        @Bean
-        public JwtBuilder jwtTestBuilder() {
-            return Jwts.builder()
-                    .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                    .setIssuer("fresh");
-        }
-
-        @Bean
-        public WebMvcConfigurer testWebMvcConfigurer() {
-            return new WebMvcConfigurer() {
-                @Override
-                public void addInterceptors(InterceptorRegistry registry) {
-                    registry.addInterceptor(new LoginCheckInterceptor(jwtTestSecretKey(), objectMapper()))
-                            .excludePathPatterns("/member", "/member/login");
-                }
-            };
-        }
-    }
-
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private JwtBuilder jwtTestBuilder;
 
     @Autowired
     private SecretKey jwtTestSecretKey;
@@ -85,15 +39,18 @@ public class LoginCheckInterceptorTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JwtTestProvider jwtTestProvider;
+
     private String makeValidKey() {
-        return jwtTestBuilder.signWith(jwtTestSecretKey, SignatureAlgorithm.HS256)
+        return jwtTestProvider.jwtBuilder().signWith(jwtTestSecretKey, SignatureAlgorithm.HS256)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + Duration.ofMinutes(30).toMillis()))
                 .claim("email", "test@abc.co.kr").compact();
     }
 
     private String makeInvalidKey() {
-        return jwtTestBuilder.signWith(Keys.secretKeyFor(SignatureAlgorithm.HS256), SignatureAlgorithm.HS256)
+        return jwtTestProvider.jwtBuilder().signWith(Keys.secretKeyFor(SignatureAlgorithm.HS256), SignatureAlgorithm.HS256)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + Duration.ofMinutes(30).toMillis()))
                 .claim("email", "test@abc.co.kr").compact();
@@ -169,7 +126,7 @@ public class LoginCheckInterceptorTest {
 
     private String makeValidKeyByDate(LocalDateTime issuedTime) {
         LocalDateTime expiredTime = issuedTime.plusMinutes(30);
-        return jwtTestBuilder.signWith(jwtTestSecretKey, SignatureAlgorithm.HS256)
+        return jwtTestProvider.jwtBuilder().signWith(jwtTestSecretKey, SignatureAlgorithm.HS256)
                 .setIssuedAt(Date.from(issuedTime.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(expiredTime.atZone(ZoneId.systemDefault()).toInstant()))
                 .claim("email", "test@abe.co.kr")
@@ -185,4 +142,5 @@ public class LoginCheckInterceptorTest {
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
     }
+
 }

@@ -2,6 +2,7 @@ package yeonleaf.plantodo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,5 +39,13 @@ public class GlobalControllerAdvice {
         ApiSimpleError apiSimpleError = new ApiSimpleError("Resource not found", "Ensure that you previously joined in the service");
         String responseData = objectMapper.writeValueAsString(apiSimpleError);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    ResponseEntity<?> persistenceExceptionHandler(PersistenceException ex) throws JsonProcessingException {
+        ApiSimpleError apiSimpleError = new ApiSimpleError("Possible server error", "Entity couldn't be persisted safely due to db error or network problem");
+        String responseData = objectMapper.writeValueAsString(apiSimpleError);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
 }

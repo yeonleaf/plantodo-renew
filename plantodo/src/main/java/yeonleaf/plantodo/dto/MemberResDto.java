@@ -9,6 +9,7 @@ import yeonleaf.plantodo.domain.Member;
 @Setter
 @NoArgsConstructor
 public class MemberResDto {
+
     private Long id;
     private String email;
     private String password;
@@ -18,4 +19,5 @@ public class MemberResDto {
         this.email = member.getEmail();
         this.password = member.getPassword();
     }
+
 }

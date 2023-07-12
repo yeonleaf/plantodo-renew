@@ -161,4 +161,5 @@ public class MemberControllerTest {
         mockMvc.perform(deleteRequest)
                 .andExpect(status().isNotFound());
     }
+
 }

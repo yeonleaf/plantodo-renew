@@ -8,9 +8,11 @@ import java.util.Optional;
 
 @Service
 public interface MemberService {
+
     Member save(MemberReqDto memberReqDto);
     Optional<Member> findById(Long id);
     boolean isNotNewMember(String email);
     Long login(MemberReqDto memberReqDto);
     void delete(Member member);
+
 }

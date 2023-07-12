@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class MemberServiceTestImpl implements MemberService {
+
     private final MemoryMemberRepository memberRepository;
 
     @Override
@@ -48,4 +49,5 @@ public class MemberServiceTestImpl implements MemberService {
     public void delete(Member member) {
         memberRepository.delete(member);
     }
+
 }

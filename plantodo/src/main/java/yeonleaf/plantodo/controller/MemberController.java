@@ -21,6 +21,8 @@ import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
+import yeonleaf.plantodo.provider.JwtBasicProvider;
+import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.validator.JoinFormatCheckValidator;
 import java.util.Optional;
@@ -29,9 +31,10 @@ import java.util.Optional;
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
+
     private final MemberService memberService;
     private final JoinFormatCheckValidator joinFormatCheckValidator = new JoinFormatCheckValidator();
-    private final JwtBuilder jwtBuilder;
+    private final JwtBasicProvider jwtProvider;
 
     @Operation(description = "회원가입", responses = {
             @ApiResponse(responseCode = "201", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MemberResDto.class))),
@@ -70,12 +73,8 @@ public class MemberController {
         }
 
         Long memberId = memberService.login(memberReqDto);
-        JwtTokenDto token = buildKey(memberId);
+        JwtTokenDto token = new JwtTokenDto(jwtProvider.generateToken(memberId));
         return ResponseEntity.status(HttpStatus.OK).body(EntityModel.of(token));
-    }
-
-    private JwtTokenDto buildKey(Long value) {
-        return new JwtTokenDto(jwtBuilder.claim("id", value).compact());
     }
 
     @Operation(description = "회원 삭제", responses = {

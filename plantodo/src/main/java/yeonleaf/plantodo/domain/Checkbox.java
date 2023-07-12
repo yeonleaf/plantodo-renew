@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 public class Checkbox {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "checkbox_id")
     private Long id;
@@ -11,4 +12,5 @@ public class Checkbox {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
+
 }

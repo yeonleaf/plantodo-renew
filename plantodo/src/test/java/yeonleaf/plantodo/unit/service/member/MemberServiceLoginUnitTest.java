@@ -1,4 +1,4 @@
-package yeonleaf.plantodo.unit.service;
+package yeonleaf.plantodo.unit.service.member;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MemberServiceLoginUnitTest {
+
     private MemoryMemberRepository memberRepository;
     private MemberServiceTestImpl memberService;
 
@@ -51,4 +52,5 @@ public class MemberServiceLoginUnitTest {
         MemberReqDto memberReqDto2 = new MemberReqDto("test@abc.co.kr", "rs%!az1q");
         assertThrows(ArgumentValidationException.class, () -> memberService.login(memberReqDto2));
     }
+
 }

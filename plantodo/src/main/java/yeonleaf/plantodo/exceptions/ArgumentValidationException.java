@@ -10,6 +10,7 @@ import java.util.Map;
 
 @Getter
 public class ArgumentValidationException extends RuntimeException {
+
     private String message;
     private Map<String, List<String>> errors = new HashMap<>();
 
@@ -31,4 +32,5 @@ public class ArgumentValidationException extends RuntimeException {
         errors.computeIfAbsent(field, k -> new ArrayList<>());
         errors.get(field).add(detail);
     }
+
 }

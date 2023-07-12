@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class SwaggerConfig {
+
     @Bean
     public OpenAPI openApi() {
         String jwtSchemeName = "jwtAuth";
@@ -30,4 +31,5 @@ public class SwaggerConfig {
                 .addSecurityItem(securityRequirement)
                 .components(components);
     }
+
 }

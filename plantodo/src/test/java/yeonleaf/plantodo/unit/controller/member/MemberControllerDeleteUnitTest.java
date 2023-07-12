@@ -1,4 +1,4 @@
-package yeonleaf.plantodo.unit.controller;
+package yeonleaf.plantodo.unit.controller.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtBuilder;
@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MemberController.class)
 public class MemberControllerDeleteUnitTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -84,4 +85,5 @@ public class MemberControllerDeleteUnitTest {
         ApiSimpleError apiSimpleError = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ApiSimpleError.class);
         assertThat(apiSimpleError.getMessage()).isEqualTo("Resource not found");
     }
+
 }

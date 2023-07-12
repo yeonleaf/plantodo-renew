@@ -1,4 +1,4 @@
-package yeonleaf.plantodo.unit.service;
+package yeonleaf.plantodo.unit.service.member;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MemberServiceSaveUnitTest {
+
     private MemoryMemberRepository memberRepository;
     private MemberServiceTestImpl memberService;
 
@@ -36,4 +37,5 @@ public class MemberServiceSaveUnitTest {
         MemberReqDto memberReqDto2 = new MemberReqDto("test@abc.co.kr", "6s0@0aq%");
         assertThrows(DuplicatedMemberException.class, () -> memberService.save(memberReqDto2));
     }
+
 }

@@ -14,6 +14,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+
     private final MemberRepository memberRepository;
 
     @Override
@@ -50,4 +51,5 @@ public class MemberServiceImpl implements MemberService {
     public void delete(Member member) {
         memberRepository.delete(member);
     }
+
 }

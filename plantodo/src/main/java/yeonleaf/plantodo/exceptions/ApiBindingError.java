@@ -10,6 +10,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 public class ApiBindingError {
+
     private String message;
     private Map<String, List<String>> errors;
 
@@ -17,4 +18,5 @@ public class ApiBindingError {
         this.message = message;
         this.errors = errors;
     }
+
 }

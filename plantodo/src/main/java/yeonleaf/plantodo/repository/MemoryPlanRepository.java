@@ -6,7 +6,7 @@ import yeonleaf.plantodo.domain.Plan;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemoryPlanRepository {
+public class MemoryPlanRepository extends MemoryRepository<Plan> {
 
     private Map<Long, Plan> plans = new HashMap<>();
     private Long id = 1L;

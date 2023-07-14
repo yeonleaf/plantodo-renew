@@ -41,4 +41,11 @@ public class Plan {
         this.member = member;
     }
 
+    public Plan(String title, LocalDate start, LocalDate end, Member member) {
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.member = member;
+    }
+
 }

@@ -16,6 +16,7 @@ import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
+import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.service.MemberService;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MemberController.class)
@@ -34,25 +36,10 @@ public class MemberControllerDeleteUnitTest {
     private MockMvc mockMvc;
 
     @MockBean
-    JwtBuilder jwtBuilder;
+    private JwtProvider jwtProvider;
 
     @MockBean
-    MemberService memberService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private MemberResDto joinOneMember(MemberReqDto memberReqDto) throws Exception {
-        String requestData = objectMapper.writeValueAsString(memberReqDto);
-
-        MockHttpServletRequestBuilder request = post("/member")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestData);
-
-        MvcResult mvcResult = mockMvc.perform(request)
-                .andReturn();
-        String resultString = mvcResult.getResponse().getContentAsString();
-        return objectMapper.readValue(resultString, MemberResDto.class);
-    }
+    private MemberService memberService;
 
     @Test
     @DisplayName("정상 삭제")
@@ -78,12 +65,10 @@ public class MemberControllerDeleteUnitTest {
         doNothing().when(memberService).delete(member);
 
         MockHttpServletRequestBuilder request = delete("/member/1");
-        MvcResult mvcResult = mockMvc.perform(request)
+        mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andReturn();
+                .andExpect(jsonPath("message").value("Resource not found"));
 
-        ApiSimpleError apiSimpleError = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ApiSimpleError.class);
-        assertThat(apiSimpleError.getMessage()).isEqualTo("Resource not found");
     }
 
 }

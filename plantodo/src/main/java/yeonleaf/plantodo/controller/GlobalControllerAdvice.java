@@ -48,4 +48,5 @@ public class GlobalControllerAdvice {
         String responseData = objectMapper.writeValueAsString(apiSimpleError);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
+
 }

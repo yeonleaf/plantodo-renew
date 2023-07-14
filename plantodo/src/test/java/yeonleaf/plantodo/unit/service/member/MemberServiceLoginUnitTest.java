@@ -20,8 +20,10 @@ public class MemberServiceLoginUnitTest {
 
     @BeforeEach
     void setUp() {
+
         memberRepository = new MemoryMemberRepository();
         memberService = new MemberServiceTestImpl(memberRepository);
+
     }
 
     /*
@@ -31,26 +33,32 @@ public class MemberServiceLoginUnitTest {
     @Test
     @DisplayName("정상 로그인")
     void loginTest_normal() {
+
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "13az$@fq");
         Member member = memberService.save(memberReqDto);
         assertThat(memberService.login(memberReqDto)).isEqualTo(member.getId());
+
     }
 
     @Test
     @DisplayName("비정상 로그인 (이메일이 일치하는 멤버가 없음)")
     void loginTest_abnormal_notFoundMemberByEmail() {
+
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "13az$@fq");
         assertThrows(ResourceNotFoundException.class, () -> memberService.login(memberReqDto));
+
     }
 
     @Test
     @DisplayName("비정상 로그인 (이메일이 일치하는 멤버가 있지만 패스워드가 일치하지 않음)")
     void loginTest_abnormal_passwordNotMatch() {
+
         MemberReqDto memberReqDto1 = new MemberReqDto("test@abc.co.kr", "13az$@fq");
         memberService.save(memberReqDto1);
 
         MemberReqDto memberReqDto2 = new MemberReqDto("test@abc.co.kr", "rs%!az1q");
         assertThrows(ArgumentValidationException.class, () -> memberService.login(memberReqDto2));
+
     }
 
 }

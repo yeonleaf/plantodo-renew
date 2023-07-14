@@ -17,19 +17,23 @@ public class MemberServiceDeleteUnitTest {
 
     @BeforeEach
     void setUp() {
+
         memberRepository = new MemoryMemberRepository();
         memberService = new MemberServiceTestImpl(memberRepository);
+
     }
 
     @Test
     @DisplayName("정상 삭제")
     void deleteTestNormal() {
+
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "1d$%saf2");
         Member member = memberService.save(memberReqDto);
 
         memberService.delete(member);
 
         assertFalse(memberService.findById(member.getId()).isPresent());
+
     }
 
 }

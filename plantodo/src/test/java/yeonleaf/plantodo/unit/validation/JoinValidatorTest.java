@@ -19,20 +19,26 @@ public class JoinValidatorTest {
 
     @BeforeEach
     void setUp() {
+
         bindingResult = spy(BindingResult.class);
         validator = new JoinFormatCheckValidator();
+
     }
 
     void validateThrowException(String email, String password) {
+
         MemberReqDto member = new MemberReqDto(email, password);
         doThrow(IllegalArgumentException.class).when(bindingResult).rejectValue(anyString(), anyString(), anyString());
         assertThatThrownBy(() -> validator.validate(member, bindingResult)).isInstanceOf(IllegalArgumentException.class);
+
     }
 
     void validateNoException(String email, String password) {
+
         MemberReqDto member = new MemberReqDto(email, password);
         doThrow(IllegalArgumentException.class).when(bindingResult).rejectValue(anyString(), anyString(), anyString());
         assertDoesNotThrow(() -> validator.validate(member, bindingResult));
+
     }
 
     @Test
@@ -54,22 +60,27 @@ public class JoinValidatorTest {
     @Test
     @DisplayName("다른 조건을 모두 만족하고 password 길이만 8글자 미만이거나 20글자 초과")
     void passwordTest1() throws IllegalAccessException {
+
         validateThrowException("test@abc.co.kr", "ac16@!");
         validateThrowException("test@abc.co.kr", "1br@2c");
         validateThrowException("test@abc.co.kr", "zc1@(bqo25!AzG9@mR!_4");
         validateThrowException("test@abc.co.kr", "$1zfqA8@39Zkq$$!zhyo8");
+
     }
 
     @Test
     @DisplayName("다른 조건을 모두 만족하고 영문자/숫자/특수문자만 가능한 조건을 만족하지 못함")
     void passwordTest2() {
+
         validateThrowException("test@abc.co.kr", "박176a@b#");
         validateThrowException("test@abc.co.kr", "27a0a남@b");
+
     }
 
     @Test
     @DisplayName("다른 조건을 모두 만족하고 영문자/숫자/특수문자가 모두 섞여있어야 한다는 조건을 만족하지 못함 (특수문자가 없음)")
     void passwordTest3() {
+
         /*특수문자가 없음*/
         validateThrowException("test@abc.co.kr", "a1b2c3d4");
         validateThrowException("test@abc.co.kr", "173zyx4b");
@@ -81,27 +92,33 @@ public class JoinValidatorTest {
         /*숫자가 없음*/
         validateThrowException("test@abc.co.kr", "@ar#l%qo");
         validateThrowException("test@abc.co.kr", "om(*rta^");
+
     }
 
     @Test
     @DisplayName("다른 조건을 모두 만족하고 특수문자는 ([ _, !, @, #, $, %, ^, &, *, (, ) ] 중 하나 이상)만 사용해야 한다는 조건을 만족하지 못함")
     void passwordTest4() {
+
         validateThrowException("test@abc.co.kr", "a1-b7qz@");
         validateThrowException("test@abc.co.kr", "a1b7>qz@");
         validateThrowException("test@abc.co.kr", "a1b7qz}@");
+
     }
 
     @Test
     @DisplayName("다른 조건을 모두 만족하고 같은 영문자/숫자/특수문자가 세 개 이상 연달아 있으면 안 된다는 조건을 만족하지 못함")
     void passwordTest5() {
+
         validateThrowException("test@abc.co.kr", "1111m@e)");
         validateThrowException("test@abc.co.kr", "em1dddd*");
         validateThrowException("test@abc.co.kr", "6az3%%%%");
+
     }
 
     @Test
     @DisplayName("다른 조건을 모두 만족하고 연속된 영문자나 숫자의 나열이 세 개 이상 있으면 안 된다는 조건을 만족하지 못함")
     void passwordTest6() {
+
         /*영문자*/
         validateThrowException("test@abc.co.kr", "abcd!a$7");
         validateThrowException("test@abc.co.kr", "^!wxyz12");
@@ -109,11 +126,13 @@ public class JoinValidatorTest {
         /*숫자*/
         validateThrowException("test@abc.co.kr", "a12#1234");
         validateThrowException("test@abc.co.kr", "b6789#z!");
+
     }
 
     @Test
     @DisplayName("모든 조건을 만족함 (연속된 영문자/숫자 4개 이상 사용 불가능 조건 edge case)")
     void passwordTest7() {
+
         /*특수문자 4개가 연달아 나오는 경우*/
         validateNoException("test@abc.co.kr", "#$%&DEL1");
 
@@ -125,14 +144,17 @@ public class JoinValidatorTest {
 
         /*특수문자 -> 영대문자*/
         validateNoException("test@abc.co.kr", "@ABCa!%6");
+
     }
 
     @Test
     @DisplayName("다른 조건을 만족하고 쉬운 단어를 넣을 수 없다는 규칙을 만족하지 못함")
     void passwordTest8() {
+
         validateThrowException("test@abc.co.kr", "qwert15!");
         validateThrowException("test@abc.co.kr", "!4azlove");
         validateThrowException("test@abc.co.kr", "1admin5#");
+
     }
 
     /**
@@ -147,6 +169,7 @@ public class JoinValidatorTest {
     @Test
     @DisplayName("다른 규칙을 만족하고 이메일 형식을 지켜야 한다는 규칙을 만족하지 못함")
     void emailTest2() {
+
         /*@ 아예 없는 경우*/
         validateThrowException("testabccokr", "a1b2#3d4");
         validateThrowException("test.abc.com", "a1b2#3d4");
@@ -160,11 +183,13 @@ public class JoinValidatorTest {
         validateThrowException("test@abc@com", "a1b2#3d4");
         validateThrowException("test@@abccom", "a1b2#3d4");
         validateThrowException("test@@abc@com", "a1b2#3d4");
+
     }
 
     @Test
     @DisplayName("다른 규칙을 만족하고 각 파트에 A-Z, a-z, 0-9, -, _, .만 사용 가능하다는 규칙을 만족하지 못함")
     void emailTest3() {
+
         /*로컬 파트*/
         validateThrowException("tes한t@abc.co.kr", "a1b2#3d4");
         validateThrowException("tes%t@abc.co.kr", "a1b2#3d4");
@@ -176,11 +201,13 @@ public class JoinValidatorTest {
         validateThrowException("test@abc#kr", "a1b2#3d4");
         validateThrowException("test@a^kr", "a1b2#3d4");
         validateThrowException("test@abc☆", "a1b2#3d4");
+
     }
 
     @Test
     @DisplayName("다른 규칙을 만족하고 각 파트에 특수문자를 맨 앞, 맨 뒤에 사용할 수 없다는 규칙을 만족하지 못함")
     void emailTest4() {
+
         /*로컬 파트*/
         /*앞 or 뒤*/
         validateThrowException("-test@abc.co.kr", "a1b2#3d4");
@@ -230,6 +257,7 @@ public class JoinValidatorTest {
     @Test
     @DisplayName("다른 규칙을 만족하고 각 파트에 .을 연달아서 쓸 수 없다는 규칙을 만족하지 않음")
     void emailTest5() {
+
         /*로컬 파트*/
         validateThrowException("te..st@abc.co.kr", "a1b2#3d4");
         validateThrowException("t...est@abc.co.kr", "a1b2#3d4");
@@ -237,6 +265,7 @@ public class JoinValidatorTest {
         /*도메인 파트*/
         validateThrowException("test@abc.co..kr", "a1b2#3d4");
         validateThrowException("test@abc..co.kr", "a1b2#3d4");
+
     }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.provider.JwtTestProvider;
+import yeonleaf.plantodo.validator.RepInputValidator;
 
 import javax.crypto.SecretKey;
 

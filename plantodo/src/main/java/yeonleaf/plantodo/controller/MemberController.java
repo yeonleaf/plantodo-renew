@@ -1,13 +1,11 @@
 package yeonleaf.plantodo.controller;
 
-import io.jsonwebtoken.JwtBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +54,7 @@ public class MemberController {
         Member member = memberService.save(memberReqDto);
 
         MemberResDto memberResDto = new MemberResDto(member);
-        return ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(memberResDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberResDto);
     }
 
     @Operation(description = "로그인", responses = {
@@ -74,7 +72,7 @@ public class MemberController {
 
         Long memberId = memberService.login(memberReqDto);
         JwtTokenDto token = new JwtTokenDto(jwtProvider.generateToken(memberId));
-        return ResponseEntity.status(HttpStatus.OK).body(EntityModel.of(token));
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     @Operation(description = "회원 삭제", responses = {

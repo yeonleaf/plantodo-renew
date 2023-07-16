@@ -1,6 +1,5 @@
 package yeonleaf.plantodo.unit.repository;
 
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.domain.Repetition;
-import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
@@ -48,4 +46,5 @@ public class GroupRepositoryUnitTest {
         assertThat(group.getId()).isNotNull();
         assertThat(group.getRepetition().getId()).isNotNull();
     }
+
 }

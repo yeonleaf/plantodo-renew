@@ -9,6 +9,7 @@ import lombok.*;
 import yeonleaf.plantodo.dto.PlanReqDto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -34,11 +35,15 @@ public class Plan {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private PlanStatus status;
+
     public Plan(PlanReqDto planReqDto, Member member) {
         this.title = planReqDto.getTitle();
         this.start = planReqDto.getStart();
         this.end = planReqDto.getEnd();
         this.member = member;
+        this.status = PlanStatus.NOW;
+
     }
 
     public Plan(String title, LocalDate start, LocalDate end, Member member) {
@@ -46,6 +51,19 @@ public class Plan {
         this.start = start;
         this.end = end;
         this.member = member;
+        this.status = PlanStatus.NOW;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Plan plan = (Plan) o;
+        return Objects.equals(getId(), plan.getId()) && Objects.equals(getTitle(), plan.getTitle()) && Objects.equals(getStart(), plan.getStart()) && Objects.equals(getEnd(), plan.getEnd()) && Objects.equals(getMember(), plan.getMember());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getTitle(), getStart(), getEnd(), getMember());
+    }
 }

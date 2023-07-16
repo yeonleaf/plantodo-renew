@@ -32,4 +32,14 @@ public class MemoryGroupRepository extends MemoryRepository<Group> {
         }
         return Optional.empty();
     }
+
+    @Override
+    public Optional<Group> findById(Long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void delete(Group group) {
+
+    }
 }

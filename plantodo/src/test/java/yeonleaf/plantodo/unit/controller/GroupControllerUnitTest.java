@@ -1,7 +1,6 @@
 package yeonleaf.plantodo.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +10,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.validation.BindingResult;
 import yeonleaf.plantodo.TestConfig;
 import yeonleaf.plantodo.controller.GroupController;
 import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
+import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.GroupService;
 
 import java.util.Arrays;
@@ -48,25 +47,26 @@ public class GroupControllerUnitTest {
     @DisplayName("정상 등록")
     void saveTestNormal() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "화"));
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "화"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 
-        when(groupService.save(any(), any())).thenReturn(new GroupResDto(1L, "title", 3L, makeArrToList("월", "화")));
+        when(groupService.save(any())).thenReturn(new GroupResDto(1L, "title", 0, 0, 3L, makeArrToList("월", "화")));
 
         mockMvc.perform(request)
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").value(1));
 
     }
 
     @Test
     @DisplayName("비정상 등록 - ArgumentResolver Validation")
-    void saveTestAbnormal() throws Exception {
+    void saveTestAbnormal_ArgumentResolverValidation() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto(null, 4L, makeArrToList("월", "화"));
+        GroupReqDto groupReqDto = new GroupReqDto(null, 4L, makeArrToList("월", "화"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -83,8 +83,9 @@ public class GroupControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - RepInputValidator")
-    void saveTestRepInputValidator() throws Exception {
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList());
+    void saveTestAbnormal_RepInputValidator() throws Exception {
+
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList(), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -94,6 +95,26 @@ public class GroupControllerUnitTest {
         mockMvc.perform(request)
                 .andExpect(jsonPath("message").value("입력값 형식 오류"))
                 .andExpect(jsonPath("errors.repValue").isNotEmpty());
+
+    }
+
+    @Test
+    @DisplayName("비정상 등록 - Resource not found")
+    void saveTestAbnormal_ResourceNotFound() throws Exception {
+
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "수"), 1L);
+        String requestData = objectMapper.writeValueAsString(groupReqDto);
+
+        MockHttpServletRequestBuilder request = post("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestData);
+
+        when(groupService.save(any())).thenThrow(new ResourceNotFoundException("Resource not found"));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
     }
 
 }

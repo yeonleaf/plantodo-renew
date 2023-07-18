@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class MemoryMemberRepository {
+public class MemoryMemberRepository extends MemoryRepository<Member> {
 
     private Map<Long, Member> members = new HashMap<>();
     private Long id = 1L;
 
-    public Member save(MemberReqDto memberReqDto) {
-        Member member = new Member(memberReqDto);
+    @Override
+    public Member save(Member member) {
         member.setId(id);
         members.put(id++, member);
         return member;

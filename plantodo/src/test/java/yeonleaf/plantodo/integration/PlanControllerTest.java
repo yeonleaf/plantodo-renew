@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.repository.GroupRepository;
@@ -53,15 +54,16 @@ public class PlanControllerTest {
     void saveTestNormal() throws Exception {
 
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "a3df!#sac");
-        Member member = memberService.save(memberReqDto);
+        MemberResDto memberResDto = memberService.save(memberReqDto);
+        Long memberId = memberResDto.getId();
 
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusDays(3);
-        PlanReqDto planReqDto = new PlanReqDto("title", start, end);
+        PlanReqDto planReqDto = new PlanReqDto("title", start, end, memberId);
         String requestData = objectMapper.writeValueAsString(planReqDto);
 
         MockHttpServletRequestBuilder request = post("/plan")
-                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 
@@ -82,15 +84,16 @@ public class PlanControllerTest {
     void saveTestAbnormal() throws Exception {
 
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "a3df!#sac");
-        Member member = memberService.save(memberReqDto);
+        MemberResDto memberResDto = memberService.save(memberReqDto);
+        Long memberId = memberResDto.getId();
 
         LocalDate start = LocalDate.now().plusDays(3);
         LocalDate end = start.minusDays(2);
-        PlanReqDto planReqDto = new PlanReqDto("title", start, end);
+        PlanReqDto planReqDto = new PlanReqDto("title", start, end, memberId);
         String requestData = objectMapper.writeValueAsString(planReqDto);
 
         MockHttpServletRequestBuilder request = post("/plan")
-                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 

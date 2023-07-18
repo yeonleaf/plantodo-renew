@@ -28,6 +28,8 @@ public class PlanResDto {
     private LocalDate end;
 
     private PlanStatus status;
+    private int uncheckedCnt;
+    private int checkedCnt;
 
     public PlanResDto(Plan plan) {
         this.id = plan.getId();
@@ -35,6 +37,18 @@ public class PlanResDto {
         this.start = plan.getStart();
         this.end = plan.getEnd();
         this.status = plan.getStatus();
+        this.uncheckedCnt = plan.getUncheckedCnt();
+        this.checkedCnt = plan.getCheckedCnt();
+    }
+
+    public PlanResDto(Long id, String title, LocalDate start, LocalDate end, PlanStatus status) {
+        this.id = id;
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.status = status;
+        this.uncheckedCnt = 0;
+        this.checkedCnt = 0;
     }
 
 }

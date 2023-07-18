@@ -37,4 +37,6 @@ public class PlanReqDto {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate end;
 
+    private Long memberId;
+
 }

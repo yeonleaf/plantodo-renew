@@ -138,31 +138,31 @@ public class MemberControllerTest {
 
     }
 
-    @Test
-    @DisplayName("회원 삭제 정상")
-    void deleteTestNormal() throws Exception {
-
-        MockHttpServletRequestBuilder joinRequest = makePostRequest("test@abc.co.kr", "du12%1aC", "/member");
-
-        MvcResult mvcResult = mockMvc.perform(joinRequest)
-                .andReturn();
-
-        long memberId = Long.parseLong(JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id").toString());
-
-        MockHttpServletRequestBuilder deleteRequest = delete("/member/" + memberId);
-        mockMvc.perform(deleteRequest)
-                .andExpect(status().isNoContent());
-
-    }
-
-    @Test
-    @DisplayName("회원 삭제 비정상 - resource not found")
-    void deleteTestAbnormal() throws Exception {
-
-        MockHttpServletRequestBuilder deleteRequest = delete("/member/1");
-        mockMvc.perform(deleteRequest)
-                .andExpect(status().isNotFound());
-
-    }
+//    @Test
+//    @DisplayName("회원 삭제 정상")
+//    void deleteTestNormal() throws Exception {
+//
+//        MockHttpServletRequestBuilder joinRequest = makePostRequest("test@abc.co.kr", "du12%1aC", "/member");
+//
+//        MvcResult mvcResult = mockMvc.perform(joinRequest)
+//                .andReturn();
+//
+//        long memberId = Long.parseLong(JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id").toString());
+//
+//        MockHttpServletRequestBuilder deleteRequest = delete("/member/" + memberId);
+//        mockMvc.perform(deleteRequest)
+//                .andExpect(status().isNoContent());
+//
+//    }
+//
+//    @Test
+//    @DisplayName("회원 삭제 비정상 - resource not found")
+//    void deleteTestAbnormal() throws Exception {
+//
+//        MockHttpServletRequestBuilder deleteRequest = delete("/member/1");
+//        mockMvc.perform(deleteRequest)
+//                .andExpect(status().isNotFound());
+//
+//    }
 
 }

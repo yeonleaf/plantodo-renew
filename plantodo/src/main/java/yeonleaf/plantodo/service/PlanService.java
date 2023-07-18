@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface PlanService {
 
-    PlanResDto save(Member member, PlanReqDto planReqDto);
+    PlanResDto save(PlanReqDto planReqDto);
     PlanResDto one(Long id);
 
     PlanResDto update(Long id, PlanReqDto planReqDto);

@@ -1,7 +1,6 @@
 package yeonleaf.plantodo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.Checkbox;
@@ -12,24 +11,23 @@ import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
-import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.repository.PlanRepository;
 import yeonleaf.plantodo.util.CheckboxDateCreator;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
-public class GroupServiceImpl implements GroupService {
+public class GroupServiceTestImpl implements GroupService {
 
-    private final PlanRepository planRepository;
-    private final GroupRepository groupRepository;
-    private final CheckboxService checkboxService;
+    private final MemoryPlanRepository planRepository;
+    private final MemoryGroupRepository groupRepository;
+    private final CheckboxServiceTestImpl checkboxService;
     private final RepInToOutConverter repInToOutConverter;
+    private final RepOutToInConverter repOutToInConverter;
 
     @Override
     public GroupResDto save(GroupReqDto groupReqDto) {
@@ -61,11 +59,22 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupResDto> findAllByPlanId(Long planId) {
-        return null;
+
+        return groupRepository.findByPlanId(planId).stream().map(group -> {
+            Repetition repetition = group.getRepetition();
+            RepInputDto repInputDto = repOutToInConverter.convert(repetition);
+            return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
+        }).collect(Collectors.toList());
+
     }
 
     @Override
     public GroupResDto one(Long id) {
-        return null;
+        Group group = groupRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Repetition repetition = group.getRepetition();
+        RepInputDto repInputDto = repOutToInConverter.convert(repetition);
+        assert repInputDto != null;
+        return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
+
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.DuplicatedMemberException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
@@ -18,11 +19,12 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     @Override
-    public Member save(MemberReqDto memberReqDto) {
+    public MemberResDto save(MemberReqDto memberReqDto) {
         if (isNotNewMember(memberReqDto.getEmail())) {
             throw new DuplicatedMemberException("이미 이메일이 있음");
         }
-        return memberRepository.save(new Member(memberReqDto));
+        Member member = memberRepository.save(new Member(memberReqDto));
+        return new MemberResDto(member);
     }
 
     @Override
@@ -43,8 +45,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<Member> findById(Long id) {
-        return memberRepository.findById(id);
+    public MemberResDto findById(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return new MemberResDto(member);
     }
 
     @Override

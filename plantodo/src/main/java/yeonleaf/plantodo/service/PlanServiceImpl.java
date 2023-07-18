@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.GroupRepository;
+import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
 
 import java.util.List;
@@ -18,12 +20,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
 
+    private final MemberRepository memberRepository;
     private final PlanRepository planRepository;
     private final GroupRepository groupRepository;
 
     @Override
-    public PlanResDto save(Member member, PlanReqDto planReqDto) {
+    public PlanResDto save(PlanReqDto planReqDto) {
 
+        Member member = memberRepository.findById(planReqDto.getMemberId()).orElseThrow(ResourceNotFoundException::new);
         Plan plan = planRepository.save(new Plan(planReqDto, member));
         groupRepository.save(new Group(plan, "DailyGroup"));
         return new PlanResDto(plan);

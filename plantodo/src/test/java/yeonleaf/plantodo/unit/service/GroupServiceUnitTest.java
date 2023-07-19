@@ -123,6 +123,7 @@ public class GroupServiceUnitTest {
 
         GroupResDto groupResDto = groupService.one(savedGroup.getId());
         assertThat(groupResDto.equals(savedGroup)).isTrue();
+        assertThat(groupResDto.getRepValue()).isEqualTo(makeArrToList("화", "목"));
 
     }
 

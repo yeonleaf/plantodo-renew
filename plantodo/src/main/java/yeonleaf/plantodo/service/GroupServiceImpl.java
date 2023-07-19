@@ -27,6 +27,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final CheckboxRepository checkboxRepository;
     private final RepInToOutConverter repInToOutConverter;
+    private final RepOutToInConverter repOutToInConverter;
 
     @Override
     public GroupResDto save(GroupReqDto groupReqDto) {
@@ -63,6 +64,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupResDto one(Long id) {
-        return null;
+
+        Group group = groupRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Repetition repetition = group.getRepetition();
+        RepInputDto repInputDto = repOutToInConverter.convert(repetition);
+        assert repInputDto != null;
+        return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
+
     }
 }

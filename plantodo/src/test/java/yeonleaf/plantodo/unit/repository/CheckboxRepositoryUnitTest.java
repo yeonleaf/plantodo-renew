@@ -40,7 +40,7 @@ public class CheckboxRepositoryUnitTest {
         Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
         Group group = groupRepository.save(new Group(plan, "title", new Repetition(0L, "-1")));
 
-        Checkbox checkbox = checkboxRepository.save(new Checkbox(group, LocalDate.now(), false));
+        Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
         Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkbox.getId());
 
         assertThat(findCheckbox.isPresent()).isTrue();

@@ -11,8 +11,10 @@ import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
+import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
+import yeonleaf.plantodo.repository.MemoryRepository;
 import yeonleaf.plantodo.util.CheckboxDateCreator;
 
 import java.time.LocalDate;
@@ -23,9 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupServiceTestImpl implements GroupService {
 
-    private final MemoryPlanRepository planRepository;
-    private final MemoryGroupRepository groupRepository;
-    private final CheckboxServiceTestImpl checkboxService;
+    private final MemoryRepository<Plan> planRepository;
+    private final MemoryRepository<Group> groupRepository;
+    private final MemoryRepository<Checkbox> checkboxRepository;
     private final RepInToOutConverter repInToOutConverter;
     private final RepOutToInConverter repOutToInConverter;
 
@@ -45,7 +47,7 @@ public class GroupServiceTestImpl implements GroupService {
 
         List<LocalDate> dates = CheckboxDateCreator.create(plan, repInputDto);
         dates.forEach(date -> {
-            checkboxService.save(new Checkbox(group, date, false));
+            checkboxRepository.save(new Checkbox(group, group.getTitle(), date, false));
         });
         group.setUncheckedCnt(dates.size());
         groupRepository.save(group);
@@ -60,7 +62,7 @@ public class GroupServiceTestImpl implements GroupService {
     @Override
     public List<GroupResDto> findAllByPlanId(Long planId) {
 
-        return groupRepository.findByPlanId(planId).stream().map(group -> {
+        return ((MemoryGroupRepository) groupRepository).findByPlanId(planId).stream().map(group -> {
             Repetition repetition = group.getRepetition();
             RepInputDto repInputDto = repOutToInConverter.convert(repetition);
             return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());

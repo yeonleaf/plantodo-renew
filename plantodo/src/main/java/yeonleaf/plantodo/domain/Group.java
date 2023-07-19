@@ -45,4 +45,12 @@ public class Group {
         this.repetition = new Repetition(0L, "00000000");
     }
 
+    public void addUncheckedCnt(int uncheckedCnt) {
+        this.uncheckedCnt += uncheckedCnt;
+    }
+
+    public void addCheckedCnt(int checkedCnt) {
+        this.checkedCnt += checkedCnt;
+    }
+
 }

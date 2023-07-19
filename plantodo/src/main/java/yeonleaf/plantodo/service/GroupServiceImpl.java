@@ -12,10 +12,7 @@ import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
-import yeonleaf.plantodo.repository.GroupRepository;
-import yeonleaf.plantodo.repository.MemoryGroupRepository;
-import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.repository.PlanRepository;
+import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.util.CheckboxDateCreator;
 
 import java.time.LocalDate;
@@ -28,7 +25,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final PlanRepository planRepository;
     private final GroupRepository groupRepository;
-    private final CheckboxService checkboxService;
+    private final CheckboxRepository checkboxRepository;
     private final RepInToOutConverter repInToOutConverter;
 
     @Override
@@ -47,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
 
         List<LocalDate> dates = CheckboxDateCreator.create(plan, repInputDto);
         dates.forEach(date -> {
-            checkboxService.save(new Checkbox(group, date, false));
+            checkboxRepository.save(new Checkbox(group, group.getTitle(), date, false));
         });
         group.setUncheckedCnt(dates.size());
         groupRepository.save(group);

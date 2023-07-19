@@ -22,14 +22,16 @@ public class PlanServiceTestImpl implements PlanService {
 
     private final MemoryRepository<Member> memberRepository;
     private final MemoryRepository<Plan> planRepository;
-    private final GroupServiceTestImpl groupService;
+    private final MemoryGroupRepository groupRepository;
 
     @Override
     public PlanResDto save(PlanReqDto planReqDto) {
+
         Member member = memberRepository.findById(planReqDto.getMemberId()).orElseThrow(ResourceNotFoundException::new);
         Plan plan = planRepository.save(new Plan(planReqDto, member));
-        groupService.save(new GroupReqDto("DailyGroup", 0L, new ArrayList<>(), plan.getId()));
+        groupRepository.save(new Group(plan, "repOptionZeroGroup"));
         return new PlanResDto(plan);
+
     }
 
     @Override

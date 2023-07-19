@@ -4,7 +4,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
+import yeonleaf.plantodo.domain.Checkbox;
+import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Member;
+import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.*;
 
@@ -12,7 +15,7 @@ import yeonleaf.plantodo.service.*;
 public class ServiceTestConfig {
 
     @Bean
-    public MemoryRepository<Member> memberRepository() {
+    public MemoryMemberRepository memberRepository() {
         return new MemoryMemberRepository();
     }
 
@@ -43,17 +46,17 @@ public class ServiceTestConfig {
 
     @Bean
     public CheckboxServiceTestImpl checkboxService() {
-        return new CheckboxServiceTestImpl(checkboxRepository());
+        return new CheckboxServiceTestImpl(planRepository(), groupRepository(), checkboxRepository());
     }
 
     @Bean
     public GroupServiceTestImpl groupService() {
-        return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxService(), repInToOutConverter(), repOutToInConverter());
+        return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxRepository(), repInToOutConverter(), repOutToInConverter());
     }
 
     @Bean
     public PlanServiceTestImpl planService() {
-        return new PlanServiceTestImpl(memberRepository(), planRepository(), groupService());
+        return new PlanServiceTestImpl(memberRepository(), planRepository(), groupRepository());
     }
 
     @Bean

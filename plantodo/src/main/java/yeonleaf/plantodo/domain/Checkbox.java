@@ -18,6 +18,8 @@ public class Checkbox {
     @Column(name = "checkbox_id")
     private Long id;
 
+    private String title;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
@@ -25,8 +27,9 @@ public class Checkbox {
     private LocalDate date;
     private boolean checked;
 
-    public Checkbox(Group group, LocalDate date, boolean checked) {
+    public Checkbox(Group group, String title, LocalDate date, boolean checked) {
         this.group = group;
+        this.title = title;
         this.date = date;
         this.checked = checked;
     }

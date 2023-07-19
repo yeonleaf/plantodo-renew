@@ -19,6 +19,7 @@ import yeonleaf.plantodo.TestConfig;
 import yeonleaf.plantodo.controller.MemberController;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.provider.JwtTestProvider;
@@ -52,7 +53,7 @@ public class MemberControllerSaveUnitTest {
 
         MemberReqDto memberReqDto = new MemberReqDto(email, password);
         String requestData = objectMapper.writeValueAsString(memberReqDto);
-        when(memberService.save(any())).thenReturn(new Member(memberReqDto));
+        when(memberService.save(any())).thenReturn(new MemberResDto(1L, email, password));
         return post("/member")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);

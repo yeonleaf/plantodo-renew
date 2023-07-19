@@ -23,4 +23,6 @@ public class GroupReqDto {
 
     private List<String> repValue = new ArrayList<>();
 
+    private Long planId;
+
 }

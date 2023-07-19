@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryMemberRepository;
@@ -35,8 +36,8 @@ public class MemberServiceLoginUnitTest {
     void loginTest_normal() {
 
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "13az$@fq");
-        Member member = memberService.save(memberReqDto);
-        assertThat(memberService.login(memberReqDto)).isEqualTo(member.getId());
+        MemberResDto memberResDto = memberService.save(memberReqDto);
+        assertThat(memberService.login(memberReqDto)).isEqualTo(memberResDto.getId());
 
     }
 

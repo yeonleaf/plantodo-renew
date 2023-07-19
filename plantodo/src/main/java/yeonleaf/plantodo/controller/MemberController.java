@@ -1,13 +1,12 @@
 package yeonleaf.plantodo.controller;
 
-import io.jsonwebtoken.JwtBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +35,11 @@ public class MemberController {
     private final JoinFormatCheckValidator joinFormatCheckValidator = new JoinFormatCheckValidator();
     private final JwtBasicProvider jwtProvider;
 
-    @Operation(description = "회원가입", responses = {
+    @Operation(summary = "회원 등록")
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MemberResDto.class))),
             @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "409", description = "duplicated member", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
-            @ApiResponse(responseCode = "404", description = "X", content = @Content)
     })
     @PostMapping
     public ResponseEntity<?> save(@Valid @RequestBody MemberReqDto memberReqDto, BindingResult bindingResult) {
@@ -53,18 +52,17 @@ public class MemberController {
             throw new ArgumentValidationException("입력값 형식 오류", bindingResult);
         }
 
-        Member member = memberService.save(memberReqDto);
+        MemberResDto memberResDto = memberService.save(memberReqDto);
 
-        MemberResDto memberResDto = new MemberResDto(member);
-        return ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(memberResDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberResDto);
     }
 
-    @Operation(description = "로그인", responses = {
+    @Operation(summary = "로그인 (jwt 토큰 발급)")
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = JwtTokenDto.class))),
             @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
-            @ApiResponse(responseCode = "401", description = "invalid Authorization header or jwt token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
-            @ApiResponse(responseCode = "409", description = "X", content = @Content)
+            @ApiResponse(responseCode = "401", description = "invalid Authorization header or jwt token", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody MemberReqDto memberReqDto, BindingResult bindingResult) {
@@ -74,24 +72,24 @@ public class MemberController {
 
         Long memberId = memberService.login(memberReqDto);
         JwtTokenDto token = new JwtTokenDto(jwtProvider.generateToken(memberId));
-        return ResponseEntity.status(HttpStatus.OK).body(EntityModel.of(token));
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
-    @Operation(description = "회원 삭제", responses = {
-            @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
-            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
-            @ApiResponse(responseCode = "400", description = "X", content = @Content),
-            @ApiResponse(responseCode = "409", description = "X", content = @Content)
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        Optional<Member> candidates = memberService.findById(id);
-
-        if (candidates.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-
-        memberService.delete(candidates.get());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+//    @Operation(description = "회원 삭제", responses = {
+//            @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
+//            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+//            @ApiResponse(responseCode = "400", description = "X", content = @Content),
+//            @ApiResponse(responseCode = "409", description = "X", content = @Content)
+//    })
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> delete(@PathVariable Long id) {
+//        Optional<Member> candidates = memberService.findById(id);
+//
+//        if (candidates.isEmpty()) {
+//            throw new ResourceNotFoundException();
+//        }
+//
+//        memberService.delete(candidates.get());
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//    }
 }

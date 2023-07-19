@@ -3,10 +3,13 @@ package yeonleaf.plantodo.service;
 import lombok.RequiredArgsConstructor;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.DuplicatedMemberException;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryMemberRepository;
+import yeonleaf.plantodo.repository.MemoryRepository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,11 +19,12 @@ public class MemberServiceTestImpl implements MemberService {
     private final MemoryMemberRepository memberRepository;
 
     @Override
-    public Member save(MemberReqDto memberReqDto) {
+    public MemberResDto save(MemberReqDto memberReqDto) {
         if (isNotNewMember(memberReqDto.getEmail())) {
             throw new DuplicatedMemberException();
         }
-        return memberRepository.save(memberReqDto);
+        Member member = memberRepository.save(new Member(memberReqDto));
+        return new MemberResDto(member);
     }
 
     @Override
@@ -41,8 +45,9 @@ public class MemberServiceTestImpl implements MemberService {
     }
 
     @Override
-    public Optional<Member> findById(Long id) {
-        return memberRepository.findById(id);
+    public MemberResDto findById(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return new MemberResDto(member);
     }
 
     @Override

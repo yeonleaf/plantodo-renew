@@ -3,9 +3,7 @@ package yeonleaf.plantodo.repository;
 import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Repetition;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MemoryGroupRepository extends MemoryRepository<Group> {
     private Map<Long, Group> groups = new HashMap<>();
@@ -15,21 +13,43 @@ public class MemoryGroupRepository extends MemoryRepository<Group> {
 
     @Override
     public Group save(Group group) {
-        group.setId(groupId);
-        Repetition repetition = group.getRepetition();
-        repetition.setId(repId);
-        group.setRepetition(repetition);
-        repetitions.put(repId++, repetition);
-        groups.put(groupId++, group);
+        Long prevGroupId = group.getId();
+        Long prevRepeatId = group.getRepetition().getId();
+        if (groups.containsKey(prevGroupId)) {
+            groups.remove(prevGroupId);
+            groups.put(prevGroupId, group);
+            if (repetitions.containsKey(prevRepeatId)) {
+                repetitions.remove(prevRepeatId);
+                repetitions.put(prevRepeatId, group.getRepetition());
+            }
+        } else {
+            group.setId(groupId);
+            Repetition repetition = group.getRepetition();
+            repetition.setId(repId);
+            group.setRepetition(repetition);
+            repetitions.put(repId++, repetition);
+            groups.put(groupId++, group);
+        }
         return group;
     }
 
-    public Optional<Group> findByPlanId(Long planId) {
+    public List<Group> findByPlanId(Long planId) {
+        List<Group> res = new ArrayList<>();
         for (Group group : groups.values()) {
             if (group.getPlan().getId().equals(planId)) {
-                return Optional.of(groups.get(group.getId()));
+                res.add(group);
             }
         }
-        return Optional.empty();
+        return res;
+    }
+
+    @Override
+    public Optional<Group> findById(Long id) {
+        return Optional.ofNullable(groups.get(id));
+    }
+
+    @Override
+    public void delete(Group group) {
+
     }
 }

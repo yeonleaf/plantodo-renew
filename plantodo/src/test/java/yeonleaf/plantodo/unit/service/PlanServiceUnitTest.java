@@ -1,53 +1,59 @@
 package yeonleaf.plantodo.unit.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import yeonleaf.plantodo.domain.Group;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import yeonleaf.plantodo.ServiceTestConfig;
+import yeonleaf.plantodo.converter.RepInToOutConverter;
+import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.Member;
-import yeonleaf.plantodo.dto.PlanReqDto;
-import yeonleaf.plantodo.dto.PlanResDto;
+import yeonleaf.plantodo.dto.*;
+import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.service.PlanService;
+import yeonleaf.plantodo.service.CheckboxServiceTestImpl;
+import yeonleaf.plantodo.service.GroupServiceTestImpl;
+import yeonleaf.plantodo.service.MemberServiceTestImpl;
 import yeonleaf.plantodo.service.PlanServiceTestImpl;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = ServiceTestConfig.class)
 public class PlanServiceUnitTest {
 
-    private PlanService planService;
-    private MemoryPlanRepository planRepository;
-    private MemoryGroupRepository groupRepository;
+    @Autowired
+    private MemberServiceTestImpl memberService;
 
-    @BeforeEach
-    void setUp() {
+    @Autowired
+    private PlanServiceTestImpl planService;
 
-        planRepository = new MemoryPlanRepository();
-        groupRepository = new MemoryGroupRepository();
-        planService = new PlanServiceTestImpl(planRepository, groupRepository);
+    @Autowired
+    private GroupServiceTestImpl groupService;
 
+    private List<String> makeArrToList(String... target) {
+        return Arrays.asList(target);
     }
 
     @Test
-    @DisplayName("정상 저장 - repOption이 0인 group 한 개를 생성")
+    @DisplayName("Plan 정상 등록 - repOption = 0인 group 하나 생성 확인")
     void saveTestNormal() {
 
-        LocalDate start = LocalDate.now();
-        LocalDate end = start.plusDays(3);
-        PlanReqDto planReqDto = new PlanReqDto("title", start, end);
+        MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
 
-        Member member = new Member("test@abc.co.kr", "1d$%2av3");
-        member.setId(1L);
+        List<GroupResDto> groups = groupService.findAllByPlanId(plan.getId());
 
-        PlanResDto planResDto = planService.save(member, planReqDto);
-        Group group = groupRepository.findByPlanId(planResDto.getId()).get();
-
-        assertThat(planResDto.getId()).isNotNull();
-        assertThat(group.getRepetition().getId()).isNotNull();
-        assertThat(group.getRepetition().getRepOption()).isEqualTo(0);
+        assertThat(groups.size()).isEqualTo(1);
+        assertThat(groups.get(0).getRepOption()).isEqualTo(0L);
 
     }
 

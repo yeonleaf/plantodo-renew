@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -16,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.repository.GroupRepository;
@@ -54,22 +54,22 @@ public class PlanControllerTest {
     void saveTestNormal() throws Exception {
 
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "a3df!#sac");
-        Member member = memberService.save(memberReqDto);
+        MemberResDto memberResDto = memberService.save(memberReqDto);
+        Long memberId = memberResDto.getId();
 
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusDays(3);
-        PlanReqDto planReqDto = new PlanReqDto("title", start, end);
+        PlanReqDto planReqDto = new PlanReqDto("title", start, end, memberId);
         String requestData = objectMapper.writeValueAsString(planReqDto);
 
         MockHttpServletRequestBuilder request = post("/plan")
-                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 
         MvcResult mvcResult = mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
-                .andExpect(jsonPath("_links.self.href").value("http://localhost/plan/1"))
                 .andReturn();
         Long planId = Long.parseLong(JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id").toString());
 
@@ -84,15 +84,16 @@ public class PlanControllerTest {
     void saveTestAbnormal() throws Exception {
 
         MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "a3df!#sac");
-        Member member = memberService.save(memberReqDto);
+        MemberResDto memberResDto = memberService.save(memberReqDto);
+        Long memberId = memberResDto.getId();
 
         LocalDate start = LocalDate.now().plusDays(3);
         LocalDate end = start.minusDays(2);
-        PlanReqDto planReqDto = new PlanReqDto("title", start, end);
+        PlanReqDto planReqDto = new PlanReqDto("title", start, end, memberId);
         String requestData = objectMapper.writeValueAsString(planReqDto);
 
         MockHttpServletRequestBuilder request = post("/plan")
-                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 

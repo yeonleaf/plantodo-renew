@@ -72,6 +72,7 @@ public class GroupServiceTestImpl implements GroupService {
 
     @Override
     public GroupResDto one(Long id) {
+
         Group group = groupRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         Repetition repetition = group.getRepetition();
         RepInputDto repInputDto = repOutToInConverter.convert(repetition);

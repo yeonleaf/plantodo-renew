@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -22,9 +23,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Import(TestConfig.class)
 @WebMvcTest(GroupController.class)
@@ -111,6 +112,34 @@ public class GroupControllerUnitTest {
 
         when(groupService.save(any())).thenThrow(new ResourceNotFoundException("Resource not found"));
 
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 단건 조회")
+    void oneTestNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/group/1");
+
+        when(groupService.one(any())).thenReturn(new GroupResDto(1L, "group", 0, 0, 1L, makeArrToList()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(1L))
+                .andExpect(content().contentType(MediaTypes.HAL_JSON))
+                .andExpect(jsonPath("_links").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 단건 조회")
+    void oneTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/group/1");
+        when(groupService.one(any())).thenThrow(new ResourceNotFoundException());
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));

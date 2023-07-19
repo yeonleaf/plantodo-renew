@@ -9,6 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import yeonleaf.plantodo.ServiceTestConfig;
 import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.*;
+import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
 import yeonleaf.plantodo.service.GroupServiceTestImpl;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ServiceTestConfig.class)
@@ -64,7 +66,7 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("repOption = 1L, start < end")
+    @DisplayName("정상 등록 - repOption = 1L, start < end")
     void saveTestRepOption1L_EndGreaterThanStart() {
 
         makeSaveRepOptionTest(1L, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 14);
@@ -72,7 +74,7 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("repOption = 1L, start = end")
+    @DisplayName("정상 등록 - repOption = 1L, start = end")
     void saveTestRepOption1L_EndEqualToStart() {
 
         makeSaveRepOptionTest(1L, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
@@ -80,7 +82,7 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("repOption = 2L, start < end")
+    @DisplayName("정상 등록 - repOption = 2L, start < end")
     void saveTestRepOption2L_EndGreaterThanStart() {
 
         makeSaveRepOptionTest(2L, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 7);
@@ -88,7 +90,7 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("repOption = 2L, start = end")
+    @DisplayName("정상 등록 - repOption = 2L, start = end")
     void saveTestRepOption2L_EndEqualToStart() {
 
         makeSaveRepOptionTest(2L, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
@@ -96,7 +98,7 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("repOption = 3L, start < end")
+    @DisplayName("정상 등록 - repOption = 3L, start < end")
     void saveTestRepOption3L_EndGreaterThanStart() {
 
         makeSaveRepOptionTest(3L, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 6);
@@ -104,11 +106,32 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("repOption = 3L, start = end")
+    @DisplayName("정상 등록 - repOption = 3L, start = end")
     void saveTestRepOption3L_EndEqualToStart() {
 
         makeSaveRepOptionTest(3L, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 0);
 
     }
 
+    @Test
+    @DisplayName("단건 정상 조회")
+    void oneTestNormal() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3L, makeArrToList("화", "목"), plan.getId()));
+
+        GroupResDto groupResDto = groupService.one(savedGroup.getId());
+        assertThat(groupResDto.equals(savedGroup)).isTrue();
+        assertThat(groupResDto.getRepValue()).isEqualTo(makeArrToList("화", "목"));
+
+    }
+
+    @Test
+    @DisplayName("단건 비정상 조회")
+    void oneTestAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> groupService.one(9999L));
+
+    }
 }

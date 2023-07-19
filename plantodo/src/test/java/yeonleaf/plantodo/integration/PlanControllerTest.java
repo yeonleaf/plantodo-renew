@@ -17,14 +17,17 @@ import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
+import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.service.MemberService;
+import yeonleaf.plantodo.service.PlanService;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,6 +51,9 @@ public class PlanControllerTest {
 
     @Autowired
     private GroupRepository groupRepository;
+
+    @Autowired
+    private PlanService planService;
 
     @Test
     @DisplayName("정상 등록 - plan 생성 - group 생성 확인(repOption 0)")
@@ -83,8 +89,7 @@ public class PlanControllerTest {
     @DisplayName("비정상 등록 (예시 : end가 start보다 이전일 수 없음)")
     void saveTestAbnormal() throws Exception {
 
-        MemberReqDto memberReqDto = new MemberReqDto("test@abc.co.kr", "a3df!#sac");
-        MemberResDto memberResDto = memberService.save(memberReqDto);
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
         Long memberId = memberResDto.getId();
 
         LocalDate start = LocalDate.now().plusDays(3);
@@ -101,6 +106,37 @@ public class PlanControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value("입력값 형식 오류"))
                 .andExpect(jsonPath("errors.end[0]").value("end는 start 이전일 수 없습니다."));
+
+    }
+
+    @Test
+    @DisplayName("단건 정상 조회")
+    void oneTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 8, 10), memberId));
+
+        MockHttpServletRequestBuilder request = get("/plan/" + planResDto.getId());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(planResDto.getId()))
+                .andExpect(jsonPath("title").value(planResDto.getTitle()))
+                .andExpect(jsonPath("uncheckedCnt").value(planResDto.getUncheckedCnt()))
+                .andExpect(jsonPath("checkedCnt").value(planResDto.getCheckedCnt()));
+
+    }
+
+    @Test
+    @DisplayName("단건 비정상 조회")
+    void oneTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plan/" + Long.MAX_VALUE);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
 
     }
 

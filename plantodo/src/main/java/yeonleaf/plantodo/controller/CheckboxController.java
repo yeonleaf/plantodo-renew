@@ -38,17 +38,23 @@ public class CheckboxController {
     })
     @PostMapping
     public ResponseEntity<?> save(@Valid @RequestBody CheckboxReqDto checkboxReqDto, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
         CheckboxResDto checkboxResDto = checkboxService.save(checkboxReqDto);
         EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto, linkTo(methodOn(CheckboxController.class).one(checkboxResDto.getId())).withSelfRel());
         return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
+
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> one(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).build();
+
+        CheckboxResDto checkboxResDto = checkboxService.one(id);
+        EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto, linkTo(methodOn(CheckboxController.class).one(id)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import yeonleaf.plantodo.domain.*;
+import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
@@ -41,10 +42,22 @@ public class CheckboxRepositoryUnitTest {
         Group group = groupRepository.save(new Group(plan, "title", new Repetition(0L, "-1")));
 
         Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
-        Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkbox.getId());
 
-        assertThat(findCheckbox.isPresent()).isTrue();
-        assertThat(findCheckbox.get().getId()).isEqualTo(checkbox.getId());
+        assertThat(checkbox.getId()).isNotNull();
 
     }
+
+    @Test
+    @DisplayName("단건 정상 조회")
+    void oneTestNormal() {
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "ab3$ax#@"));
+        Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "title", new Repetition(0L, "-1")));
+        Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
+
+        Checkbox findCheckbox = checkboxRepository.findById(checkbox.getId()).orElseThrow(ResourceNotFoundException::new);
+
+        assertThat(findCheckbox.equals(checkbox)).isTrue();
+    }
+
 }

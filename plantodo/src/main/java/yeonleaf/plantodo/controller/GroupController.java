@@ -67,6 +67,10 @@ public class GroupController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> one(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(new GroupResDto());
+
+        GroupResDto groupResDto = groupService.one(id);
+        EntityModel<GroupResDto> entityModel = EntityModel.of(groupResDto, linkTo(methodOn(GroupController.class).one(id)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
     }
 }

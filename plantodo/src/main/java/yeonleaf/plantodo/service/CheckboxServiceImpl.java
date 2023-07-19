@@ -35,4 +35,10 @@ public class CheckboxServiceImpl implements CheckboxService {
         Group group = candidates.get(0);
         return new CheckboxResDto(checkboxRepository.save(new Checkbox(group, checkboxReqDto.getTitle(), checkboxReqDto.getDate(),false)));
     }
+
+    @Override
+    public CheckboxResDto one(Long id) {
+        Checkbox checkbox = checkboxRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return new CheckboxResDto(checkbox);
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import yeonleaf.plantodo.ServiceTestConfig;
+import yeonleaf.plantodo.domain.Checkbox;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.CheckboxReqDto;
@@ -14,6 +15,7 @@ import yeonleaf.plantodo.dto.CheckboxResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
+import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryMemberRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
 import yeonleaf.plantodo.service.CheckboxService;
@@ -33,6 +35,9 @@ public class CheckboxServiceUnitTest {
 
     @Autowired
     private MemoryMemberRepository memberRepository;
+
+    @Autowired
+    private MemoryCheckboxRepository checkboxRepository;
 
     @Autowired
     private PlanService planService;
@@ -74,7 +79,31 @@ public class CheckboxServiceUnitTest {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
         CheckboxReqDto checkboxReqDto = new CheckboxReqDto("title", plan.getId(), LocalDate.now());
+
         assertThrows(ResourceNotFoundException.class, () -> checkboxService.save(checkboxReqDto));
+
+    }
+
+    @Test
+    @DisplayName("단건 정상 조회")
+    void oneTestNormal() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        CheckboxReqDto checkboxReqDto = new CheckboxReqDto("title", planResDto.getId(), LocalDate.now());
+        CheckboxResDto checkboxResDto = checkboxService.save(checkboxReqDto);
+
+        CheckboxResDto findCheckboxResDto = checkboxService.one(checkboxResDto.getId());
+
+        assertThat(checkboxResDto.equals(findCheckboxResDto)).isTrue();
+
+    }
+
+    @Test
+    @DisplayName("단건 비정상 조회")
+    void oneTestAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.one(Long.MAX_VALUE));
 
     }
 }

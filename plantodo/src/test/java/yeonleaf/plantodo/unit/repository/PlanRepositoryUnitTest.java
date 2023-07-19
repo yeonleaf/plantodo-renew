@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.PlanReqDto;
+import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
 
@@ -26,25 +27,23 @@ public class PlanRepositoryUnitTest {
 
     @Autowired
     private PlanRepository planRepository;
-//
-//    private Plan savePlan(Member member, int delay) {
-//        Plan plan1 = new Plan(new PlanReqDto("plan" + delay, LocalDate.now().plusDays(delay), LocalDate.now().plusDays(delay + 3)), member);
-//        return planRepository.save(plan1);
-//    }
-//
-//    @Test
-//    @DisplayName("Plan 하나 조회")
-//    void getOnePlanTest() {
-//
-//        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
-//
-//        Plan plan = savePlan(member, 0);
-//        Optional<Plan> findPlan = planRepository.findById(plan.getId());
-//
-//        assertThat(findPlan.isPresent()).isTrue();
-//        assertThat(findPlan.get().getId()).isEqualTo(plan.getId());
-//
-//    }
+
+    @Test
+    @DisplayName("단건 정상 조회")
+    void getOnePlanTest() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
+
+        Plan findPlan = planRepository.findById(plan.getId()).orElseThrow(ResourceNotFoundException::new);
+
+        assertThat(findPlan.getId()).isEqualTo(plan.getId());
+        assertThat(findPlan.getTitle()).isEqualTo(plan.getTitle());
+        assertThat(findPlan.getStatus()).isEqualTo(plan.getStatus());
+        assertThat(findPlan.getCheckedCnt()).isEqualTo(plan.getCheckedCnt());
+        assertThat(findPlan.getUncheckedCnt()).isEqualTo(plan.getUncheckedCnt());
+
+    }
 //
 //    @Test
 //    @DisplayName("모든 Plan 조회")

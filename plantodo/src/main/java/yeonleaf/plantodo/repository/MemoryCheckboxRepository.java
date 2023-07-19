@@ -27,7 +27,7 @@ public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
 
     @Override
     public Optional<Checkbox> findById(Long id) {
-        return Optional.empty();
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override

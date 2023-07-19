@@ -17,9 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CheckboxServiceTestImpl implements CheckboxService {
 
-    private final MemoryRepository<Plan> planRepository;
-    private final MemoryRepository<Group> groupRepository;
-    private final MemoryRepository<Checkbox> checkboxRepository;
+    private final MemoryPlanRepository planRepository;
+    private final MemoryGroupRepository groupRepository;
+    private final MemoryCheckboxRepository checkboxRepository;
 
     @Override
     public CheckboxResDto save(CheckboxReqDto checkboxReqDto) {
@@ -42,8 +42,7 @@ public class CheckboxServiceTestImpl implements CheckboxService {
 
     private Group findGroupRepOptionZero(Long planId) {
 
-        List<Group> candidates = ((MemoryGroupRepository) groupRepository)
-                .findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption().equals(0L)).toList();
+        List<Group> candidates = groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption().equals(0L)).toList();
         if (candidates.size() != 1) {
             throw new ResourceNotFoundException();
         }
@@ -51,4 +50,9 @@ public class CheckboxServiceTestImpl implements CheckboxService {
 
     }
 
+    @Override
+    public CheckboxResDto one(Long id) {
+        Checkbox checkbox = checkboxRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return new CheckboxResDto(checkbox);
+    }
 }

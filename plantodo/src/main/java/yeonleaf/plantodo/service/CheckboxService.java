@@ -8,4 +8,5 @@ import yeonleaf.plantodo.dto.CheckboxResDto;
 @Service
 public interface CheckboxService {
     CheckboxResDto save(CheckboxReqDto checkboxReqDto);
+    CheckboxResDto one(Long id);
 }

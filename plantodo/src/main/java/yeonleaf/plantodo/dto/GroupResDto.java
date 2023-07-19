@@ -8,6 +8,7 @@ import yeonleaf.plantodo.domain.Group;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -31,5 +32,17 @@ public class GroupResDto {
         this.repValue = repValue;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupResDto that = (GroupResDto) o;
+        return getCheckedCnt() == that.getCheckedCnt() && getUncheckedCnt() == that.getUncheckedCnt() && Objects.equals(getId(), that.getId()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getRepOption(), that.getRepOption()) && Objects.equals(getRepValue(), that.getRepValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getTitle(), getCheckedCnt(), getUncheckedCnt(), getRepOption(), getRepValue());
+    }
 }
 

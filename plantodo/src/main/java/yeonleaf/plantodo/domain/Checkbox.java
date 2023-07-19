@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -34,4 +35,16 @@ public class Checkbox {
         this.checked = checked;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Checkbox checkbox = (Checkbox) o;
+        return isChecked() == checkbox.isChecked() && Objects.equals(getId(), checkbox.getId()) && Objects.equals(getTitle(), checkbox.getTitle()) && Objects.equals(getGroup(), checkbox.getGroup()) && Objects.equals(getDate(), checkbox.getDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getTitle(), getGroup(), getDate(), isChecked());
+    }
 }

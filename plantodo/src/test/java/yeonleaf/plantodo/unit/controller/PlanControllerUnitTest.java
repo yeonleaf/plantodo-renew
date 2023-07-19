@@ -178,24 +178,37 @@ public class PlanControllerUnitTest {
 
     }
 
-//    @Test
-//    @DisplayName("plan만 한 개 정상 조회")
-//    void getOneTestNormal() throws Exception {
-//
-//        MockHttpServletRequestBuilder request = get("/plan/1")
-//                .header("Authorization", "");
-//
-//        when(planService.one(any())).thenReturn(new PlanResDto(1L, "title", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
-//
-//        mockMvc.perform(request)
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("id").value(1L))
-//                .andExpect(jsonPath("_links.self").exists())
-//                .andExpect(jsonPath("_links.removal").exists())
-//                .andExpect(jsonPath("_links.switch").exists());
-//
-//    }
-//
+    @Test
+    @DisplayName("정상 단건 조회")
+    void getOneTestNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plan/1")
+                .header("Authorization", "");
+
+        when(planService.one(any())).thenReturn(new PlanResDto(1L, "title", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(1L))
+                .andExpect(jsonPath("_links.self").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 단건 조회")
+    void getOneTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plan/1")
+                .header("Authorization", "");
+
+        when(planService.one(any())).thenThrow(new ResourceNotFoundException());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 //    @Test
 //    @DisplayName("plan만 여러 개 정상 조회")
 //    void getAllTestNormal() throws Exception {

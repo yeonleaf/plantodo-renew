@@ -22,6 +22,7 @@ import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -79,6 +80,35 @@ public class CheckboxControllerUnitTest {
         MockHttpServletRequestBuilder request = post("/checkbox")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("단건 정상 조회")
+    void oneTestNormal() throws Exception {
+
+        when(checkboxService.one(any())).thenReturn(new CheckboxResDto(1L, "checkbox", false));
+
+        MockHttpServletRequestBuilder request = get("/checkbox/1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaTypes.HAL_JSON))
+                .andExpect(jsonPath("id").isNumber());
+
+    }
+
+    @Test
+    @DisplayName("단건 비정상 조회")
+    void oneTestAbnormal() throws Exception {
+
+        when(checkboxService.one(any())).thenThrow(ResourceNotFoundException.class);
+
+        MockHttpServletRequestBuilder request = get("/checkbox/1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

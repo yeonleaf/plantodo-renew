@@ -1,45 +1,57 @@
 package yeonleaf.plantodo.unit.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import yeonleaf.plantodo.ServiceTestConfig;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
-import yeonleaf.plantodo.domain.Member;
+import yeonleaf.plantodo.domain.Checkbox;
+import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
+import yeonleaf.plantodo.repository.MemoryMemberRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.service.CheckboxServiceTestImpl;
-import yeonleaf.plantodo.service.GroupServiceTestImpl;
-import yeonleaf.plantodo.service.MemberServiceTestImpl;
-import yeonleaf.plantodo.service.PlanServiceTestImpl;
+import yeonleaf.plantodo.service.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = ServiceTestConfig.class)
 public class PlanServiceUnitTest {
 
-    @Autowired
     private MemberServiceTestImpl memberService;
 
-    @Autowired
     private PlanServiceTestImpl planService;
 
-    @Autowired
     private GroupServiceTestImpl groupService;
+
+    private MemoryMemberRepository memberRepository;
+
+    private MemoryPlanRepository planRepository;
+
+    private MemoryGroupRepository groupRepository;
+
+    private MemoryCheckboxRepository checkboxRepository;
+
+    @BeforeEach
+    void setUp() {
+        memberRepository = new MemoryMemberRepository();
+        planRepository = new MemoryPlanRepository();
+        groupRepository = new MemoryGroupRepository();
+        checkboxRepository = new MemoryCheckboxRepository();
+
+        memberService = new MemberServiceTestImpl(memberRepository);
+        planService = new PlanServiceTestImpl(memberRepository, planRepository, groupRepository, checkboxRepository);
+        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter());
+
+    }
 
     private List<String> makeArrToList(String... target) {
         return Arrays.asList(target);
@@ -55,7 +67,7 @@ public class PlanServiceUnitTest {
         List<GroupResDto> groups = groupService.findAllByPlanId(plan.getId());
 
         assertThat(groups.size()).isEqualTo(1);
-        assertThat(groups.get(0).getRepOption()).isEqualTo(0L);
+        assertThat(groups.get(0).getRepOption()).isEqualTo(0);
 
     }
 
@@ -82,6 +94,428 @@ public class PlanServiceUnitTest {
     void oneTestAbnormal() {
 
         assertThrows(ResourceNotFoundException.class, () -> planService.one(9999L));
+
+    }
+
+    @Test
+    @DisplayName("정상 타이틀 수정")
+    void updateTitleTestNormal() {
+
+        MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        groupService.save(new GroupReqDto("group", 1, makeArrToList(), plan.getId()));
+
+        planService.update(new PlanUpdateReqDto(plan.getId(), "updatedTitle", plan.getStart(), plan.getEnd()));
+
+        Plan findPlan = planRepository.findById(plan.getId()).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getTitle()).isEqualTo("updatedTitle");
+
+    }
+
+    @Test
+    @DisplayName("비정상 타이틀 수정")
+    void updateTitleTestAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> planService.update(
+                new PlanUpdateReqDto(Long.MAX_VALUE, "updatedTitle",
+                        LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18))));
+
+    }
+
+    private PlanResDto makeOldPlan() {
+        MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        return planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member.getId()));
+    }
+
+    private List<LocalDate> makeDateRangeTest(int repOption, List<String> repValue, LocalDate newStart, LocalDate newEnd) {
+
+        PlanResDto oldPlan = makeOldPlan();
+        GroupResDto group = groupService.save(new GroupReqDto("group", repOption, repValue, oldPlan.getId()));
+
+        PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(oldPlan.getId(), oldPlan.getTitle(), newStart, newEnd);
+        planService.update(planUpdateReqDto);
+
+        return checkboxRepository.findByGroupId(group.getId()).stream().map(Checkbox::getDate).toList();
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart < newStart < newEnd < oldEnd")
+    void updateDateRangeTestNormal_repOption1_allDatesUnique_1() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 20),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 22),
+                LocalDate.of(2023, 7, 23)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - newStart < oldStart < newEnd < oldEnd")
+    void updateDateRangeTestNormal_repOption1_allDatesUnique_2() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
+        IntStream.rangeClosed(16, 23).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+        IntStream.rangeClosed(24, 25).forEach(i -> assertThat(dateResult).doesNotContain(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - newStart < oldStart < oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption1_allDatesUnique_3() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
+        IntStream.rangeClosed(16, 29).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart < newStart < oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption1_allDatesUnique_4() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
+        IntStream.rangeClosed(23, 29).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+        IntStream.rangeClosed(18, 22).forEach(i -> assertThat(dateResult).doesNotContain(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - newStart < newEnd < oldStart < oldEnd")
+    void updateDateRangeTestNormal_repOption1_allDatesUnique_5() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
+        IntStream.rangeClosed(13, 16).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+        IntStream.rangeClosed(17, 25).forEach(i -> assertThat(dateResult).doesNotContain(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart < oldEnd < newStart < newEnd")
+    void updateDateRangeTestNormal_repOption1_allDatesUnique_6() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
+        IntStream.rangeClosed(29, 31).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+        IntStream.rangeClosed(18, 28).forEach(i -> assertThat(dateResult).doesNotContain(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart == newStart && oldEnd == newEnd")
+    void updateDateRangeTestNormal_repOption1_datesArentChanged() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
+        IntStream.rangeClosed(18, 25).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart = newStart && oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption1_newEndGreaterThanOldEnd() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
+        IntStream.rangeClosed(18, 29).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart = newStart, oldEnd > newEnd")
+    void updateDateRangeTestNormal_repOption1_oldEndGreaterThanNewEnd() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
+        IntStream.rangeClosed(18, 23).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+        IntStream.rangeClosed(24, 25).forEach(i -> assertThat(dateResult).doesNotContain(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart < newStart, oldEnd = newEnd")
+    void updateDateRangeTestNormal_repOption1_newStartGreaterThanOldStart() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
+        IntStream.rangeClosed(20, 25).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+        IntStream.rangeClosed(18, 19).forEach(i -> assertThat(dateResult).doesNotContain(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 1 - oldStart > newStart, oldEnd = newEnd")
+    void updateDateRangeTestNormal_repOption1_oldStartGreaterThanNewStart() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
+        IntStream.rangeClosed(16, 25).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+
+    /*
+    * repOption = 2
+    * */
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart < newStart < newEnd < oldEnd")
+    void updateDateRangeTestNormal_repOption2_allDatesUnique_1() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 20),
+                LocalDate.of(2023, 7, 23)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - newStart < oldStart < newEnd < oldEnd")
+    void updateDateRangeTestNormal_repOption2_allDatesUnique_2() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
+        IntStream.iterate(16, i -> i + 3).limit(3).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - newStart < oldStart < oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption2_allDatesUnique_3() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
+        IntStream.iterate(16, i -> i + 3).limit(5).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart < newStart < oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption2_allDatesUnique_4() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
+        IntStream.iterate(23, i -> i + 3).limit(3).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - newStart < newEnd < oldStart < oldEnd")
+    void updateDateRangeTestNormal_repOption2_allDatesUnique_5() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 13),
+                LocalDate.of(2023, 7, 16)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart < oldEnd < newStart < newEnd")
+    void updateDateRangeTestNormal_repOption2_allDatesUnique_6() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 29)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart == newStart && oldEnd == newEnd")
+    void updateDateRangeTestNormal_repOption2_datesArentChanged() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 18),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart = newStart && oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption2_newEndGreaterThanOldEnd() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
+        IntStream.iterate(18, i -> i + 3).limit(4).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart = newStart, oldEnd > newEnd")
+    void updateDateRangeTestNormal_repOption2_oldEndGreaterThanNewEnd() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 18),
+                LocalDate.of(2023, 7, 21)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart < newStart, oldEnd = newEnd")
+    void updateDateRangeTestNormal_repOption2_newStartGreaterThanOldStart() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 20),
+                LocalDate.of(2023, 7, 23)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 2 - oldStart > newStart, oldEnd = newEnd")
+    void updateDateRangeTestNormal_repOption2_oldStartGreaterThanNewStart() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 16),
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 22),
+                LocalDate.of(2023, 7, 25)
+        );
+
+    }
+
+    /*
+    * repOption = 3L
+    * */
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3 - oldStart < newStart < newEnd < oldEnd")
+    void updateDateRangeTestNormal_repOption3_allDatesUnique_1() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 21)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3 - newStart < oldStart < newEnd < oldEnd")
+    void updateDateRangeTestNormal_repOption3_allDatesUnique_2() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 17),
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3 - newStart < oldStart < oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption3_allDatesUnique_3() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 17),
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24),
+                LocalDate.of(2023, 7, 26),
+                LocalDate.of(2023, 7, 28)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3 - oldStart < newStart < oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption3_allDatesUnique_4() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 24),
+                LocalDate.of(2023, 7, 26),
+                LocalDate.of(2023, 7, 28)
+        );
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3 - newStart < newEnd < oldStart < oldEnd")
+    void updateDateRangeTestNormal_repOption3_allDatesUnique_5() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 14)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3 - oldStart < oldEnd < newStart < newEnd")
+    void updateDateRangeTestNormal_repOption3_allDatesUnique_6() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 31)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3L - oldStart == newStart && oldEnd == newEnd")
+    void updateDateRangeTestNormal_repOption3_datesArentChanged() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3L - oldStart = newStart && oldEnd < newEnd")
+    void updateDateRangeTestNormal_repOption3_newEndGreaterThanOldEnd() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24),
+                LocalDate.of(2023, 7, 26),
+                LocalDate.of(2023, 7, 28)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3L - oldStart = newStart, oldEnd > newEnd")
+    void updateDateRangeTestNormal_repOption3_oldEndGreaterThanNewEnd() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3L - oldStart < newStart, oldEnd = newEnd")
+    void updateDateRangeTestNormal_repOption3_newStartGreaterThanOldStart() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 수정 - repOption = 3L - oldStart > newStart, oldEnd = newEnd")
+    void updateDateRangeTestNormal_repOption3_oldStartGreaterThanNewStart() {
+
+        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 17),
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
 
     }
 

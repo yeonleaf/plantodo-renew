@@ -26,7 +26,7 @@ public class RepInToOutConverterTest {
         return Arrays.asList(target);
     }
 
-    private void assertInputConversionResult(Long repOption, String expectedRepValue, String... target) {
+    private void assertInputConversionResult(int repOption, String expectedRepValue, String... target) {
 
         RepInputDto input = new RepInputDto(repOption, makeArrToString(target));
         Repetition output = repInToOutConverter.convert(input);
@@ -38,9 +38,9 @@ public class RepInToOutConverterTest {
     @DisplayName("validate 통과한 이후 convert 결과 검증")
     void convertInputTestNormal() {
 
-        assertInputConversionResult(1L, "-1");
-        assertInputConversionResult(2L, "2", "2");
-        assertInputConversionResult(3L, "1010001", "수", "월", "일");
+        assertInputConversionResult(1, "-1");
+        assertInputConversionResult(2, "2", "2");
+        assertInputConversionResult(3, "1010001", "수", "월", "일");
 
     }
 

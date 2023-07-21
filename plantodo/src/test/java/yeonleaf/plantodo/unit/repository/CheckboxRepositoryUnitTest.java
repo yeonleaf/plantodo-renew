@@ -39,7 +39,7 @@ public class CheckboxRepositoryUnitTest {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "ab3$ax#@"));
         Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
-        Group group = groupRepository.save(new Group(plan, "title", new Repetition(0L, "-1")));
+        Group group = groupRepository.save(new Group(plan, "title", new Repetition(0, "-1")));
 
         Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
 
@@ -52,7 +52,7 @@ public class CheckboxRepositoryUnitTest {
     void oneTestNormal() {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "ab3$ax#@"));
         Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
-        Group group = groupRepository.save(new Group(plan, "title", new Repetition(0L, "-1")));
+        Group group = groupRepository.save(new Group(plan, "title", new Repetition(0, "-1")));
         Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
 
         Checkbox findCheckbox = checkboxRepository.findById(checkbox.getId()).orElseThrow(ResourceNotFoundException::new);

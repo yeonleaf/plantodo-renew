@@ -15,7 +15,7 @@ public class CheckboxDateCreator {
         List<LocalDate> res = new ArrayList<>();
         LocalDate start = plan.getStart();
         LocalDate end = plan.getEnd();
-        Long repOption = repInputDto.getRepOption();
+        int repOption = repInputDto.getRepOption();
         List<String> repValue = repInputDto.getRepValue();
 
         int betweenDays = Period.between(start, end).getDays();
@@ -30,13 +30,13 @@ public class CheckboxDateCreator {
 
     }
 
-    static boolean canMakeCheckboxNow(LocalDate start, LocalDate now, Long repOption, List<String> repValue) {
+    static boolean canMakeCheckboxNow(LocalDate start, LocalDate now, int repOption, List<String> repValue) {
 
         List<DayOfWeek> dayOfWeeks = repValue.stream().map(CheckboxDateCreator::parseKoreanDateToDayOfWeek).toList();
 
-        if (repOption == 3L) {
+        if (repOption == 3) {
             return dayOfWeeks.contains(now.getDayOfWeek());
-        } else if (repOption == 2L) {
+        } else if (repOption == 2) {
             if (repValue.isEmpty()) {
                 throw new IllegalArgumentException();
             }

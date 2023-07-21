@@ -14,15 +14,15 @@ public class RepOutToInConverter implements Converter<Repetition, RepInputDto> {
     @Override
     public RepInputDto convert(Repetition source) {
 
-        Long repOption = source.getRepOption();
+        int repOption = source.getRepOption();
         String repValue = source.getRepValue();
 
         RepInputDto repInputDto = new RepInputDto();
         repInputDto.setRepOption(repOption);
 
-        if (repOption.equals(1L)) {
+        if (repOption == 1) {
             return repInputDto;
-        } else if (repOption.equals(2L)) {
+        } else if (repOption == 2) {
             repInputDto.getRepValue().add(repValue);
             return repInputDto;
         } else {

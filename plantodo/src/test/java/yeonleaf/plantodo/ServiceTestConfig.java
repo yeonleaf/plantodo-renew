@@ -56,12 +56,12 @@ public class ServiceTestConfig {
 
     @Bean
     public PlanServiceTestImpl planService() {
-        return new PlanServiceTestImpl(memberRepository(), planRepository(), groupRepository());
+        return new PlanServiceTestImpl(memberRepository(), planRepository(), groupRepository(), checkboxRepository());
     }
 
     @Bean
     public MemberServiceTestImpl memberService() {
-        return new MemberServiceTestImpl((MemoryMemberRepository) memberRepository());
+        return new MemberServiceTestImpl(memberRepository());
     }
 
 }

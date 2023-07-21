@@ -27,7 +27,7 @@ public class CheckboxServiceImpl implements CheckboxService {
         Long planId = checkboxReqDto.getPlanId();
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
 
-        List<Group> candidates = groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption().equals(0L)).toList();
+        List<Group> candidates = groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption() == 0).toList();
         if (candidates.size() != 1) {
             throw new ResourceNotFoundException();
         }

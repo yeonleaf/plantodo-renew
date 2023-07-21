@@ -32,7 +32,7 @@ public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
 
     @Override
     public void delete(Checkbox checkbox) {
-
+        data.remove(checkbox.getId());
     }
 
     public List<Checkbox> findByGroupId(Long groupId) {

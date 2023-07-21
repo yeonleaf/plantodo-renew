@@ -5,6 +5,7 @@ import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
+import yeonleaf.plantodo.dto.PlanUpdateReqDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface PlanService {
     PlanResDto save(PlanReqDto planReqDto);
     PlanResDto one(Long id);
 
-    PlanResDto update(Long id, PlanReqDto planReqDto);
+    PlanResDto update(PlanUpdateReqDto planUpdateReqDto);
 
     void delete(Long id);
 

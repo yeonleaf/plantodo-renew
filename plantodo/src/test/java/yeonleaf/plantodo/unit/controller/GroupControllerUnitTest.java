@@ -48,14 +48,14 @@ public class GroupControllerUnitTest {
     @DisplayName("정상 등록")
     void saveTestNormal() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "화"), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3, makeArrToList("월", "화"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 
-        when(groupService.save(any())).thenReturn(new GroupResDto(1L, "title", 0, 0, 3L, makeArrToList("월", "화")));
+        when(groupService.save(any())).thenReturn(new GroupResDto(1L, "title", 0, 0, 3, makeArrToList("월", "화")));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
@@ -67,7 +67,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 등록 - ArgumentResolver Validation")
     void saveTestAbnormal_ArgumentResolverValidation() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto(null, 4L, makeArrToList("월", "화"), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto(null, 4, makeArrToList("월", "화"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -86,7 +86,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 등록 - RepInputValidator")
     void saveTestAbnormal_RepInputValidator() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList(), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto("title", 2, makeArrToList(), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -103,7 +103,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 등록 - Resource not found")
     void saveTestAbnormal_ResourceNotFound() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "수"), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3, makeArrToList("월", "수"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -124,7 +124,7 @@ public class GroupControllerUnitTest {
 
         MockHttpServletRequestBuilder request = get("/group/1");
 
-        when(groupService.one(any())).thenReturn(new GroupResDto(1L, "group", 0, 0, 1L, makeArrToList()));
+        when(groupService.one(any())).thenReturn(new GroupResDto(1L, "group", 0, 0, 1, makeArrToList()));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())

@@ -14,18 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import yeonleaf.plantodo.converter.RepInToOutConverter;
-import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
-import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
-import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.service.GroupService;
-import yeonleaf.plantodo.service.PlanService;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;

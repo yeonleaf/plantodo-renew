@@ -18,8 +18,8 @@ public class GroupReqDto {
     private String title;
 
     @NotNull
-    @Range(min = 1L, max = 3L)
-    private Long repOption;
+    @Range(min = 1, max = 3)
+    private int repOption;
 
     private List<String> repValue = new ArrayList<>();
 

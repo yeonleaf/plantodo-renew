@@ -59,6 +59,17 @@ public class Plan {
         this.uncheckedCnt = 0;
     }
 
+    public Plan(Long id, String title, LocalDate start, LocalDate end, Member member) {
+        this.id = id;
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.member = member;
+        this.status = PlanStatus.NOW;
+        this.checkedCnt = 0;
+        this.uncheckedCnt = 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

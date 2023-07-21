@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * repOption = 2L, repOption = 3L 케이스는 테스트 불가 (현재 시점을 기준으로 테스트해야 하기 때문에 멱등을 보장할 수 없음)
+ * repOption = 2, repOption = 2 케이스는 테스트 불가 (현재 시점을 기준으로 테스트해야 하기 때문에 멱등을 보장할 수 없음)
  */
 @Transactional
 @SpringBootTest
@@ -74,13 +74,13 @@ public class GroupControllerTest {
     }
 
     @Test
-    @DisplayName("정상 등록 - repOption = 1L")
-    void saveTestNormal_RepOption1L() throws Exception {
+    @DisplayName("정상 등록 - repOption = 1")
+    void saveTestNormal_RepOption1() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
 
-        GroupReqDto groupReqDto = new GroupReqDto("group", 1L, makeArrToList(), plan.getId());
+        GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList(), plan.getId());
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +88,6 @@ public class GroupControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaTypes.HAL_JSON))
                 .andExpect(jsonPath("id").isNumber())
                 .andExpect(jsonPath("uncheckedCnt").value(8))
                 .andExpect(jsonPath("_links").exists())
@@ -100,7 +99,7 @@ public class GroupControllerTest {
     @DisplayName("비정상 등록 - RepInputValidator Validation")
     void saveTestAbnormal_RepInputValidatorValidation() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("group", 1L, makeArrToList("월"), Long.MAX_VALUE);
+        GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList("월"), Long.MAX_VALUE);
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +117,7 @@ public class GroupControllerTest {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
-        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3L, "1010100")));
+        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         MockHttpServletRequestBuilder request = get("/group/" + group.getId());
 

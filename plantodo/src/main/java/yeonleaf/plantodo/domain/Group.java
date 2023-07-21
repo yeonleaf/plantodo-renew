@@ -42,7 +42,7 @@ public class Group {
         this.title = title;
         this.checkedCnt = 0;
         this.uncheckedCnt = 0;
-        this.repetition = new Repetition(0L, "00000000");
+        this.repetition = new Repetition(0, "00000000");
     }
 
     public void addUncheckedCnt(int uncheckedCnt) {

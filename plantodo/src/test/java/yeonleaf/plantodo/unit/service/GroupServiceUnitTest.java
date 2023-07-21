@@ -48,7 +48,7 @@ public class GroupServiceUnitTest {
         return Arrays.asList(target);
     }
 
-    private void makeSaveRepOptionTest(Long repOption, List<String> repValue, LocalDate start, LocalDate end, int expectedCnt) {
+    private void makeSaveRepOptionTest(int repOption, List<String> repValue, LocalDate start, LocalDate end, int expectedCnt) {
 
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", start, end, member));
@@ -66,34 +66,34 @@ public class GroupServiceUnitTest {
     }
 
     @Test
-    @DisplayName("정상 등록 - repOption = 1L, start < end")
-    void saveTestRepOption1L_EndGreaterThanStart() {
+    @DisplayName("정상 등록 - repOption = 1, start < end")
+    void saveTestRepOption1_EndGreaterThanStart() {
 
-        makeSaveRepOptionTest(1L, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 14);
-
-    }
-
-    @Test
-    @DisplayName("정상 등록 - repOption = 1L, start = end")
-    void saveTestRepOption1L_EndEqualToStart() {
-
-        makeSaveRepOptionTest(1L, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
+        makeSaveRepOptionTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 14);
 
     }
 
     @Test
-    @DisplayName("정상 등록 - repOption = 2L, start < end")
-    void saveTestRepOption2L_EndGreaterThanStart() {
+    @DisplayName("정상 등록 - repOption = 1, start = end")
+    void saveTestRepOption1_EndEqualToStart() {
 
-        makeSaveRepOptionTest(2L, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 7);
+        makeSaveRepOptionTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
 
     }
 
     @Test
-    @DisplayName("정상 등록 - repOption = 2L, start = end")
-    void saveTestRepOption2L_EndEqualToStart() {
+    @DisplayName("정상 등록 - repOption = 2, start < end")
+    void saveTestRepOption2_EndGreaterThanStart() {
 
-        makeSaveRepOptionTest(2L, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
+        makeSaveRepOptionTest(2, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 7);
+
+    }
+
+    @Test
+    @DisplayName("정상 등록 - repOption = 2, start = end")
+    void saveTestRepOption2_EndEqualToStart() {
+
+        makeSaveRepOptionTest(2, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
 
     }
 
@@ -101,15 +101,15 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 3L, start < end")
     void saveTestRepOption3L_EndGreaterThanStart() {
 
-        makeSaveRepOptionTest(3L, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 6);
+        makeSaveRepOptionTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 6);
 
     }
 
     @Test
     @DisplayName("정상 등록 - repOption = 3L, start = end")
-    void saveTestRepOption3L_EndEqualToStart() {
+    void saveTestRepOption3_EndEqualToStart() {
 
-        makeSaveRepOptionTest(3L, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 0);
+        makeSaveRepOptionTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 0);
 
     }
 
@@ -119,7 +119,7 @@ public class GroupServiceUnitTest {
 
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3L, makeArrToList("화", "목"), plan.getId()));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
 
         GroupResDto groupResDto = groupService.one(savedGroup.getId());
         assertThat(groupResDto.equals(savedGroup)).isTrue();

@@ -58,22 +58,7 @@ public class PlanRepositoryUnitTest {
 //        assertThat(all.size()).isEqualTo(3);
 //
 //    }
-//
-//    @Test
-//    @DisplayName("Plan 하나 수정")
-//    void updateOnePlan() {
-//
-//        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
-//        Plan plan = savePlan(member, 0);
-//
-//        plan.setTitle("revisedTitle");
-//        planRepository.save(plan);
-//
-//        Optional<Plan> updatedPlan = planRepository.findById(plan.getId());
-//        assertThat(updatedPlan.isPresent()).isTrue();
-//        assertThat(updatedPlan.get().getTitle()).isEqualTo("revisedTitle");
-//
-//    }
+
 //
 //    @Test
 //    @DisplayName("Plan 하나 삭제")

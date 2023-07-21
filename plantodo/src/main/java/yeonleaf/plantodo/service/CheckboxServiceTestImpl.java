@@ -42,7 +42,7 @@ public class CheckboxServiceTestImpl implements CheckboxService {
 
     private Group findGroupRepOptionZero(Long planId) {
 
-        List<Group> candidates = groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption().equals(0L)).toList();
+        List<Group> candidates = groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption() == 0).toList();
         if (candidates.size() != 1) {
             throw new ResourceNotFoundException();
         }

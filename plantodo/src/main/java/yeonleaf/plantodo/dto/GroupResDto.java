@@ -20,10 +20,10 @@ public class GroupResDto {
     private String title;
     private int checkedCnt;
     private int uncheckedCnt;
-    private Long repOption;
+    private int repOption;
     private List<String> repValue = new ArrayList<>();
 
-    public GroupResDto(Group group, Long repOption, List<String> repValue) {
+    public GroupResDto(Group group, int repOption, List<String> repValue) {
         this.id = group.getId();
         this.title = group.getTitle();
         this.checkedCnt = group.getCheckedCnt();

@@ -43,7 +43,7 @@ public class GroupRepositoryUnitTest {
     void saveTestNormal() {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1eab^d2a"));
         Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
-        Repetition repetition = new Repetition(3L, "0000001");
+        Repetition repetition = new Repetition(2, "0000001");
         Group group = groupRepository.save(new Group(plan, "title", repetition));
         assertThat(group.getId()).isNotNull();
         assertThat(group.getRepetition().getId()).isNotNull();
@@ -56,7 +56,7 @@ public class GroupRepositoryUnitTest {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1eab^d2a"));
         Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
 
-        Repetition repetition = new Repetition(3L, "0000001");
+        Repetition repetition = new Repetition(2, "0000001");
         Group group = groupRepository.save(new Group(plan, "title", repetition));
 
         Group findGroup = groupRepository.findById(group.getId()).orElseThrow(ResourceNotFoundException::new);
@@ -71,10 +71,10 @@ public class GroupRepositoryUnitTest {
 //        Member member = memberRepository.save(new Member("test@abc.co.kr", "1eab^d2a"));
 //        Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
 //
-//        Repetition repetition1 = new Repetition(3L, "0000001");
+//        Repetition repetition1 = new Repetition(2, "0000001");
 //        Group group1 = groupRepository.save(new Group(plan, "title", repetition1));
 //
-//        Repetition repetition2 = new Repetition(3L, "0000001");
+//        Repetition repetition2 = new Repetition(2, "0000001");
 //        Group group2 = groupRepository.save(new Group(plan, "title", repetition2));
 //
 //        List<Group> findGroup = groupRepository.findByPlanId(plan.getId());

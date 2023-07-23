@@ -42,6 +42,21 @@ public class PlanRepositoryUnitTest {
         assertThat(findPlan.getStatus()).isEqualTo(plan.getStatus());
 
     }
+
+    @Test
+    @DisplayName("Plan 단건 삭제")
+    void deleteOnePlan() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
+
+        planRepository.delete(plan);
+
+        Optional<Plan> findPlan = planRepository.findById(plan.getId());
+        assertThat(findPlan.isEmpty()).isTrue();
+
+    }
+
 //
 //    @Test
 //    @DisplayName("모든 Plan 조회")
@@ -57,18 +72,5 @@ public class PlanRepositoryUnitTest {
 //
 //    }
 
-//
-//    @Test
-//    @DisplayName("Plan 하나 삭제")
-//    void deleteOnePlan() {
-//
-//        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
-//        Plan plan = savePlan(member, 0);
-//
-//        planRepository.delete(plan);
-//
-//        Optional<Plan> findPlan = planRepository.findById(plan.getId());
-//        assertThat(findPlan.isEmpty()).isTrue();
-//
-//    }
+
 }

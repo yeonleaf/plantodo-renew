@@ -60,4 +60,19 @@ public class CheckboxRepositoryUnitTest {
         assertThat(findCheckbox.equals(checkbox)).isTrue();
     }
 
+    @Test
+    @DisplayName("단건 정상 삭제")
+    void deleteTestNormal() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "ab3$ax#@"));
+        Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "title", new Repetition(0, "-1")));
+        Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
+
+        checkboxRepository.delete(checkbox);
+
+        Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkbox.getId());
+        assertThat(findCheckbox).isEmpty();
+
+    }
 }

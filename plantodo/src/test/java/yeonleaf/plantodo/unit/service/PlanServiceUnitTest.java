@@ -15,6 +15,7 @@ import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryMemberRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
 import yeonleaf.plantodo.service.*;
+import yeonleaf.plantodo.validator.RepInputValidator;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -49,7 +50,7 @@ public class PlanServiceUnitTest {
 
         memberService = new MemberServiceTestImpl(memberRepository);
         planService = new PlanServiceTestImpl(memberRepository, planRepository, groupRepository, checkboxRepository);
-        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter());
+        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter(), new RepInputValidator());
 
     }
 
@@ -83,8 +84,6 @@ public class PlanServiceUnitTest {
         assertThat(findPlan.getId()).isEqualTo(plan.getId());
         assertThat(findPlan.getStart()).isEqualTo(plan.getStart());
         assertThat(findPlan.getEnd()).isEqualTo(plan.getEnd());
-        assertThat(findPlan.getCheckedCnt()).isEqualTo(plan.getCheckedCnt());
-        assertThat(findPlan.getUncheckedCnt()).isEqualTo(plan.getUncheckedCnt());
         assertThat(findPlan.getStatus()).isEqualTo(plan.getStatus());
 
     }

@@ -215,7 +215,7 @@ public class PlanControllerUnitTest {
     void updateTestNormal() throws Exception {
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(1L, "revisedTitle", LocalDate.now(), LocalDate.now().plusDays(3));
-        when(planService.update(any())).thenReturn(new PlanResDto(1L, "revisedTitle", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW, 0, 0));
+        when(planService.update(any())).thenReturn(new PlanResDto(1L, "revisedTitle", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
         MockHttpServletRequestBuilder request = put("/plan")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
@@ -250,7 +250,7 @@ public class PlanControllerUnitTest {
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("message").value("입력값 타입/형식 오류"));
+                .andExpect(jsonPath("message").value("입력값 타입/내용 오류"));
 
     }
 

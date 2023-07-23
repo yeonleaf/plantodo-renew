@@ -18,6 +18,7 @@ import yeonleaf.plantodo.service.PlanServiceTestImpl;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,12 +57,6 @@ public class GroupServiceUnitTest {
 
         List<Checkbox> checkboxes = checkboxRepository.findByGroupId(group.getId());
         assertThat(checkboxes.size()).isEqualTo(expectedCnt);
-
-        GroupResDto findGroup = groupService.one(group.getId());
-        assertThat(findGroup.getUncheckedCnt()).isEqualTo(expectedCnt);
-
-        PlanResDto findPlan = planService.one(plan.getId());
-        assertThat(findPlan.getUncheckedCnt()).isEqualTo(expectedCnt);
 
     }
 
@@ -122,6 +117,7 @@ public class GroupServiceUnitTest {
         GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
 
         GroupResDto groupResDto = groupService.one(savedGroup.getId());
+
         assertThat(groupResDto.equals(savedGroup)).isTrue();
         assertThat(groupResDto.getRepValue()).isEqualTo(makeArrToList("화", "목"));
 
@@ -134,4 +130,132 @@ public class GroupServiceUnitTest {
         assertThrows(ResourceNotFoundException.class, () -> groupService.one(9999L));
 
     }
+
+    @Test
+    @DisplayName("정상 수정 - 타이틀 X, repOption X, repValue X (변화 없음)")
+    void updateTestNormal_notChanged() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 3, makeArrToList("화", "목"));
+        GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
+
+        assertThat(updatedGroup.getTitle()).isEqualTo(savedGroup.getTitle());
+        assertThat(updatedGroup.getRepOption()).isEqualTo(savedGroup.getRepOption());
+        assertThat(updatedGroup.getRepValue()).isEqualTo(savedGroup.getRepValue());
+
+    }
+
+    @Test
+    @DisplayName("정상 수정 - 타이틀 O, repOption X, repValue X")
+    void updateTestNormal_changedOnlyTitle() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedGroup", 3, makeArrToList("화", "목"));
+        groupService.update(groupUpdateReqDto);
+
+        GroupResDto groupResDto = groupService.one(savedGroup.getId());
+        assertThat(groupResDto.getTitle()).isEqualTo("updatedGroup");
+
+    }
+
+    @Test
+    @DisplayName("정상 수정 - 타이틀 X, repOption O, repValue O")
+    void updateTestNormal_changedRepOptionAndRepValue() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 2, makeArrToList("3"));
+        GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
+
+        Stream<LocalDate> dateResult = checkboxRepository.findByGroupId(updatedGroup.getId()).stream().map(Checkbox::getDate);
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 18),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 수정 - 타이틀 X, repOption X, repValue O")
+    void updateTestNormal_changedOnlyRepValue() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 3, makeArrToList("월", "수", "금"));
+        GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
+
+        Stream<LocalDate> dateResult = checkboxRepository.findByGroupId(updatedGroup.getId()).stream().map(Checkbox::getDate);
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 수정 - 타이틀 O, repOption O, repValue O")
+    void updateTestNormal_changedAll() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목"), plan.getId()));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedTitle", 2, makeArrToList("3"));
+        GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
+
+        GroupResDto groupResDto = groupService.one(updatedGroup.getId());
+        assertThat(groupResDto.getTitle()).isEqualTo("updatedTitle");
+
+        Stream<LocalDate> dateResult = checkboxRepository.findByGroupId(updatedGroup.getId()).stream().map(Checkbox::getDate);
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 18),
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("정상 수정 - 타이틀 O, repOption X, repValue O")
+    void updateTestNormal_changedTitleAndRepValue() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목"), plan.getId()));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedTitle", 3, makeArrToList("월", "일"));
+        GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
+
+        GroupResDto groupResDto = groupService.one(updatedGroup.getId());
+        assertThat(groupResDto.getTitle()).isEqualTo("updatedTitle");
+
+        Stream<LocalDate> dateResult = checkboxRepository.findByGroupId(updatedGroup.getId()).stream().map(Checkbox::getDate);
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 23),
+                LocalDate.of(2023, 7, 24)
+        );
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - Resource not found")
+    void updateTestAbnormal_resourceNotFound() {
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedTitle", 3, makeArrToList("월", "일"));
+        assertThrows(ResourceNotFoundException.class, () -> groupService.update(groupUpdateReqDto));
+
+    }
+
 }

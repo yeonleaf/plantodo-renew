@@ -30,10 +30,7 @@ public class CheckboxServiceTestImpl implements CheckboxService {
         Group group = findGroupRepOptionZero(planId);
         Checkbox checkbox = checkboxRepository.save(new Checkbox(group, checkboxReqDto.getTitle(), checkboxReqDto.getDate(), false));
 
-        group.addUncheckedCnt(1);
         groupRepository.save(group);
-
-        plan.addUncheckedCnt(1);
         planRepository.save(plan);
 
         return new CheckboxResDto(checkbox);

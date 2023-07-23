@@ -1,6 +1,7 @@
 package yeonleaf.plantodo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.stereotype.Service;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
@@ -34,7 +35,6 @@ public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
     private final GroupRepository groupRepository;
     private final CheckboxRepository checkboxRepository;
-    private final PlanDateRangeRevisionMaker planDateRangeRevisionMaker;
     private final RepInToOutConverter repInToOutConverter;
     private final RepOutToInConverter repOutToInConverter;
 
@@ -62,6 +62,8 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public PlanResDto update(PlanUpdateReqDto planUpdateReqDto) {
+
+        PlanDateRangeRevisionMaker planDateRangeRevisionMaker = new PlanDateRangeRevisionMaker();
 
         Long id = planUpdateReqDto.getId();
         Plan oldPlan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);

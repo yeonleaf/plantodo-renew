@@ -40,8 +40,6 @@ public class PlanRepositoryUnitTest {
         assertThat(findPlan.getId()).isEqualTo(plan.getId());
         assertThat(findPlan.getTitle()).isEqualTo(plan.getTitle());
         assertThat(findPlan.getStatus()).isEqualTo(plan.getStatus());
-        assertThat(findPlan.getCheckedCnt()).isEqualTo(plan.getCheckedCnt());
-        assertThat(findPlan.getUncheckedCnt()).isEqualTo(plan.getUncheckedCnt());
 
     }
 //

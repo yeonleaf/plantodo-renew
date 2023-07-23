@@ -58,9 +58,6 @@ public class CheckboxServiceUnitTest {
 
         assertThat(checkboxResDto.getId()).isNotNull();
 
-        Plan plan = planRepository.findById(planResDto.getId()).orElseThrow(ResourceNotFoundException::new);
-        assertThat(plan.getUncheckedCnt()).isEqualTo(1);
-
     }
 
     @Test

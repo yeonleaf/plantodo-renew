@@ -22,8 +22,6 @@ public class Group {
     private Plan plan;
 
     private String title;
-    private int checkedCnt;
-    private int uncheckedCnt;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "rep_id")
@@ -33,24 +31,12 @@ public class Group {
         this.plan = plan;
         this.title = title;
         this.repetition = repetition;
-        this.checkedCnt = 0;
-        this.uncheckedCnt = 0;
     }
 
     public Group(Plan plan, String title) {
         this.plan = plan;
         this.title = title;
-        this.checkedCnt = 0;
-        this.uncheckedCnt = 0;
         this.repetition = new Repetition(0, "00000000");
-    }
-
-    public void addUncheckedCnt(int uncheckedCnt) {
-        this.uncheckedCnt += uncheckedCnt;
-    }
-
-    public void addCheckedCnt(int checkedCnt) {
-        this.checkedCnt += checkedCnt;
     }
 
 }

@@ -90,7 +90,7 @@ public class PlanController {
     public ResponseEntity<?> update(@Valid @RequestBody PlanUpdateReqDto planUpdateReqDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            throw new ArgumentValidationException("입력값 타입/형식 오류", bindingResult);
+            throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
 
         PlanResDto planResDto = planService.update(planUpdateReqDto);

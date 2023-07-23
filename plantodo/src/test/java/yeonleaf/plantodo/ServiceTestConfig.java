@@ -10,6 +10,7 @@ import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.*;
+import yeonleaf.plantodo.validator.RepInputValidator;
 
 @TestConfiguration
 public class ServiceTestConfig {
@@ -51,7 +52,7 @@ public class ServiceTestConfig {
 
     @Bean
     public GroupServiceTestImpl groupService() {
-        return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxRepository(), repInToOutConverter(), repOutToInConverter());
+        return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxRepository(), repInToOutConverter(), repOutToInConverter(), repInputValidator());
     }
 
     @Bean
@@ -62,6 +63,11 @@ public class ServiceTestConfig {
     @Bean
     public MemberServiceTestImpl memberService() {
         return new MemberServiceTestImpl(memberRepository());
+    }
+
+    @Bean
+    public RepInputValidator repInputValidator() {
+        return new RepInputValidator();
     }
 
 }

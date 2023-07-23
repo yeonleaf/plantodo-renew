@@ -16,12 +16,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
+import yeonleaf.plantodo.dto.GroupUpdateReqDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.validator.RepInputValidator;
+
+import javax.swing.text.html.parser.Entity;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -40,8 +43,7 @@ public class GroupController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @PostMapping
-    public ResponseEntity<?> save(@Valid @RequestBody GroupReqDto groupReqDto,
-                                  BindingResult bindingResult) {
+    public ResponseEntity<?> save(@Valid @RequestBody GroupReqDto groupReqDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
@@ -65,6 +67,24 @@ public class GroupController {
 
         GroupResDto groupResDto = groupService.one(id);
         EntityModel<GroupResDto> entityModel = EntityModel.of(groupResDto, linkTo(methodOn(GroupController.class).one(id)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
+    }
+
+    @PutMapping
+    public ResponseEntity<?> update(@Valid @RequestBody GroupUpdateReqDto groupUpdateReqDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
+        }
+
+        repInputValidator.validate(new RepInputDto(groupUpdateReqDto.getRepOption(), groupUpdateReqDto.getRepValue()), bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new ArgumentValidationException("입력값 형식 오류", bindingResult);
+        }
+
+        GroupResDto groupResDto = groupService.update(groupUpdateReqDto);
+        EntityModel<GroupResDto> entityModel = EntityModel.of(groupResDto, linkTo(methodOn(GroupController.class).one(groupResDto.getId())).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 
     }

@@ -14,13 +14,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import yeonleaf.plantodo.domain.Checkbox;
 import yeonleaf.plantodo.domain.Group;
-import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.service.GroupService;
-import yeonleaf.plantodo.service.GroupServiceTestImpl;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.service.PlanService;
 
@@ -129,9 +127,7 @@ public class PlanControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(planResDto.getId()))
-                .andExpect(jsonPath("title").value(planResDto.getTitle()))
-                .andExpect(jsonPath("uncheckedCnt").value(planResDto.getUncheckedCnt()))
-                .andExpect(jsonPath("checkedCnt").value(planResDto.getCheckedCnt()));
+                .andExpect(jsonPath("title").value(planResDto.getTitle()));
 
     }
 

@@ -22,8 +22,6 @@ public class PlanServiceTestImpl implements PlanService {
     private final MemoryPlanRepository planRepository;
     private final MemoryGroupRepository groupRepository;
     private final MemoryCheckboxRepository checkboxRepository;
-
-    private final PlanDateRangeRevisionMaker planDateRangeRevisionMaker = new PlanDateRangeRevisionMaker();
     private final RepOutToInConverter repOutToInConverter = new RepOutToInConverter();
 
     @Override
@@ -51,6 +49,8 @@ public class PlanServiceTestImpl implements PlanService {
     @Override
     public PlanResDto update(PlanUpdateReqDto planUpdateReqDto) {
 
+        PlanDateRangeRevisionMaker planDateRangeRevisionMaker = new PlanDateRangeRevisionMaker();
+
         Long id = planUpdateReqDto.getId();
         Plan oldPlan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         if (onlyTitleDifferent(planUpdateReqDto, oldPlan)) {
@@ -59,6 +59,7 @@ public class PlanServiceTestImpl implements PlanService {
         }
 
         HashMap<LocalDate, Integer> revisedDateRange = planDateRangeRevisionMaker.revise(planUpdateReqDto, oldPlan);
+        System.out.println(revisedDateRange);
 
         oldPlan.setTitle(planUpdateReqDto.getTitle());
         oldPlan.setStart(planUpdateReqDto.getStart());

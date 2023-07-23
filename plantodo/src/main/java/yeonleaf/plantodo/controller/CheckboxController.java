@@ -58,6 +58,12 @@ public class CheckboxController {
 
     }
 
+    @Operation(summary = "Checkbox 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
+            @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+    })
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody CheckboxUpdateReqDto checkboxUpdateReqDto, BindingResult bindingResult) {
 

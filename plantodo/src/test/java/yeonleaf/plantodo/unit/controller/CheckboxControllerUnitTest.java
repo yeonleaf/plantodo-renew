@@ -15,6 +15,7 @@ import yeonleaf.plantodo.TestConfig;
 import yeonleaf.plantodo.controller.CheckboxController;
 import yeonleaf.plantodo.dto.CheckboxReqDto;
 import yeonleaf.plantodo.dto.CheckboxResDto;
+import yeonleaf.plantodo.dto.CheckboxUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.CheckboxServiceTestImpl;
 
@@ -22,8 +23,8 @@ import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Import({TestConfig.class})
@@ -109,6 +110,57 @@ public class CheckboxControllerUnitTest {
         when(checkboxService.one(any())).thenThrow(ResourceNotFoundException.class);
 
         MockHttpServletRequestBuilder request = get("/checkbox/1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 수정")
+    void updateTestNormal() throws Exception {
+
+        CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(1L, "updatedTitle");
+        MockHttpServletRequestBuilder request = put("/checkbox")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
+
+        when(checkboxService.update(any())).thenReturn(new CheckboxResDto(1L, "updatedTitle", false));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("title").value("updatedTitle"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - ArgumentResolver Validation")
+    void updateTestAbnormal_argumentResolverValidation() throws Exception {
+
+        CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(null, "updatedTitle");
+
+        MockHttpServletRequestBuilder request = put("/checkbox")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.id").exists())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - Resource not found")
+    void updateTestAbnormal_resourceNotFound() throws Exception {
+
+        CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(Long.MAX_VALUE, "updatedTitle");
+        MockHttpServletRequestBuilder request = put("/checkbox")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
+
+        when(checkboxService.update(any())).thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

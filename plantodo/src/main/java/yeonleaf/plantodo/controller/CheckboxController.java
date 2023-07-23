@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import yeonleaf.plantodo.dto.CheckboxReqDto;
 import yeonleaf.plantodo.dto.CheckboxResDto;
+import yeonleaf.plantodo.dto.CheckboxUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
@@ -53,6 +54,19 @@ public class CheckboxController {
 
         CheckboxResDto checkboxResDto = checkboxService.one(id);
         EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto, linkTo(methodOn(CheckboxController.class).one(id)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
+    }
+
+    @PutMapping
+    public ResponseEntity<?> update(@Valid @RequestBody CheckboxUpdateReqDto checkboxUpdateReqDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
+        }
+
+        CheckboxResDto checkboxResDto = checkboxService.update(checkboxUpdateReqDto);
+        EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto, linkTo(methodOn(CheckboxController.class).one(checkboxUpdateReqDto.getId())).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 
     }

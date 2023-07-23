@@ -6,11 +6,11 @@ import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.CheckboxReqDto;
 import yeonleaf.plantodo.dto.CheckboxResDto;
+import yeonleaf.plantodo.dto.CheckboxUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.repository.MemoryRepository;
 
 import java.util.List;
 
@@ -49,7 +49,19 @@ public class CheckboxServiceTestImpl implements CheckboxService {
 
     @Override
     public CheckboxResDto one(Long id) {
+
         Checkbox checkbox = checkboxRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         return new CheckboxResDto(checkbox);
+
+    }
+
+    @Override
+    public CheckboxResDto update(CheckboxUpdateReqDto checkboxUpdateReqDto) {
+
+        Checkbox oldCheckbox = checkboxRepository.findById(checkboxUpdateReqDto.getId()).orElseThrow(ResourceNotFoundException::new);
+        oldCheckbox.setTitle(checkboxUpdateReqDto.getTitle());
+        checkboxRepository.save(oldCheckbox);
+        return new CheckboxResDto(oldCheckbox);
+
     }
 }

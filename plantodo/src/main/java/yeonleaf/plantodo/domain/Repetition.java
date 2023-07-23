@@ -17,10 +17,10 @@ public class Repetition {
     @Column(name = "rep_id")
     private Long id;
 
-    private Long repOption;
+    private int repOption;
     private String repValue;
 
-    public Repetition(Long repOption, String repValue) {
+    public Repetition(int repOption, String repValue) {
         this.repOption = repOption;
         this.repValue = repValue;
     }

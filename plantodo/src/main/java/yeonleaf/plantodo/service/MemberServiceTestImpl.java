@@ -29,7 +29,7 @@ public class MemberServiceTestImpl implements MemberService {
 
     @Override
     public boolean isNotNewMember(String email) {
-        return memberRepository.findByEmail(email).size() > 0;
+        return !memberRepository.findByEmail(email).isEmpty();
     }
 
     @Override

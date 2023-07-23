@@ -1,6 +1,5 @@
 package yeonleaf.plantodo.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.hamcrest.Matchers;
@@ -10,18 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import yeonleaf.plantodo.domain.Group;
-import yeonleaf.plantodo.domain.Member;
-import yeonleaf.plantodo.domain.Plan;
-import yeonleaf.plantodo.domain.Repetition;
+import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.GroupReqDto;
+import yeonleaf.plantodo.dto.GroupUpdateReqDto;
+import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
@@ -30,13 +27,13 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * repOption = 2L, repOption = 3L 케이스는 테스트 불가 (현재 시점을 기준으로 테스트해야 하기 때문에 멱등을 보장할 수 없음)
+ * repOption = 2, repOption = 2 케이스는 테스트 불가 (현재 시점을 기준으로 테스트해야 하기 때문에 멱등을 보장할 수 없음)
  */
 @Transactional
 @SpringBootTest
@@ -51,6 +48,9 @@ public class GroupControllerTest {
 
     @Autowired
     private GroupRepository groupRepository;
+
+    @Autowired
+    private CheckboxRepository checkboxRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -74,13 +74,13 @@ public class GroupControllerTest {
     }
 
     @Test
-    @DisplayName("정상 등록 - repOption = 1L")
-    void saveTestNormal_RepOption1L() throws Exception {
+    @DisplayName("정상 등록 - repOption = 1")
+    void saveTestNormal_RepOption1() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
 
-        GroupReqDto groupReqDto = new GroupReqDto("group", 1L, makeArrToList(), plan.getId());
+        GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList(), plan.getId());
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -88,9 +88,7 @@ public class GroupControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaTypes.HAL_JSON))
                 .andExpect(jsonPath("id").isNumber())
-                .andExpect(jsonPath("uncheckedCnt").value(8))
                 .andExpect(jsonPath("_links").exists())
                 .andDo(print());
 
@@ -100,7 +98,7 @@ public class GroupControllerTest {
     @DisplayName("비정상 등록 - RepInputValidator Validation")
     void saveTestAbnormal_RepInputValidatorValidation() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("group", 1L, makeArrToList("월"), Long.MAX_VALUE);
+        GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList("월"), Long.MAX_VALUE);
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +116,7 @@ public class GroupControllerTest {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
-        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3L, "1010100")));
+        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         MockHttpServletRequestBuilder request = get("/group/" + group.getId());
 
@@ -137,6 +135,87 @@ public class GroupControllerTest {
     void oneTestAbnormal() throws Exception {
 
         MockHttpServletRequestBuilder request = get("/group/" + Long.MAX_VALUE);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 수정")
+    void updateTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 3, makeArrToList("화", "목", "토"));
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("title").value("updatedGroup"))
+                .andExpect(jsonPath("repOption").value(3))
+                .andExpect(jsonPath("repValue").value(Matchers.containsInAnyOrder("화", "목", "토")));
+
+        List<LocalDate> dateResult = checkboxRepository.findByGroupId(group.getId()).stream().map(Checkbox::getDate).toList();
+        assertThat(dateResult).containsOnly(
+                LocalDate.of(2023, 7, 25)
+        );
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - ArgumentResolver Validation")
+    void updateTestAbnormal_argumentResolverValidation() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 0, makeArrToList("화", "목", "토"));
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("입력값 타입/내용 오류"))
+                .andExpect(jsonPath("errors.repOption").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - RepInputValidator")
+    void updateTestAbnormal_repInputValidator() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 1, makeArrToList("화", "목", "토"));
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("입력값 형식 오류"))
+                .andExpect(jsonPath("errors.repValue").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - Resource not found")
+    void updateTestAbnormal_resourceNotFound() throws Exception {
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedGroup", 1, makeArrToList());
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

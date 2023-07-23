@@ -1,5 +1,6 @@
 package yeonleaf.plantodo.unit.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import yeonleaf.plantodo.domain.PlanStatus;
 import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
+import yeonleaf.plantodo.dto.PlanUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.service.PlanService;
@@ -27,8 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -209,51 +210,48 @@ public class PlanControllerUnitTest {
 
     }
 
-//    @Test
-//    @DisplayName("plan만 여러 개 정상 조회")
-//    void getAllTestNormal() throws Exception {
-//
-//        MockHttpServletRequestBuilder request = get("/plans")
-//                .header("Authorization", "")
-//                .param("memberId", "1");
-//
-//        List<PlanResDto> all = new ArrayList<>();
-//        all.add(new PlanResDto(1L, "plan1", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
-//        all.add(new PlanResDto(2L, "plan2", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
-//        all.add(new PlanResDto(3L, "plan3", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
-//
-//        when(planService.all(any())).thenReturn(all);
-//
-//        mockMvc.perform(request)
-//                .andExpect(status().isOk())
-//                .andDo(print());
-//
-//    }
-//
-//    @Test
-//    @DisplayName("정상 삭제 - plan만")
-//    void deleteTestNormal() throws Exception {
-//
-//        MockHttpServletRequestBuilder request = delete("/plan/1")
-//                .header("Authorization", "");
-//        when(planService.one(any())).thenReturn(new PlanResDto(1L, "title", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
-//        doNothing().when(planService).delete(any());
-//        mockMvc.perform(request)
-//                .andExpect(status().isNoContent());
-//
-//    }
-//
-//    @Test
-//    @DisplayName("비정상 삭제 - plan만 - Resource not found")
-//    void deleteTestAbnormal() throws Exception {
-//
-//        MockHttpServletRequestBuilder request = delete("/plan/1")
-//                .header("Authorization", "");
-//        when(planService.one(any())).thenReturn(null);
-//        doNothing().when(planService).delete(any());
-//        mockMvc.perform(request)
-//                .andExpect(jsonPath("message").value("Resource not found"));
-//
-//    }
+    @Test
+    @DisplayName("정상 수정")
+    void updateTestNormal() throws Exception {
+
+        PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(1L, "revisedTitle", LocalDate.now(), LocalDate.now().plusDays(3));
+        when(planService.update(any())).thenReturn(new PlanResDto(1L, "revisedTitle", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.NOW));
+        MockHttpServletRequestBuilder request = put("/plan")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(planUpdateReqDto));
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - Resource not found")
+    void updateTestAbnormal_resourceNotFound() throws Exception {
+
+        PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(1L, "revisedTitle", LocalDate.now(), LocalDate.now().plusDays(3));
+        doThrow(ResourceNotFoundException.class).when(planService).update(any());
+        MockHttpServletRequestBuilder request = put("/plan")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(planUpdateReqDto));
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - ArgumentResolver Validation")
+    void updateTestAbnormal_argumentResolverValidation() throws Exception {
+
+        PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(1L, null, LocalDate.now(), LocalDate.now().plusDays(3));
+        doThrow(ResourceNotFoundException.class).when(planService).update(any());
+        MockHttpServletRequestBuilder request = put("/plan")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(planUpdateReqDto));
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("입력값 타입/내용 오류"));
+
+    }
 
 }

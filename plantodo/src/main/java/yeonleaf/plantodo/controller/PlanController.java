@@ -19,6 +19,7 @@ import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
+import yeonleaf.plantodo.dto.PlanUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
@@ -80,6 +81,19 @@ public class PlanController {
     public ResponseEntity<?> one(@PathVariable Long id) {
 
         PlanResDto planResDto = planService.one(id);
+        EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
+    }
+
+    @PutMapping("/plan")
+    public ResponseEntity<?> update(@Valid @RequestBody PlanUpdateReqDto planUpdateReqDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
+        }
+
+        PlanResDto planResDto = planService.update(planUpdateReqDto);
         EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 

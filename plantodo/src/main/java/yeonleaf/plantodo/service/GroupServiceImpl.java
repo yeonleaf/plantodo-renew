@@ -10,6 +10,7 @@ import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.domain.Repetition;
 import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
+import yeonleaf.plantodo.dto.GroupUpdateReqDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.*;
@@ -17,6 +18,7 @@ import yeonleaf.plantodo.util.CheckboxDateCreator;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -47,10 +49,7 @@ public class GroupServiceImpl implements GroupService {
         dates.forEach(date -> {
             checkboxRepository.save(new Checkbox(group, group.getTitle(), date, false));
         });
-        group.setUncheckedCnt(dates.size());
         groupRepository.save(group);
-
-        plan.addUncheckedCnt(dates.size());
         planRepository.save(plan);
 
         return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
@@ -72,4 +71,66 @@ public class GroupServiceImpl implements GroupService {
         return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
 
     }
+
+    @Override
+    public GroupResDto update(GroupUpdateReqDto groupUpdateReqDto) {
+
+        Group oldGroup = groupRepository.findById(groupUpdateReqDto.getId()).orElseThrow(ResourceNotFoundException::new);
+
+        String oldTitle = oldGroup.getTitle();
+        int oldRepOption = oldGroup.getRepetition().getRepOption();
+        String oldRepValue = oldGroup.getRepetition().getRepValue();
+
+        String newTitle = groupUpdateReqDto.getTitle();
+        int newRepOption = groupUpdateReqDto.getRepOption();
+        List<String> newRepValueList = groupUpdateReqDto.getRepValue();
+        String newRepValue = Objects.requireNonNull(repInToOutConverter.convert(new RepInputDto(newRepOption, newRepValueList))).getRepValue();
+
+        boolean hasDifferentTitle = hasDifferentTitle(oldTitle, newTitle);
+        boolean hasDifferentRepOption = hasDifferentRepOption(oldRepOption, newRepOption);
+        boolean hasDifferentRepValue = hasDifferentRepValue(oldRepValue, newRepValue);
+
+        if (!hasDifferentTitle && !hasDifferentRepOption && !hasDifferentRepValue) {
+            return new GroupResDto(oldGroup, oldRepOption, newRepValueList);
+        }
+
+        oldGroup.setTitle(newTitle);
+
+        if (!hasDifferentRepOption && !hasDifferentRepValue) {
+            Group newGroup = groupRepository.save(oldGroup);
+            return new GroupResDto(newGroup, oldRepOption, newRepValueList);
+        }
+
+        resetCheckboxes(oldGroup, newRepOption, newRepValueList);
+
+        Repetition oldRepetition = oldGroup.getRepetition();
+        oldRepetition.setRepOption(newRepOption);
+        oldRepetition.setRepValue(newRepValue);
+        oldGroup.setRepetition(oldRepetition);
+
+        Group newGroup = groupRepository.save(oldGroup);
+
+        return new GroupResDto(newGroup, newRepOption, newRepValueList);
+    }
+
+    private boolean hasDifferentTitle(String oldTitle, String newTitle) {
+        return !oldTitle.equals(newTitle);
+    }
+
+    private boolean hasDifferentRepOption(int oldRepOption, int newRepOption) {
+        return oldRepOption != newRepOption;
+    }
+
+    private boolean hasDifferentRepValue(String oldRepValue, String newRepValue) {
+        return !oldRepValue.equals(newRepValue);
+    }
+
+    private void resetCheckboxes(Group group, int newRepOption, List<String> newRepValue) {
+
+        checkboxRepository.findByGroupId(group.getId()).forEach(checkboxRepository::delete);
+        List<LocalDate> dates = CheckboxDateCreator.create(group.getPlan(), new RepInputDto(newRepOption, newRepValue));
+        dates.forEach(date -> checkboxRepository.save(new Checkbox(group, group.getTitle(), date, false)));
+
+    }
+
 }

@@ -36,8 +36,6 @@ public class Plan {
     private Member member;
 
     private PlanStatus status;
-    private int checkedCnt;
-    private int uncheckedCnt;
 
     public Plan(PlanReqDto planReqDto, Member member) {
         this.title = planReqDto.getTitle();
@@ -45,8 +43,6 @@ public class Plan {
         this.end = planReqDto.getEnd();
         this.member = member;
         this.status = PlanStatus.NOW;
-        this.checkedCnt = 0;
-        this.uncheckedCnt = 0;
     }
 
     public Plan(String title, LocalDate start, LocalDate end, Member member) {
@@ -55,8 +51,15 @@ public class Plan {
         this.end = end;
         this.member = member;
         this.status = PlanStatus.NOW;
-        this.checkedCnt = 0;
-        this.uncheckedCnt = 0;
+    }
+
+    public Plan(Long id, String title, LocalDate start, LocalDate end, Member member) {
+        this.id = id;
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.member = member;
+        this.status = PlanStatus.NOW;
     }
 
     @Override
@@ -70,14 +73,6 @@ public class Plan {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getTitle(), getStart(), getEnd(), getMember());
-    }
-
-    public void addUncheckedCnt(int uncheckedCnt) {
-        this.uncheckedCnt += uncheckedCnt;
-    }
-
-    public void addCheckedCnt(int checkedCnt) {
-        this.checkedCnt += checkedCnt;
     }
 
 }

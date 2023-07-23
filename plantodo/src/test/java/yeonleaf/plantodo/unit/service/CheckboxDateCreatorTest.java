@@ -19,7 +19,7 @@ public class CheckboxDateCreatorTest {
         return Arrays.asList(target);
     }
 
-    private void makeCreateTestRepOption(LocalDate start, LocalDate end, Long repOption, List<String> repValue, int expectedCnt) {
+    private void makeCreateTestRepOption(LocalDate start, LocalDate end, int repOption, List<String> repValue, int expectedCnt) {
 
         Member member = new Member("test@abc.co.kr", "3d^$a2df");
         member.setId(1L);
@@ -33,65 +33,65 @@ public class CheckboxDateCreatorTest {
     }
 
     @Test
-    @DisplayName("repOption = 1L, start < end")
-    void createTestRepOption1L_EndGreaterThanStart() {
+    @DisplayName("repOption = 1, start < end")
+    void createTestRepOption1_EndGreaterThanStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 1L, makeArrToList(), 14);
+                LocalDate.of(2023, 7, 31), 1, makeArrToList(), 14);
 
     }
 
     @Test
-    @DisplayName("repOption = 1L, start = end")
-    void createTestRepOption1L_EndEqualToStart() {
+    @DisplayName("repOption = 1, start = end")
+    void createTestRepOption1_EndEqualToStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 18), 1L, makeArrToList(), 1);
+                LocalDate.of(2023, 7, 18), 1, makeArrToList(), 1);
 
     }
 
 
     @Test
-    @DisplayName("repOption = 2L, start < end")
-    void createTestRepOption2L_EndGreaterThanStart() {
+    @DisplayName("repOption = 2, start < end")
+    void createTestRepOption2_EndGreaterThanStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 2L, makeArrToList("2"), 7);
+                LocalDate.of(2023, 7, 31), 2, makeArrToList("2"), 7);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 20), 2L, makeArrToList("2"), 2);
+                LocalDate.of(2023, 7, 20), 2, makeArrToList("2"), 2);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 19), 2L, makeArrToList("2"), 1);
+                LocalDate.of(2023, 7, 19), 2, makeArrToList("2"), 1);
 
     }
 
     @Test
-    @DisplayName("repOption = 2L, start = end")
+    @DisplayName("repOption = 2, start = end")
     void createTestRepOption2L_EndEqualToStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 18), 2L, makeArrToList("2"), 1);
+                LocalDate.of(2023, 7, 18), 2, makeArrToList("2"), 1);
 
     }
 
     @Test
-    @DisplayName("repOption = 3L, start < end")
-    void createTestRepOption3L_EndGreaterThanStart() {
+    @DisplayName("repOption = 3, start < end")
+    void createTestRepOption3_EndGreaterThanStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 3L, makeArrToList("월", "수", "금"), 6);
+                LocalDate.of(2023, 7, 31), 3, makeArrToList("월", "수", "금"), 6);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 3L, makeArrToList("월", "화", "수", "목", "금", "토", "일"), 14);
+                LocalDate.of(2023, 7, 31), 3, makeArrToList("월", "화", "수", "목", "금", "토", "일"), 14);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 3L, makeArrToList("월"), 2);
+                LocalDate.of(2023, 7, 31), 3, makeArrToList("월"), 2);
 
     }
 
     @Test
-    @DisplayName("repOption = 3L, start = end")
+    @DisplayName("repOption = 3, start = end")
     void createTestRepOption3L_EndEqualToStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 18), 3L, makeArrToList("월", "수", "금"), 0);
+                LocalDate.of(2023, 7, 18), 3, makeArrToList("월", "수", "금"), 0);
 
     }
 

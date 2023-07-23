@@ -17,7 +17,7 @@ public class RepInToOutConverter implements Converter<RepInputDto, Repetition> {
 
         Repetition repetition = new Repetition();
 
-        Long repOption = source.getRepOption();
+        int repOption = source.getRepOption();
         List<String> repValue = source.getRepValue();
 
         repetition.setRepOption(repOption);
@@ -26,11 +26,11 @@ public class RepInToOutConverter implements Converter<RepInputDto, Repetition> {
 
     }
 
-    private String makeRepValue(Long repOption, List<String> repList) {
+    private String makeRepValue(int repOption, List<String> repList) {
 
-        if (repOption.equals(1L)) {
+        if (repOption == 1) {
             return "-1";
-        } else if (repOption.equals(2L)) {
+        } else if (repOption == 2) {
             return repList.get(0);
         } else {
             StringBuilder repStr = new StringBuilder("0000000");

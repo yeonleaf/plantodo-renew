@@ -15,6 +15,7 @@ import yeonleaf.plantodo.TestConfig;
 import yeonleaf.plantodo.controller.GroupController;
 import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupResDto;
+import yeonleaf.plantodo.dto.GroupUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.GroupService;
 
@@ -23,8 +24,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Import(TestConfig.class)
@@ -48,14 +48,14 @@ public class GroupControllerUnitTest {
     @DisplayName("정상 등록")
     void saveTestNormal() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "화"), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3, makeArrToList("월", "화"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestData);
 
-        when(groupService.save(any())).thenReturn(new GroupResDto(1L, "title", 0, 0, 3L, makeArrToList("월", "화")));
+        when(groupService.save(any())).thenReturn(new GroupResDto(1L, "title", 3, makeArrToList("월", "화")));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
@@ -67,7 +67,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 등록 - ArgumentResolver Validation")
     void saveTestAbnormal_ArgumentResolverValidation() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto(null, 4L, makeArrToList("월", "화"), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto(null, 4, makeArrToList("월", "화"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -86,7 +86,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 등록 - RepInputValidator")
     void saveTestAbnormal_RepInputValidator() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList(), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto("title", 2, makeArrToList(), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -103,7 +103,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 등록 - Resource not found")
     void saveTestAbnormal_ResourceNotFound() throws Exception {
 
-        GroupReqDto groupReqDto = new GroupReqDto("title", 3L, makeArrToList("월", "수"), 1L);
+        GroupReqDto groupReqDto = new GroupReqDto("title", 3, makeArrToList("월", "수"), 1L);
         String requestData = objectMapper.writeValueAsString(groupReqDto);
 
         MockHttpServletRequestBuilder request = post("/group")
@@ -124,7 +124,7 @@ public class GroupControllerUnitTest {
 
         MockHttpServletRequestBuilder request = get("/group/1");
 
-        when(groupService.one(any())).thenReturn(new GroupResDto(1L, "group", 0, 0, 1L, makeArrToList()));
+        when(groupService.one(any())).thenReturn(new GroupResDto(1L, "group", 1, makeArrToList()));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -143,6 +143,58 @@ public class GroupControllerUnitTest {
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 수정")
+    void updateTestNormal() throws Exception {
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(1L, "updatedTitle", 1, makeArrToList());
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        when(groupService.update(any())).thenReturn(new GroupResDto(groupUpdateReqDto.getId(), groupUpdateReqDto.getTitle(), groupUpdateReqDto.getRepOption(), groupUpdateReqDto.getRepValue()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("title").value("updatedTitle"))
+                .andExpect(jsonPath("_links.self").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - ArgumentResolver Validation")
+    void updateTestAbnormal_argumentResolverValidation() throws Exception {
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(1L, "updatedTitle", 0, makeArrToList());
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        when(groupService.update(any())).thenReturn(new GroupResDto(groupUpdateReqDto.getId(), groupUpdateReqDto.getTitle(), groupUpdateReqDto.getRepOption(), groupUpdateReqDto.getRepValue()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("입력값 타입/내용 오류"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 수정 - repInputValidator")
+    void updateTestAbnormal_repInputValidator() throws Exception {
+
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(1L, "updatedTitle", 2, makeArrToList("월", "수", "금"));
+        MockHttpServletRequestBuilder request = put("/group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        when(groupService.update(any())).thenReturn(new GroupResDto(groupUpdateReqDto.getId(), groupUpdateReqDto.getTitle(), groupUpdateReqDto.getRepOption(), groupUpdateReqDto.getRepValue()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("입력값 형식 오류"));
 
     }
 

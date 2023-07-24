@@ -22,12 +22,17 @@ public class ServiceTestConfig {
 
     @Bean
     public MemoryGroupRepository groupRepository() {
-        return new MemoryGroupRepository();
+        return new MemoryGroupRepository(repetitionRepository());
     }
 
     @Bean
     public MemoryCheckboxRepository checkboxRepository() {
         return new MemoryCheckboxRepository();
+    }
+
+    @Bean
+    public MemoryRepetitionRepository repetitionRepository() {
+        return new MemoryRepetitionRepository();
     }
 
     @Bean
@@ -57,7 +62,7 @@ public class ServiceTestConfig {
 
     @Bean
     public PlanServiceTestImpl planService() {
-        return new PlanServiceTestImpl(memberRepository(), planRepository(), groupRepository(), checkboxRepository());
+        return new PlanServiceTestImpl(memberRepository(), planRepository(), groupRepository(), checkboxRepository(), groupService());
     }
 
     @Bean

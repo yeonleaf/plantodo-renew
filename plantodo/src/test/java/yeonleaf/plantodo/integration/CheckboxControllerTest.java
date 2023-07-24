@@ -23,6 +23,7 @@ import yeonleaf.plantodo.service.PlanService;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -171,9 +172,64 @@ public class CheckboxControllerTest {
     void updateTestAbnormal_resourceNotFound() throws Exception {
 
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(Long.MAX_VALUE, "updatedTitle");
+
         MockHttpServletRequestBuilder request = put("/checkbox")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - group checkbox")
+    void deleteTestNormal_groupCheckbox() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "e1Df%4sa"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrList(), planResDto.getId()));
+
+        Checkbox checkbox = checkboxRepository.findByGroupId(groupResDto.getId()).get(0);
+        Long checkboxId = checkbox.getId();
+
+        MockHttpServletRequestBuilder request = delete("/checkbox/" + checkboxId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+        Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkboxId);
+        assertThat(findCheckbox).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - daily checkbox")
+    void deleteTestNormal_dailyCheckbox() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "e1Df%4sa"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        Long checkboxId = checkboxResDto.getId();
+
+        MockHttpServletRequestBuilder request = delete("/checkbox/" + checkboxId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+        Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkboxId);
+        assertThat(findCheckbox).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제 - Resource not found")
+    void deleteTestAbnormal_resourceNotFound() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/checkbox/" + Long.MAX_VALUE);
+
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));

@@ -22,7 +22,7 @@ import yeonleaf.plantodo.service.CheckboxServiceTestImpl;
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -161,6 +161,33 @@ public class CheckboxControllerUnitTest {
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
 
         when(checkboxService.update(any())).thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제")
+    void deleteTestNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/checkbox/1");
+
+        doNothing().when(checkboxService).delete(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제")
+    void deleteTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/checkbox/1");
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).delete(any());
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

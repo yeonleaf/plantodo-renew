@@ -1,41 +1,39 @@
 package yeonleaf.plantodo.repository;
 
+import lombok.RequiredArgsConstructor;
 import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Repetition;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 public class MemoryGroupRepository extends MemoryRepository<Group> {
-    private Map<Long, Group> groups = new HashMap<>();
-    private Map<Long, Repetition> repetitions = new HashMap<>();
-    private Long groupId = 1L;
-    private Long repId = 1L;
+
+    private final MemoryRepetitionRepository repetitionRepository;
+
+    private Map<Long, Group> data = new HashMap<>();
+    private Long id = 1L;
 
     @Override
     public Group save(Group group) {
         Long prevGroupId = group.getId();
-        Long prevRepeatId = group.getRepetition().getId();
-        if (groups.containsKey(prevGroupId)) {
-            groups.remove(prevGroupId);
-            groups.put(prevGroupId, group);
-            if (repetitions.containsKey(prevRepeatId)) {
-                repetitions.remove(prevRepeatId);
-                repetitions.put(prevRepeatId, group.getRepetition());
-            }
-        } else {
-            group.setId(groupId);
-            Repetition repetition = group.getRepetition();
-            repetition.setId(repId);
+        if (data.containsKey(prevGroupId)) {
+            data.remove(prevGroupId);
+            Repetition repetition = repetitionRepository.save(group.getRepetition());
             group.setRepetition(repetition);
-            repetitions.put(repId++, repetition);
-            groups.put(groupId++, group);
+            data.put(prevGroupId, group);
+        } else {
+            group.setId(id);
+            Repetition repetition = repetitionRepository.save(group.getRepetition());
+            group.setRepetition(repetition);
+            data.put(id++, group);
         }
         return group;
     }
 
     public List<Group> findByPlanId(Long planId) {
         List<Group> res = new ArrayList<>();
-        for (Group group : groups.values()) {
+        for (Group group : data.values()) {
             if (group.getPlan().getId().equals(planId)) {
                 res.add(group);
             }
@@ -45,11 +43,11 @@ public class MemoryGroupRepository extends MemoryRepository<Group> {
 
     @Override
     public Optional<Group> findById(Long id) {
-        return Optional.ofNullable(groups.get(id));
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
     public void delete(Group group) {
-
+        data.remove(group.getId());
     }
 }

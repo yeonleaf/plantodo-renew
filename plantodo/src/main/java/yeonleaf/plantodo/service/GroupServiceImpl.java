@@ -133,4 +133,12 @@ public class GroupServiceImpl implements GroupService {
 
     }
 
+    @Override
+    public void delete(Long id) {
+
+        Group group = groupRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        checkboxRepository.findByGroupId(group.getId()).forEach(checkboxRepository::delete);
+        groupRepository.delete(group);
+
+    }
 }

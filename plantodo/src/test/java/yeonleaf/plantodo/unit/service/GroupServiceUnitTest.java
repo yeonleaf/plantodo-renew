@@ -11,13 +11,16 @@ import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
+import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
+import yeonleaf.plantodo.repository.MemoryRepetitionRepository;
 import yeonleaf.plantodo.service.GroupServiceTestImpl;
 import yeonleaf.plantodo.service.PlanServiceTestImpl;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +41,12 @@ public class GroupServiceUnitTest {
 
     @Autowired
     private PlanServiceTestImpl planService;
+
+    @Autowired
+    private MemoryGroupRepository groupRepository;
+
+    @Autowired
+    private MemoryRepetitionRepository repetitionRepository;
 
     private Member makeMember(String email, String password) {
         Member member = new Member(email, password);
@@ -255,6 +264,35 @@ public class GroupServiceUnitTest {
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedTitle", 3, makeArrToList("월", "일"));
         assertThrows(ResourceNotFoundException.class, () -> groupService.update(groupUpdateReqDto));
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - Repetition, Checkbox 삭제 확인")
+    void deleteTestNormal() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목"), plan.getId()));
+        Group findGroup = groupRepository.findById(savedGroup.getId()).orElseThrow(ResourceNotFoundException::new);
+
+        Long groupId = findGroup.getId();
+        Long repetitionId = findGroup.getRepetition().getId();
+
+        groupService.delete(groupId);
+
+        List<Checkbox> findCheckboxes = checkboxRepository.findByGroupId(groupId);
+        Optional<Repetition> findRepetition = repetitionRepository.findById(repetitionId);
+        assertThat(findCheckboxes).isEmpty();
+        assertThat(findRepetition).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제 - Resource not found")
+    void deleteTestAbnormal_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> groupService.delete(Long.MAX_VALUE));
 
     }
 

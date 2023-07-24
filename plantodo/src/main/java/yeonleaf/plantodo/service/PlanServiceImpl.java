@@ -37,6 +37,7 @@ public class PlanServiceImpl implements PlanService {
     private final CheckboxRepository checkboxRepository;
     private final RepInToOutConverter repInToOutConverter;
     private final RepOutToInConverter repOutToInConverter;
+    private final GroupService groupService;
 
     @Override
     public PlanResDto save(PlanReqDto planReqDto) {
@@ -133,12 +134,9 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void delete(Long id) {
 
-        Optional<Plan> candidate = planRepository.findById(id);
-        if (candidate.isPresent()) {
-            planRepository.delete(candidate.get());
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        groupRepository.findByPlanId(plan.getId()).forEach(group -> groupService.delete(group.getId()));
+        planRepository.delete(plan);
 
     }
 

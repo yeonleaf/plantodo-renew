@@ -254,4 +254,31 @@ public class PlanControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 삭제")
+    void deleteTestNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/plan/1");
+
+        doNothing().when(planService).delete(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제")
+    void deleteTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/plan/1");
+
+        doThrow(ResourceNotFoundException.class).when(planService).delete(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

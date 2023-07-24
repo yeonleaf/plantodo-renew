@@ -36,7 +36,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     ResponseEntity<?> resourceNotFoundExceptionHandler(ResourceNotFoundException ex) throws JsonProcessingException {
-        ApiSimpleError apiSimpleError = new ApiSimpleError("Resource not found", "Ensure that you previously joined in the service");
+        ApiSimpleError apiSimpleError = new ApiSimpleError("Resource not found", "Ensure that you previously created a resource in the service");
         String responseData = objectMapper.writeValueAsString(apiSimpleError);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
     }

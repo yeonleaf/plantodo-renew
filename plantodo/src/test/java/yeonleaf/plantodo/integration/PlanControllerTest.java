@@ -18,6 +18,7 @@ import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
+import yeonleaf.plantodo.service.CheckboxService;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.service.PlanService;
@@ -25,6 +26,7 @@ import yeonleaf.plantodo.service.PlanService;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -49,13 +51,16 @@ public class PlanControllerTest {
     private MemberService memberService;
 
     @Autowired
-    private GroupRepository groupRepository;
-
-    @Autowired
     private PlanService planService;
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private CheckboxService checkboxService;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     @Autowired
     private CheckboxRepository checkboxRepository;
@@ -243,6 +248,45 @@ public class PlanControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제")
+    void deleteTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
+        Long planId = planResDto.getId();
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
+        Long groupId = groupResDto.getId();
+        Long checkboxId = checkboxResDto.getId();
+
+        MockHttpServletRequestBuilder request = delete("/plan/" + planId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+        List<Group> findGroups = groupRepository.findByPlanId(planId);
+        List<Checkbox> findCheckboxes = checkboxRepository.findByGroupId(groupId);
+        Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkboxId);
+
+        assertThat(findGroups).isEmpty();
+        assertThat(findCheckboxes).isEmpty();
+        assertThat(findCheckbox).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제 - Resource not found")
+    void deleteTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/group/" + Long.MAX_VALUE);
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
 
     }
 

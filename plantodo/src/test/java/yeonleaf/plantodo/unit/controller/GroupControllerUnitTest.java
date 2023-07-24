@@ -198,4 +198,31 @@ public class GroupControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 삭제")
+    void deleteTestNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/group/1");
+
+        doNothing().when(groupService).delete(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제")
+    void deleteTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/group/1");
+
+        doThrow(ResourceNotFoundException.class).when(groupService).delete(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

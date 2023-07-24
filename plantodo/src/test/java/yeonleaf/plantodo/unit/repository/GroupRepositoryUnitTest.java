@@ -13,6 +13,7 @@ import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
+import yeonleaf.plantodo.repository.RepetitionRepository;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -33,6 +34,9 @@ public class GroupRepositoryUnitTest {
 
     @Autowired
     private GroupRepository groupRepository;
+
+    @Autowired
+    private RepetitionRepository repetitionRepository;
 
     private List<String> makeArrToList(String... target) {
         return Arrays.asList(target);
@@ -63,6 +67,30 @@ public class GroupRepositoryUnitTest {
         assertThat(group.equals(findGroup)).isTrue();
 
     }
+
+    @Test
+    @DisplayName("Group 단건 삭제 (Repetition 삭제 확인)")
+    void deleteTestNormal_checkRepetition() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1eab^d2a"));
+        Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
+
+        Repetition repetition = new Repetition(2, "0000001");
+        Group group = groupRepository.save(new Group(plan, "title", repetition));
+
+        Long repetitionId = repetition.getId();
+        Long groupId = group.getId();
+
+        groupRepository.delete(group);
+
+        Optional<Group> findGroup = groupRepository.findById(groupId);
+        Optional<Repetition> findRepetition = repetitionRepository.findById(repetitionId);
+
+        assertThat(findGroup).isEmpty();
+        assertThat(findRepetition).isEmpty();
+
+    }
+
 
 //    @Test
 //    @DisplayName("정상 조회 - all - by plan id")

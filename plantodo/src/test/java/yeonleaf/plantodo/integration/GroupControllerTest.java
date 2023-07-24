@@ -147,7 +147,7 @@ public class GroupControllerTest {
     void updateTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 24), LocalDate.of(2023, 7, 27), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 3, makeArrToList("화", "목", "토"));
@@ -163,7 +163,8 @@ public class GroupControllerTest {
 
         List<LocalDate> dateResult = checkboxRepository.findByGroupId(group.getId()).stream().map(Checkbox::getDate).toList();
         assertThat(dateResult).containsOnly(
-                LocalDate.of(2023, 7, 25)
+                LocalDate.of(2023, 7, 25),
+                LocalDate.of(2023, 7, 27)
         );
 
     }
@@ -216,6 +217,37 @@ public class GroupControllerTest {
         MockHttpServletRequestBuilder request = put("/group")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupUpdateReqDto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제")
+    void deleteTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
+        Long groupId = group.getId();
+
+        MockHttpServletRequestBuilder request = delete("/group/" + groupId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+        List<Checkbox> findCheckboxes = checkboxRepository.findByGroupId(groupId);
+        assertThat(findCheckboxes).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제 - Resource not found")
+    void deleteTestAbnormal_resourceNotFound() throws Exception {
+
+        MockHttpServletRequestBuilder request = delete("/group/" + Long.MAX_VALUE);
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

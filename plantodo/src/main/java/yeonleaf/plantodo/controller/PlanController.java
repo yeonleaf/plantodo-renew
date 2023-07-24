@@ -105,6 +105,17 @@ public class PlanController {
 
     }
 
+    @Operation(summary = "Plan 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+    })
+    @DeleteMapping("/plan/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        planService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 //    @GetMapping("/plans")
 //    public ResponseEntity<?> all(@RequestParam(name = "memberId") Long memberId) {
 //
@@ -115,12 +126,6 @@ public class PlanController {
 //
 //    }
 //
-//    @DeleteMapping("/plan/{id}")
-//    public ResponseEntity<?> removal(@PathVariable Long id) {
-//        PlanResDto plan = Optional.ofNullable(planService.one(id)).orElseThrow(ResourceNotFoundException::new);
-//        planService.delete(plan.getId());
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//    }
 //
 //    @PatchMapping("/plan/{id}")
 //    public ResponseEntity<?> status(@PathVariable Long id) {

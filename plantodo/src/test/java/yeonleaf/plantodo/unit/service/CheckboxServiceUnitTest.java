@@ -22,6 +22,7 @@ import yeonleaf.plantodo.service.PlanService;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -150,6 +151,29 @@ public class CheckboxServiceUnitTest {
 
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(Long.MAX_VALUE, "updatedTitle");
         assertThrows(ResourceNotFoundException.class, () -> checkboxService.update(checkboxUpdateReqDto));
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제")
+    void deleteTestNormal() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+
+        checkboxService.delete(checkboxResDto.getId());
+
+        Optional<Checkbox> findCheckbox = checkboxRepository.findById(checkboxResDto.getId());
+        assertThat(findCheckbox).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제 - Resource not found")
+    void deleteTestAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.delete(Long.MAX_VALUE));
 
     }
 

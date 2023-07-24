@@ -7,19 +7,18 @@ import org.junit.jupiter.api.Test;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.Checkbox;
+import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
-import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
-import yeonleaf.plantodo.repository.MemoryGroupRepository;
-import yeonleaf.plantodo.repository.MemoryMemberRepository;
-import yeonleaf.plantodo.repository.MemoryPlanRepository;
+import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.*;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,19 +38,25 @@ public class PlanServiceUnitTest {
 
     private MemoryGroupRepository groupRepository;
 
+    private MemoryRepetitionRepository repetitionRepository;
+
     private MemoryCheckboxRepository checkboxRepository;
+
+    private CheckboxService checkboxService;
 
     @BeforeEach
     void setUp() {
+
         memberRepository = new MemoryMemberRepository();
         planRepository = new MemoryPlanRepository();
-        groupRepository = new MemoryGroupRepository();
+        repetitionRepository = new MemoryRepetitionRepository();
+        groupRepository = new MemoryGroupRepository(repetitionRepository);
         checkboxRepository = new MemoryCheckboxRepository();
 
         memberService = new MemberServiceTestImpl(memberRepository);
-        planService = new PlanServiceTestImpl(memberRepository, planRepository, groupRepository, checkboxRepository);
         groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter(), new RepInputValidator());
-
+        planService = new PlanServiceTestImpl(memberRepository, planRepository, groupRepository, checkboxRepository, groupService);
+        checkboxService = new CheckboxServiceTestImpl(planRepository, groupRepository, checkboxRepository);
     }
 
     private List<String> makeArrToList(String... target) {
@@ -515,6 +520,117 @@ public class PlanServiceUnitTest {
                 LocalDate.of(2023, 7, 21),
                 LocalDate.of(2023, 7, 24)
         );
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - 클라이언트 Group X, Daily Checkbox X")
+    void deleteTestNormal_noClientGroup_noDailyCheckboxes() {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
+
+        Long planId = planResDto.getId();
+        planService.delete(planId);
+
+        List<GroupResDto> groups = groupService.findAllByPlanId(planId);
+        assertThat(groups).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - 클라이언트 Group X, Daily Checkbox O")
+    void deleteTestNormal_noClientGroup_dailyCheckboxes() {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
+        Long planId = planResDto.getId();
+
+        CheckboxResDto checkboxResDto1 = checkboxService.save(new CheckboxReqDto("title1", planResDto.getId(), LocalDate.of(2023, 7, 18)));
+        CheckboxResDto checkboxResDto2 = checkboxService.save(new CheckboxReqDto("title2", planResDto.getId(), LocalDate.of(2023, 7, 19)));
+        CheckboxResDto checkboxResDto3 = checkboxService.save(new CheckboxReqDto("title3", planResDto.getId(), LocalDate.of(2023, 7, 20)));
+
+        planService.delete(planId);
+
+        Optional<Plan> findPlan = planRepository.findById(planId);
+        assertThat(findPlan).isEmpty();
+
+        List<Group> findGroup = groupRepository.findByPlanId(planId);
+        assertThat(findGroup).isEmpty();
+
+        Optional<Checkbox> findCheckbox1 = checkboxRepository.findById(checkboxResDto1.getId());
+        Optional<Checkbox> findCheckbox2 = checkboxRepository.findById(checkboxResDto2.getId());
+        Optional<Checkbox> findCheckbox3 = checkboxRepository.findById(checkboxResDto3.getId());
+
+        assertThat(findCheckbox1).isEmpty();
+        assertThat(findCheckbox2).isEmpty();
+        assertThat(findCheckbox3).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - 클라이언트 Group O, Daily Checkboxes X")
+    void deleteTestNormal_haveClientGroup_noDailyCheckboxes() {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        Long planId = planResDto.getId();
+        Long groupId = groupResDto.getId();
+
+        planService.delete(planId);
+
+        Optional<Plan> findPlan = planRepository.findById(planId);
+        assertThat(findPlan).isEmpty();
+
+        List<Group> findGroup = groupRepository.findByPlanId(planId);
+        assertThat(findGroup).isEmpty();
+
+        List<Checkbox> checkboxes = checkboxRepository.findByGroupId(groupId);
+        assertThat(checkboxes).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("정상 삭제 - 클라이언트 Group O, Daily Checkboxes O")
+    void deleteTestNormal_haveClientGroup_haveDailyCheckboxes() {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        Long planId = planResDto.getId();
+        Long groupId = groupResDto.getId();
+
+        CheckboxResDto checkboxResDto1 = checkboxService.save(new CheckboxReqDto("title1", planResDto.getId(), LocalDate.of(2023, 7, 18)));
+        CheckboxResDto checkboxResDto2 = checkboxService.save(new CheckboxReqDto("title2", planResDto.getId(), LocalDate.of(2023, 7, 19)));
+        CheckboxResDto checkboxResDto3 = checkboxService.save(new CheckboxReqDto("title3", planResDto.getId(), LocalDate.of(2023, 7, 20)));
+
+        planService.delete(planId);
+
+        Optional<Plan> findPlan = planRepository.findById(planId);
+        assertThat(findPlan).isEmpty();
+
+        List<Group> findGroup = groupRepository.findByPlanId(planId);
+        assertThat(findGroup).isEmpty();
+
+        Optional<Checkbox> findCheckbox1 = checkboxRepository.findById(checkboxResDto1.getId());
+        Optional<Checkbox> findCheckbox2 = checkboxRepository.findById(checkboxResDto2.getId());
+        Optional<Checkbox> findCheckbox3 = checkboxRepository.findById(checkboxResDto3.getId());
+
+        assertThat(findCheckbox1).isEmpty();
+        assertThat(findCheckbox2).isEmpty();
+        assertThat(findCheckbox3).isEmpty();
+
+        List<Checkbox> checkboxes = checkboxRepository.findByGroupId(groupId);
+        assertThat(checkboxes).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("비정상 삭제 - Resource not found")
+    void deleteTestAbnormal_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> planService.delete(Long.MAX_VALUE));
 
     }
 

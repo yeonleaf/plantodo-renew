@@ -22,6 +22,7 @@ public class PlanServiceTestImpl implements PlanService {
     private final MemoryPlanRepository planRepository;
     private final MemoryGroupRepository groupRepository;
     private final MemoryCheckboxRepository checkboxRepository;
+    private final GroupServiceTestImpl groupService;
     private final RepOutToInConverter repOutToInConverter = new RepOutToInConverter();
 
     @Override
@@ -119,12 +120,9 @@ public class PlanServiceTestImpl implements PlanService {
     @Override
     public void delete(Long id) {
 
-        Optional<Plan> candidate = planRepository.findById(id);
-        if (candidate.isPresent()) {
-            planRepository.delete(candidate.get());
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        groupRepository.findByPlanId(plan.getId()).forEach(group -> groupService.delete(group.getId()));
+        planRepository.delete(plan);
 
     }
 

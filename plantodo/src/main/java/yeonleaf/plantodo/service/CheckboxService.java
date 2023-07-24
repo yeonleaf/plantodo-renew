@@ -11,5 +11,6 @@ public interface CheckboxService {
     CheckboxResDto save(CheckboxReqDto checkboxReqDto);
     CheckboxResDto one(Long id);
     CheckboxResDto update(CheckboxUpdateReqDto checkboxUpdateReqDto);
+    void delete(Long id);
 
 }

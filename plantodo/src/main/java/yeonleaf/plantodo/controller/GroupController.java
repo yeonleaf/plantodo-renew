@@ -91,4 +91,17 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 
     }
+
+    @Operation(summary = "Group 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+
+        groupService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
 }

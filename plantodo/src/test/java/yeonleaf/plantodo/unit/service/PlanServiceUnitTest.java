@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
-import yeonleaf.plantodo.domain.Checkbox;
-import yeonleaf.plantodo.domain.Group;
-import yeonleaf.plantodo.domain.Plan;
+import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.*;
@@ -631,6 +629,44 @@ public class PlanServiceUnitTest {
     void deleteTestAbnormal_resourceNotFound() {
 
         assertThrows(ResourceNotFoundException.class, () -> planService.delete(Long.MAX_VALUE));
+
+    }
+
+    @Test
+    @DisplayName("정상 상태 변경 - NOW TO COMPLETED")
+    void changeTestNormal_nowToCompleted() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long planId = plan.getId();
+
+        planService.change(planId);
+
+        Plan findPlan = planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.COMPLETED);
+
+    }
+
+    @Test
+    @DisplayName("정상 상태 변경 - COMPLETED TO NOW")
+    void changeTestNormal_completedToNow() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.COMPLETED));
+        Long planId = plan.getId();
+
+        planService.change(planId);
+
+        Plan findPlan = planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.NOW);
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경 - Resource not found")
+    void changeTestAbnormal_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> planService.change(Long.MAX_VALUE));
 
     }
 

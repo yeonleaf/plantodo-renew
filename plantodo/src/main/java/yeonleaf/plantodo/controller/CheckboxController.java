@@ -93,4 +93,18 @@ public class CheckboxController {
 
     }
 
+    @Operation(summary = "Checkbox 상태 변경 (checked ↔ unchecked)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> change(@PathVariable Long id) {
+
+        CheckboxResDto checkboxResDto = checkboxService.change(id);
+        EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto, linkTo(methodOn(CheckboxController.class).change(id)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
+    }
+
 }

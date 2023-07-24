@@ -236,4 +236,33 @@ public class CheckboxControllerTest {
 
     }
 
+    @Test
+    @DisplayName("정상 상태 변경")
+    void changeStatusTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "e1Df%4sa"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        Long checkboxId = checkboxResDto.getId();
+
+        MockHttpServletRequestBuilder request = patch("/checkbox/" + checkboxId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("checked").value(true));
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경")
+    void changeStatusTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/checkbox/" + Long.MAX_VALUE);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

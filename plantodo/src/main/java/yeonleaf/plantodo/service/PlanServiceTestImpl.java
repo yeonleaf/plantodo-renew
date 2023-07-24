@@ -130,4 +130,14 @@ public class PlanServiceTestImpl implements PlanService {
     public List<PlanResDto> all(Long memberId) {
         return null;
     }
+
+    @Override
+    public PlanResDto change(Long id) {
+
+        Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        plan.changeStatus();
+        return new PlanResDto(planRepository.save(plan));
+
+    }
+
 }

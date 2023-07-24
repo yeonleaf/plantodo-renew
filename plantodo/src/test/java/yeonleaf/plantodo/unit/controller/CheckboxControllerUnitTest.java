@@ -195,4 +195,32 @@ public class CheckboxControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 상태 변경")
+    void changeStatusTestNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/checkbox/1");
+
+        doReturn(new CheckboxResDto(1L, "title", true)).when(checkboxService).change(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("checked").value("true"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경 - Resource not found")
+    void changeStatusTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/checkbox/1");
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).change(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

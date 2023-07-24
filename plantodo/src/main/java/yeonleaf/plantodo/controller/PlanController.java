@@ -112,8 +112,23 @@ public class PlanController {
     })
     @DeleteMapping("/plan/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
+
         planService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
+    @Operation(summary = "Plan 상태 변경 (NOW ↔ COMPLETED)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PlanResDto.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+    })
+    @PatchMapping("/plan/{id}")
+    public ResponseEntity<?> change(@PathVariable Long id) {
+
+        PlanResDto planResDto = planService.change(id);
+        return ResponseEntity.status(HttpStatus.OK).body(planResDto);
+
     }
 
 }

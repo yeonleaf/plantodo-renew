@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import yeonleaf.plantodo.domain.*;
+import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
@@ -75,4 +76,22 @@ public class CheckboxRepositoryUnitTest {
         assertThat(findCheckbox).isEmpty();
 
     }
+
+    @Test
+    @DisplayName("정상 상태 변경 - checked to unchecked")
+    void changeStatusTestNormal() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "ab3$ax#@"));
+        Plan plan = planRepository.save(new Plan("title", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Group group = groupRepository.save(new Group(plan, "title", new Repetition(1, "-1")));
+        Checkbox checkbox = checkboxRepository.save(new Checkbox(group, "title", LocalDate.now(), false));
+
+        checkbox.changeChecked();
+        checkboxRepository.save(checkbox);
+
+        Checkbox findCheckbox = checkboxRepository.findById(checkbox.getId()).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findCheckbox.isChecked()).isTrue();
+
+    }
+
 }

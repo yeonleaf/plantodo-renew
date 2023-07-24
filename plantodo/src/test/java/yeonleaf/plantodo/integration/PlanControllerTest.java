@@ -137,7 +137,7 @@ public class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("단건 비정상 조회")
+    @DisplayName("단건 비정상 조회 - Resource not found")
     void oneTestAbnormal() throws Exception {
 
         MockHttpServletRequestBuilder request = get("/plan/" + Long.MAX_VALUE);
@@ -238,7 +238,7 @@ public class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("비정상 수정")
+    @DisplayName("비정상 수정 - Resource not found")
     void updateTestAbnormal() throws Exception {
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(Long.MAX_VALUE, "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
@@ -283,7 +283,36 @@ public class PlanControllerTest {
     @DisplayName("비정상 삭제 - Resource not found")
     void deleteTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = delete("/group/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = delete("/plan/" + Long.MAX_VALUE);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 상태 변경")
+    void changeStatusTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
+        Long planId = planResDto.getId();
+
+        MockHttpServletRequestBuilder request = patch("/plan/" + planId);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("status").value("COMPLETED"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경 - Resource not found")
+    void changeStatusTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/plan/" + Long.MAX_VALUE);
+
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));

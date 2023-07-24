@@ -53,7 +53,10 @@ public class CheckboxController {
     public ResponseEntity<?> one(@PathVariable Long id) {
 
         CheckboxResDto checkboxResDto = checkboxService.one(id);
-        EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto, linkTo(methodOn(CheckboxController.class).one(id)).withSelfRel());
+        EntityModel<CheckboxResDto> entityModel = EntityModel.of(checkboxResDto,
+                linkTo(methodOn(CheckboxController.class).one(id)).withSelfRel(),
+                linkTo(methodOn(CheckboxController.class).delete(id)).withRel("deletion")
+        );
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 
     }

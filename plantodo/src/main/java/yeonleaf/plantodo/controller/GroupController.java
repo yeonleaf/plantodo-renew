@@ -63,7 +63,10 @@ public class GroupController {
     public ResponseEntity<?> one(@PathVariable Long id) {
 
         GroupResDto groupResDto = groupService.one(id);
-        EntityModel<GroupResDto> entityModel = EntityModel.of(groupResDto, linkTo(methodOn(GroupController.class).one(id)).withSelfRel());
+        EntityModel<GroupResDto> entityModel = EntityModel.of(groupResDto,
+                linkTo(methodOn(GroupController.class).one(id)).withSelfRel(),
+                linkTo(methodOn(GroupController.class).delete(id)).withRel("deletion")
+        );
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 
     }

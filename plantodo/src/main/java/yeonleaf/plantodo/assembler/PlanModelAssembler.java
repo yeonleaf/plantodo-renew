@@ -16,8 +16,8 @@ public class PlanModelAssembler implements RepresentationModelAssembler<PlanResD
     @Override
     public EntityModel<PlanResDto> toModel(PlanResDto planResDto) {
         return EntityModel.of(planResDto,
-                linkTo(methodOn(PlanController.class).one(planResDto.getId())).withSelfRel()
-//                linkTo(methodOn(PlanController.class).removal(planResDto.getId())).withRel("removal"),
+                linkTo(methodOn(PlanController.class).one(planResDto.getId())).withSelfRel(),
+                linkTo(methodOn(PlanController.class).delete(planResDto.getId())).withRel("deletion")
 //                linkTo(methodOn(PlanController.class).status(planResDto.getId())).withRel("switch")
         );
     }

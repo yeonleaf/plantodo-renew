@@ -116,20 +116,4 @@ public class PlanController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-//    @GetMapping("/plans")
-//    public ResponseEntity<?> all(@RequestParam(name = "memberId") Long memberId) {
-//
-//        List<EntityModel<PlanResDto>> planResDtoList = planService.all(memberId).stream()
-//                .map(planModelAssembler::toModel)
-//                .collect(Collectors.toList());
-//        return ResponseEntity.status(HttpStatus.OK).body(planResDtoList);
-//
-//    }
-//
-//
-//    @PatchMapping("/plan/{id}")
-//    public ResponseEntity<?> status(@PathVariable Long id) {
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
-
 }

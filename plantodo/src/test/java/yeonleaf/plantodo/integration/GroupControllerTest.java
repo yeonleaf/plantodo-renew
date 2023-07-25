@@ -274,4 +274,36 @@ public class GroupControllerTest {
 
     }
 
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
+        groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
+        groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
+
+        MockHttpServletRequestBuilder request = get("/groups")
+                .param("planId", plan.getId().toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - Resource not found")
+    void allTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/groups")
+                .param("planId", String.valueOf(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

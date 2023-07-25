@@ -1,11 +1,10 @@
 package yeonleaf.plantodo.repository;
 
+import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MemoryPlanRepository extends MemoryRepository<Plan> {
 
@@ -36,6 +35,16 @@ public class MemoryPlanRepository extends MemoryRepository<Plan> {
 
     public void delete(Plan plan) {
         data.remove(plan.getId());
+    }
+
+    public List<Plan> findByMemberId(Long memberId) {
+        List<Plan> res = new ArrayList<>();
+        for (Plan plan : data.values()) {
+            if (plan.getMember().getId().equals(memberId)) {
+                res.add(plan);
+            }
+        }
+        return res;
     }
 
 }

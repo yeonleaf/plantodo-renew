@@ -309,4 +309,39 @@ public class PlanControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() throws Exception {
+
+        List<PlanResDto> plans = new ArrayList<>();
+        plans.add(new PlanResDto(1L, "title1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+        plans.add(new PlanResDto(2L, "title2", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+        plans.add(new PlanResDto(3L, "title3", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+
+        when(planService.all(any())).thenReturn(plans);
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", "1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.planResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회")
+    void allTestAbnormal() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(planService).all(any());
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", "1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

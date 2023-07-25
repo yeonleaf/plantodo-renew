@@ -20,6 +20,8 @@ import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.CheckboxServiceTestImpl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -216,6 +218,80 @@ public class CheckboxControllerUnitTest {
         MockHttpServletRequestBuilder request = patch("/checkbox/1");
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).change(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - by plan")
+    void allTestNormal_byPlan() throws Exception {
+
+        List<CheckboxResDto> checkboxes = new ArrayList<>();
+        checkboxes.add(new CheckboxResDto(1L, "title", false));
+        checkboxes.add(new CheckboxResDto(1L, "title", true));
+        checkboxes.add(new CheckboxResDto(1L, "title", false));
+
+        when(checkboxService.allByPlan(any())).thenReturn(checkboxes);
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("id", "1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - by group")
+    void allTestNormal_byGroup() throws Exception {
+
+        List<CheckboxResDto> checkboxes = new ArrayList<>();
+        checkboxes.add(new CheckboxResDto(1L, "title", false));
+        checkboxes.add(new CheckboxResDto(1L, "title", true));
+        checkboxes.add(new CheckboxResDto(1L, "title", false));
+
+        when(checkboxService.allByGroup(any())).thenReturn(checkboxes);
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                        .param("id", "1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - by plan - Resource not found")
+    void allTestAbnormal_byPlan_resourceNotFound() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any());
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("id", "1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - by group - Resource not found")
+    void allTestAbnormal_byGroup_resourceNotFound() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any());
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("id", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.*;
@@ -21,6 +22,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 public class PlanServiceUnitTest {
 
@@ -68,7 +70,7 @@ public class PlanServiceUnitTest {
         MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
 
-        List<GroupResDto> groups = groupService.findAllByPlanId(plan.getId());
+        List<GroupResDto> groups = groupService.all(plan.getId());
 
         assertThat(groups.size()).isEqualTo(1);
         assertThat(groups.get(0).getRepOption()).isEqualTo(0);
@@ -547,7 +549,7 @@ public class PlanServiceUnitTest {
         Long planId = planResDto.getId();
         planService.delete(planId);
 
-        List<GroupResDto> groups = groupService.findAllByPlanId(planId);
+        List<Group> groups = groupRepository.findByPlanId(planId);
         assertThat(groups).isEmpty();
 
     }
@@ -683,6 +685,29 @@ public class PlanServiceUnitTest {
     void changeTestAbnormal_resourceNotFound() {
 
         assertThrows(ResourceNotFoundException.class, () -> planService.change(Long.MAX_VALUE));
+
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+
+        List<PlanResDto> all = planService.all(memberId);
+        assertThat(all.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - Resource not found")
+    void allTestAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> planService.all(Long.MAX_VALUE));
 
     }
 

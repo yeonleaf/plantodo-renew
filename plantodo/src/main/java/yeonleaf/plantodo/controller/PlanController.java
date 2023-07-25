@@ -140,4 +140,19 @@ public class PlanController {
 
     }
 
+    @Operation(summary = "모든 Plan 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping("/plans")
+    public ResponseEntity<?> all(@RequestParam Long memberId) {
+
+        List<EntityModel<PlanResDto>> all = planService.all(memberId).stream().map(planModelAssembler::toModel).toList();
+        CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all, linkTo(methodOn(PlanController.class)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
 }

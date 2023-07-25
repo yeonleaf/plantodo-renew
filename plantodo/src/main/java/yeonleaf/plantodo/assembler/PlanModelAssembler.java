@@ -13,7 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class PlanModelAssembler implements RepresentationModelAssembler<PlanResDto, EntityModel<PlanResDto>> {
-    @Override
+        @Override
     public EntityModel<PlanResDto> toModel(PlanResDto planResDto) {
         return EntityModel.of(planResDto,
                 linkTo(methodOn(PlanController.class).one(planResDto.getId())).withSelfRel(),

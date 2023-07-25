@@ -12,6 +12,7 @@ import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -79,6 +80,26 @@ public class CheckboxServiceTestImpl implements CheckboxService {
         Checkbox checkbox = checkboxRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         checkbox.changeChecked();
         return new CheckboxResDto(checkboxRepository.save(checkbox));
+
+    }
+
+    @Override
+    public List<CheckboxResDto> allByGroup(Long groupId) {
+
+        groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
+
+        return checkboxRepository.findByGroupId(groupId).stream().map(CheckboxResDto::new).toList();
+
+    }
+
+    @Override
+    public List<CheckboxResDto> allByPlan(Long planId) {
+
+        planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+
+        List<Checkbox> checkboxes = new ArrayList<>();
+        groupRepository.findByPlanId(planId).forEach(group -> checkboxes.addAll(checkboxRepository.findByGroupId(group.getId())));
+        return checkboxes.stream().map(CheckboxResDto::new).toList();
 
     }
 }

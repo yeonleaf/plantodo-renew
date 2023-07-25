@@ -287,4 +287,119 @@ public class CheckboxControllerTest {
 
     }
 
+    public List<String> makeArrToList(String... target) {
+        return Arrays.asList(target);
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - by plan")
+    void allTestNormal_byPlan() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "td#4edf1@"));
+        Long memberId = member.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("id", planId.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(4));
+
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - by group")
+    void allTestNormal_byGroup() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = member.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
+        Long planId = planResDto.getId();
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        Long groupId = groupResDto.getId();
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("id", groupId.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - by group - not lowercase standard")
+    void allTestNormal_byGroup_notLowerCaseStandard() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = member.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
+        Long planId = planResDto.getId();
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        Long groupId = groupResDto.getId();
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "GRoup")
+                .param("id", groupId.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - by plan - Resource not found")
+    void allTestAbnormal_byPlan() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("id", String.valueOf(Long.MAX_VALUE));
+
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - by group - Resource not found")
+    void allTestAbnormal_byGroup() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("id", String.valueOf(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - invalid standard")
+    void allTestAbnormal_notPlanAndNotGroup() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "member")
+                .param("id", String.valueOf(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.standard").exists());
+
+    }
+
+
+
+
 }

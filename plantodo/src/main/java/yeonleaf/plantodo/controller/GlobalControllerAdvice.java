@@ -49,4 +49,12 @@ public class GlobalControllerAdvice {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
 
+    @ExceptionHandler(QueryStringValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ResponseEntity<?> queryStringValidationExceptionHandler(QueryStringValidationException ex) throws JsonProcessingException {
+        ApiBindingError apiBindingError = new ApiBindingError("Invalid query strings", ex.getErrors());
+        String responseData = objectMapper.writeValueAsString(apiBindingError);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+    }
+
 }

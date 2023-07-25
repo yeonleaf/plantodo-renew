@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,8 +58,16 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupResDto> findAllByPlanId(Long planId) {
-        return null;
+    public List<GroupResDto> all(Long planId) {
+
+        planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+
+        return groupRepository.findByPlanId(planId).stream().map(group -> {
+            Repetition repetition = group.getRepetition();
+            RepInputDto repInputDto = repOutToInConverter.convert(repetition);
+            return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
+        }).collect(Collectors.toList());
+
     }
 
     @Override

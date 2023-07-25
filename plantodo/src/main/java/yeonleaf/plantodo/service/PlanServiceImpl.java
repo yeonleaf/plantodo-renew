@@ -53,8 +53,16 @@ public class PlanServiceImpl implements PlanService {
     public PlanResDto one(Long id) {
 
         Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        checkPlanOutdated(plan);
         return new PlanResDto(plan);
 
+    }
+
+    private void checkPlanOutdated(Plan plan) {
+        if (plan.getEnd().isBefore(LocalDate.now())) {
+            plan.changeToPast();
+            planRepository.save(plan);
+        }
     }
 
     @Override

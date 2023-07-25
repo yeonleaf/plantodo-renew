@@ -92,6 +92,22 @@ public class PlanServiceUnitTest {
     }
 
     @Test
+    @DisplayName("정상 조회 - PAST")
+    void oneTestNormal_planBecomesPast() {
+
+        MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
+        PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 24), member.getId()));
+
+        PlanResDto findPlan = planService.one(plan.getId());
+
+        assertThat(findPlan.getId()).isEqualTo(plan.getId());
+        assertThat(findPlan.getStart()).isEqualTo(plan.getStart());
+        assertThat(findPlan.getEnd()).isEqualTo(plan.getEnd());
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.PAST);
+
+    }
+
+    @Test
     @DisplayName("비정상 조회")
     void oneTestAbnormal() {
 

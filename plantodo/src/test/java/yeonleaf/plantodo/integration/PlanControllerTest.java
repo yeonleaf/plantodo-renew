@@ -138,6 +138,25 @@ public class PlanControllerTest {
     }
 
     @Test
+    @DisplayName("단건 정상 조회 - PAST")
+    void oneTestNormal_planBecomesPast() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 24), memberId));
+
+        MockHttpServletRequestBuilder request = get("/plan/" + planResDto.getId())
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberResDto.getId()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(planResDto.getId()))
+                .andExpect(jsonPath("title").value(planResDto.getTitle()))
+                .andExpect(jsonPath("status").value("PAST"));
+
+    }
+
+    @Test
     @DisplayName("단건 비정상 조회 - Resource not found")
     void oneTestAbnormal() throws Exception {
 

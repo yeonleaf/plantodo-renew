@@ -62,6 +62,28 @@ public class Plan {
         this.status = PlanStatus.NOW;
     }
 
+    public Plan(String title, LocalDate start, LocalDate end, Member member, PlanStatus status) {
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.member = member;
+        this.status = status;
+    }
+
+    public void changeStatus() {
+
+        if (this.status.equals(PlanStatus.NOW)) {
+            this.status = PlanStatus.COMPLETED;
+        } else if (this.status.equals(PlanStatus.COMPLETED)) {
+            this.status = PlanStatus.NOW;
+        }
+
+    }
+
+    public void changeToPast() {
+        this.status = PlanStatus.PAST;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -177,4 +177,45 @@ public class CheckboxServiceUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 상태 변경 - unchecked to checked")
+    void changeStatusTestNormal_uncheckedToChecked() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        Long checkboxId = checkboxResDto.getId();
+
+        checkboxService.change(checkboxId);
+
+        Checkbox findCheckbox = checkboxRepository.findById(checkboxId).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findCheckbox.isChecked()).isTrue();
+
+    }
+
+    @Test
+    @DisplayName("정상 상태 변경 - checked to unchecked")
+    void changeStatusTestNormal_checkedToUnchecked() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        Long checkboxId = checkboxResDto.getId();
+
+        checkboxService.change(checkboxId);
+        checkboxService.change(checkboxId);
+
+        Checkbox findCheckbox = checkboxRepository.findById(checkboxId).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findCheckbox.isChecked()).isFalse();
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경 - Resource not found")
+    void changeStatusAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.change(Long.MAX_VALUE));
+
+    }
+
 }

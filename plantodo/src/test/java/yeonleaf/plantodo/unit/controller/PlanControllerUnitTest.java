@@ -281,4 +281,32 @@ public class PlanControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 상태 변경")
+    void changeStatusNormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/plan/1");
+
+        when(planService.change(any())).thenReturn(new PlanResDto(1L, "plan", LocalDate.now(), LocalDate.now().plusDays(3), PlanStatus.COMPLETED));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("status").value("COMPLETED"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경 - Resource not found")
+    void changeStatusAbnormal_resourceNotFound() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/plan/1");
+
+        doThrow(ResourceNotFoundException.class).when(planService).change(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

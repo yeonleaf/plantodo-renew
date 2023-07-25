@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
+import yeonleaf.plantodo.domain.PlanStatus;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemberRepository;
@@ -57,20 +58,64 @@ public class PlanRepositoryUnitTest {
 
     }
 
-//
-//    @Test
-//    @DisplayName("모든 Plan 조회")
-//    void getAllPlanTest() {
-//
-//        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
-//        savePlan(member, 0);
-//        savePlan(member, 1);
-//        savePlan(member, 2);
-//
-//        List<Plan> all = planRepository.findAll();
-//        assertThat(all.size()).isEqualTo(3);
-//
-//    }
+    @Test
+    @DisplayName("상태 변경 - NOW to COMPLETED")
+    void changeOnePlan_nowToCompleted() {
 
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
+
+        plan.changeStatus();
+        planRepository.save(plan);
+
+        Plan findPlan = planRepository.findById(plan.getId()).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.COMPLETED);
+
+    }
+
+    @Test
+    @DisplayName("상태 변경 - COMPLETED to NOW")
+    void changeOnePlan_completedToNow() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.COMPLETED));
+
+        plan.changeStatus();
+        planRepository.save(plan);
+
+        Plan findPlan = planRepository.findById(plan.getId()).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.NOW);
+
+    }
+
+    @Test
+    @DisplayName("상태 변경 - NOW to PAST")
+    void changeOnePlan_nowToPast() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+
+        plan.changeToPast();
+        planRepository.save(plan);
+
+        Plan findPlan = planRepository.findById(plan.getId()).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.PAST);
+
+    }
+
+    @Test
+    @DisplayName("상태 변경 - COMPLETED to PAST")
+    void changeOnePlan_completedToPast() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.COMPLETED));
+
+        plan.changeToPast();
+        planRepository.save(plan);
+
+        Plan findPlan = planRepository.findById(plan.getId()).orElseThrow(ResourceNotFoundException::new);
+        assertThat(findPlan.getStatus()).isEqualTo(PlanStatus.PAST);
+
+    }
 
 }

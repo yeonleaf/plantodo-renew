@@ -14,12 +14,15 @@ import yeonleaf.plantodo.domain.Checkbox;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
+import yeonleaf.plantodo.provider.JwtBasicProvider;
+import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.service.CheckboxService;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.service.PlanService;
 
+import javax.crypto.SecretKey;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -57,6 +60,12 @@ public class CheckboxControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private SecretKey jwtSecretKey;
+
+    @Autowired
+    private JwtBasicProvider jwtProvider;
+
     @Test
     @DisplayName("정상 저장")
     void saveTestNormal() throws Exception {
@@ -67,6 +76,7 @@ public class CheckboxControllerTest {
         CheckboxReqDto checkboxReqDto = new CheckboxReqDto("checkbox", planResDto.getId(), LocalDate.now());
 
         MockHttpServletRequestBuilder request = post("/checkbox")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxReqDto));
 
@@ -86,7 +96,8 @@ public class CheckboxControllerTest {
         PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
         CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("checkbox", planResDto.getId(), LocalDate.now()));
 
-        MockHttpServletRequestBuilder request = get("/checkbox/" + checkboxResDto.getId());
+        MockHttpServletRequestBuilder request = get("/checkbox/" + checkboxResDto.getId())
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -100,7 +111,8 @@ public class CheckboxControllerTest {
     @DisplayName("단건 비정상 조회")
     void oneTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkbox/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = get("/checkbox/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
@@ -117,6 +129,7 @@ public class CheckboxControllerTest {
 
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(checkboxResDto.getId(), "updatedTitle");
         MockHttpServletRequestBuilder request = put("/checkbox")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
 
@@ -143,6 +156,7 @@ public class CheckboxControllerTest {
 
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(checkbox.getId(), "updatedTitle");
         MockHttpServletRequestBuilder request = put("/checkbox")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
         mockMvc.perform(request)
@@ -159,6 +173,7 @@ public class CheckboxControllerTest {
 
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(null, "updatedTitle");
         MockHttpServletRequestBuilder request = put("/checkbox")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(null))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
         mockMvc.perform(request)
@@ -174,6 +189,7 @@ public class CheckboxControllerTest {
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(Long.MAX_VALUE, "updatedTitle");
 
         MockHttpServletRequestBuilder request = put("/checkbox")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
 
@@ -194,7 +210,9 @@ public class CheckboxControllerTest {
         Checkbox checkbox = checkboxRepository.findByGroupId(groupResDto.getId()).get(0);
         Long checkboxId = checkbox.getId();
 
-        MockHttpServletRequestBuilder request = delete("/checkbox/" + checkboxId);
+        MockHttpServletRequestBuilder request = delete("/checkbox/" + checkboxId)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()));
+
 
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -214,7 +232,8 @@ public class CheckboxControllerTest {
         CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
         Long checkboxId = checkboxResDto.getId();
 
-        MockHttpServletRequestBuilder request = delete("/checkbox/" + checkboxId);
+        MockHttpServletRequestBuilder request = delete("/checkbox/" + checkboxId)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()));
 
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -228,7 +247,39 @@ public class CheckboxControllerTest {
     @DisplayName("비정상 삭제 - Resource not found")
     void deleteTestAbnormal_resourceNotFound() throws Exception {
 
-        MockHttpServletRequestBuilder request = delete("/checkbox/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = delete("/checkbox/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 상태 변경")
+    void changeStatusTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "e1Df%4sa"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        Long checkboxId = checkboxResDto.getId();
+
+        MockHttpServletRequestBuilder request = patch("/checkbox/" + checkboxId)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("checked").value(true));
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경")
+    void changeStatusTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/checkbox/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

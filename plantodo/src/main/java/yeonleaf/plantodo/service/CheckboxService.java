@@ -13,4 +13,6 @@ public interface CheckboxService {
     CheckboxResDto update(CheckboxUpdateReqDto checkboxUpdateReqDto);
     void delete(Long id);
 
+    CheckboxResDto change(Long id);
+
 }

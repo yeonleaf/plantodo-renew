@@ -35,6 +35,10 @@ public class Checkbox {
         this.checked = checked;
     }
 
+    public void changeChecked() {
+        this.checked = !this.isChecked();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -73,4 +73,12 @@ public class CheckboxServiceTestImpl implements CheckboxService {
 
     }
 
+    @Override
+    public CheckboxResDto change(Long id) {
+
+        Checkbox checkbox = checkboxRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        checkbox.changeChecked();
+        return new CheckboxResDto(checkboxRepository.save(checkbox));
+
+    }
 }

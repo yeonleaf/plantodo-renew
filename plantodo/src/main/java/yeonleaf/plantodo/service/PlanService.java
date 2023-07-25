@@ -21,4 +21,6 @@ public interface PlanService {
 
     List<PlanResDto> all(Long memberId);
 
+    PlanResDto change(Long id);
+
 }

@@ -38,13 +38,17 @@ public class PlanServiceTestImpl implements PlanService {
     @Override
     public PlanResDto one(Long id) {
 
-        Optional<Plan> candidate = planRepository.findById(id);
-        if (candidate.isPresent()) {
-            return new PlanResDto(candidate.get());
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        checkPlanOutdated(plan);
+        return new PlanResDto(plan);
 
+    }
+
+    private void checkPlanOutdated(Plan plan) {
+        if (plan.getEnd().isBefore(LocalDate.now())) {
+            plan.changeToPast();
+            planRepository.save(plan);
+        }
     }
 
     @Override
@@ -130,4 +134,14 @@ public class PlanServiceTestImpl implements PlanService {
     public List<PlanResDto> all(Long memberId) {
         return null;
     }
+
+    @Override
+    public PlanResDto change(Long id) {
+
+        Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        plan.changeStatus();
+        return new PlanResDto(planRepository.save(plan));
+
+    }
+
 }

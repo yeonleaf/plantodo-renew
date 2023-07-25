@@ -127,7 +127,8 @@ public class PlanControllerTest {
         Long memberId = memberResDto.getId();
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 8, 10), memberId));
 
-        MockHttpServletRequestBuilder request = get("/plan/" + planResDto.getId());
+        MockHttpServletRequestBuilder request = get("/plan/" + planResDto.getId())
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberResDto.getId()));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -137,10 +138,30 @@ public class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("단건 비정상 조회")
+    @DisplayName("단건 정상 조회 - PAST")
+    void oneTestNormal_planBecomesPast() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 24), memberId));
+
+        MockHttpServletRequestBuilder request = get("/plan/" + planResDto.getId())
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberResDto.getId()));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(planResDto.getId()))
+                .andExpect(jsonPath("title").value(planResDto.getTitle()))
+                .andExpect(jsonPath("status").value("PAST"));
+
+    }
+
+    @Test
+    @DisplayName("단건 비정상 조회 - Resource not found")
     void oneTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/plan/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = get("/plan/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
@@ -164,6 +185,7 @@ public class PlanControllerTest {
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(planResDto.getId(), "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
         MockHttpServletRequestBuilder request = put("/plan")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
 
@@ -195,6 +217,7 @@ public class PlanControllerTest {
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(planResDto.getId(), "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
         MockHttpServletRequestBuilder request = put("/plan")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
 
@@ -222,6 +245,7 @@ public class PlanControllerTest {
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(planResDto.getId(), "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
         MockHttpServletRequestBuilder request = put("/plan")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
 
@@ -238,11 +262,12 @@ public class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("비정상 수정")
+    @DisplayName("비정상 수정 - Resource not found")
     void updateTestAbnormal() throws Exception {
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(Long.MAX_VALUE, "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
         MockHttpServletRequestBuilder request = put("/plan")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
 
@@ -264,7 +289,8 @@ public class PlanControllerTest {
         Long groupId = groupResDto.getId();
         Long checkboxId = checkboxResDto.getId();
 
-        MockHttpServletRequestBuilder request = delete("/plan/" + planId);
+        MockHttpServletRequestBuilder request = delete("/plan/" + planId)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId));
 
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -283,7 +309,40 @@ public class PlanControllerTest {
     @DisplayName("비정상 삭제 - Resource not found")
     void deleteTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = delete("/group/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = delete("/plan/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 상태 변경")
+    void changeStatusTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
+        Long memberId = memberResDto.getId();
+        Long planId = planResDto.getId();
+
+        MockHttpServletRequestBuilder request = patch("/plan/" + planId)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("status").value("COMPLETED"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 상태 변경 - Resource not found")
+    void changeStatusTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = patch("/plan/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
+
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));

@@ -23,7 +23,7 @@ public class WebConfig {
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(new LoginCheckInterceptor(jwtSecretKey, objectMapper))
-                        .addPathPatterns("/plan/*", "/checkbox/*", "/group/*");
+                        .addPathPatterns("/plan", "/plan/*", "/checkbox", "/checkbox/*", "/group", "/group/*");
             }
         };
     }

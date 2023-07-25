@@ -18,11 +18,14 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.GroupReqDto;
 import yeonleaf.plantodo.dto.GroupUpdateReqDto;
+import yeonleaf.plantodo.provider.JwtBasicProvider;
+import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
 
+import javax.crypto.SecretKey;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -61,6 +64,12 @@ public class GroupControllerTest {
     @Autowired
     private WebApplicationContext ctx;
 
+    @Autowired
+    private SecretKey jwtSecretKey;
+
+    @Autowired
+    private JwtBasicProvider jwtProvider;
+
     @BeforeEach
     void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
@@ -83,6 +92,7 @@ public class GroupControllerTest {
         GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList(), plan.getId());
 
         MockHttpServletRequestBuilder request = post("/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupReqDto));
 
@@ -101,6 +111,7 @@ public class GroupControllerTest {
         GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList("월"), Long.MAX_VALUE);
 
         MockHttpServletRequestBuilder request = post("/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupReqDto));
 
@@ -118,7 +129,8 @@ public class GroupControllerTest {
         Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
-        MockHttpServletRequestBuilder request = get("/group/" + group.getId());
+        MockHttpServletRequestBuilder request = get("/group/" + group.getId())
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -134,7 +146,8 @@ public class GroupControllerTest {
     @DisplayName("단건 비정상 조회")
     void oneTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/group/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = get("/group/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
@@ -152,6 +165,7 @@ public class GroupControllerTest {
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 3, makeArrToList("화", "목", "토"));
         MockHttpServletRequestBuilder request = put("/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupUpdateReqDto));
 
@@ -179,6 +193,7 @@ public class GroupControllerTest {
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 0, makeArrToList("화", "목", "토"));
         MockHttpServletRequestBuilder request = put("/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupUpdateReqDto));
 
@@ -199,6 +214,7 @@ public class GroupControllerTest {
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 1, makeArrToList("화", "목", "토"));
         MockHttpServletRequestBuilder request = put("/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupUpdateReqDto));
 
@@ -215,6 +231,7 @@ public class GroupControllerTest {
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedGroup", 1, makeArrToList());
         MockHttpServletRequestBuilder request = put("/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(groupUpdateReqDto));
 
@@ -233,7 +250,8 @@ public class GroupControllerTest {
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
         Long groupId = group.getId();
 
-        MockHttpServletRequestBuilder request = delete("/group/" + groupId);
+        MockHttpServletRequestBuilder request = delete("/group/" + groupId)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()));
 
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -247,7 +265,8 @@ public class GroupControllerTest {
     @DisplayName("비정상 삭제 - Resource not found")
     void deleteTestAbnormal_resourceNotFound() throws Exception {
 
-        MockHttpServletRequestBuilder request = delete("/group/" + Long.MAX_VALUE);
+        MockHttpServletRequestBuilder request = delete("/group/" + Long.MAX_VALUE)
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE));
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

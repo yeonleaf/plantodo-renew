@@ -52,12 +52,8 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public PlanResDto one(Long id) {
 
-        Optional<Plan> candidate = planRepository.findById(id);
-        if (candidate.isPresent()) {
-            return new PlanResDto(candidate.get());
-        } else {
-            throw new ResourceNotFoundException();
-        }
+        Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return new PlanResDto(plan);
 
     }
 

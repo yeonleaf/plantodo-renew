@@ -4,6 +4,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
+import yeonleaf.plantodo.controller.CheckboxController;
 import yeonleaf.plantodo.controller.GroupController;
 import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.PlanResDto;
@@ -22,6 +23,7 @@ public class GroupModelAssembler implements RepresentationModelAssembler<GroupRe
     public EntityModel<GroupResDto> toModel(GroupResDto entity) {
         return EntityModel.of(entity,
                 linkTo(methodOn(GroupController.class).one(entity.getId())).withSelfRel(),
+                linkTo(methodOn(CheckboxController.class).all("group", entity.getId())).withRel("lower-collection"),
                 linkTo(methodOn(GroupController.class).delete(entity.getId())).withRel("deletion"));
     }
 }

@@ -191,7 +191,8 @@ public class PlanControllerUnitTest {
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(1L))
-                .andExpect(jsonPath("_links.self").exists());
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.lower-collection").exists());
 
     }
 

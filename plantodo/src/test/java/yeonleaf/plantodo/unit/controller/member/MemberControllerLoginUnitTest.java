@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,7 +84,8 @@ public class MemberControllerLoginUnitTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("token").isString());
+                .andExpect(jsonPath("token").isString())
+                .andExpect(jsonPath("_links.collection").exists());
 
     }
 

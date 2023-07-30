@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,9 @@ import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.validator.JoinFormatCheckValidator;
 import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/member")
@@ -53,7 +57,6 @@ public class MemberController {
         }
 
         MemberResDto memberResDto = memberService.save(memberReqDto);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(memberResDto);
     }
 
@@ -72,7 +75,8 @@ public class MemberController {
 
         Long memberId = memberService.login(memberReqDto);
         JwtTokenDto token = new JwtTokenDto(jwtProvider.generateToken(memberId));
-        return ResponseEntity.status(HttpStatus.OK).body(token);
+        EntityModel<JwtTokenDto> entityModel = EntityModel.of(token, linkTo(methodOn(PlanController.class).all(memberId)).withRel("collection"));
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
     }
 
 //    @Operation(description = "회원 삭제", responses = {

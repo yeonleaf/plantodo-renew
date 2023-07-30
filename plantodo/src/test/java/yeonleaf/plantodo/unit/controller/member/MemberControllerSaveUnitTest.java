@@ -79,7 +79,8 @@ public class MemberControllerSaveUnitTest {
 
         MockHttpServletRequestBuilder request = makeSaveRequest("test@abc.co.kr", "sz81@Za3");
         mockMvc.perform(request)
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andDo(print());
 
     }
 

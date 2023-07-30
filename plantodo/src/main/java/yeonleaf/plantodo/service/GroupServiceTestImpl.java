@@ -61,9 +61,11 @@ public class GroupServiceTestImpl implements GroupService {
     }
 
     @Override
-    public List<GroupResDto> findAllByPlanId(Long planId) {
+    public List<GroupResDto> all(Long planId) {
 
-        return ((MemoryGroupRepository) groupRepository).findByPlanId(planId).stream().map(group -> {
+        planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+
+        return groupRepository.findByPlanId(planId).stream().map(group -> {
             Repetition repetition = group.getRepetition();
             RepInputDto repInputDto = repOutToInConverter.convert(repetition);
             return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());

@@ -349,4 +349,35 @@ public class PlanControllerTest {
 
     }
 
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
+        planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
+        planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", memberResDto.getId().toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.planResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - Resource not found")
+    void allTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", String.valueOf(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

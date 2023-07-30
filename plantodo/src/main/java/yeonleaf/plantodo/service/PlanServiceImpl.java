@@ -146,7 +146,10 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public List<PlanResDto> all(Long memberId) {
-        return null;
+
+        memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
+        return planRepository.findByMemberId(memberId).stream().map(PlanResDto::new).toList();
+
     }
 
     @Override

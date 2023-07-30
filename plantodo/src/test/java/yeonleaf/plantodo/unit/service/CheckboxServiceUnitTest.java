@@ -218,4 +218,53 @@ public class CheckboxServiceUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - planId로 조회")
+    void allTestNormal_byPlanId() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+
+        List<CheckboxResDto> allByPlan = checkboxService.allByPlan(planResDto.getId());
+        assertThat(allByPlan.size()).isEqualTo(7);
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - planId로 조회")
+    void allTestAbnormal_byPlanId() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.allByPlan(Long.MAX_VALUE));
+
+    }
+
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회 - groupId로 조회")
+    void allTestNormal_byGroupId() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
+        checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+
+        List<CheckboxResDto> allByGroup = checkboxService.allByGroup(groupResDto.getId());
+        assertThat(allByGroup.size()).isEqualTo(4);
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - groupId로 조회")
+    void allTestAbnormal_byGroupId() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.allByGroup(Long.MAX_VALUE));
+
+    }
+
 }

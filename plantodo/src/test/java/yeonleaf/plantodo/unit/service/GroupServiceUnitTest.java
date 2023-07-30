@@ -296,4 +296,28 @@ public class GroupServiceUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
+        groupService.save(new GroupReqDto("title2", 3, makeArrToList("화", "목"), plan.getId()));
+        groupService.save(new GroupReqDto("title3", 3, makeArrToList("화", "목"), plan.getId()));
+
+        List<GroupResDto> all = groupService.all(plan.getId());
+
+        assertThat(all.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회 - Resource not found")
+    void allTestAbnormal() {
+
+        assertThrows(ResourceNotFoundException.class, () -> groupService.all(Long.MAX_VALUE));
+
+    }
+
 }

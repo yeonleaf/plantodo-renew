@@ -19,6 +19,7 @@ import yeonleaf.plantodo.dto.GroupUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.GroupService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -130,7 +131,8 @@ public class GroupControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(1L))
                 .andExpect(content().contentType(MediaTypes.HAL_JSON))
-                .andExpect(jsonPath("_links").exists());
+                .andExpect(jsonPath("_links").exists())
+                .andExpect(jsonPath("_links.lower-collection").exists());
 
     }
 
@@ -218,6 +220,41 @@ public class GroupControllerUnitTest {
         MockHttpServletRequestBuilder request = delete("/group/1");
 
         doThrow(ResourceNotFoundException.class).when(groupService).delete(any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() throws Exception {
+
+        List<GroupResDto> groups = new ArrayList<>();
+        groups.add(new GroupResDto(1L, "title1", 1, makeArrToList()));
+        groups.add(new GroupResDto(2L, "title1", 1, makeArrToList()));
+        groups.add(new GroupResDto(3L, "title1", 1, makeArrToList()));
+
+        when(groupService.all(any())).thenReturn(groups);
+
+        MockHttpServletRequestBuilder request = get("/groups")
+                .param("planId", "1");
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 순수 컬렉션 조회")
+    void allTestAbnormal() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(groupService).all(any());
+
+        MockHttpServletRequestBuilder request = get("/groups")
+                .param("planId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

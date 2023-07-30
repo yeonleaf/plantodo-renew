@@ -85,7 +85,7 @@ public class MemberControllerLoginUnitTest {
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("token").isString())
-                .andExpect(jsonPath("_links.collection").exists());
+                .andExpect(jsonPath("_links.lower-collection").exists());
 
     }
 

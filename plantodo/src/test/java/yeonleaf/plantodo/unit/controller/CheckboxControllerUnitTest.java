@@ -47,7 +47,7 @@ public class CheckboxControllerUnitTest {
     void saveTestNormal() throws Exception {
 
         CheckboxReqDto checkboxReqDto = new CheckboxReqDto("checkbox", 1L, LocalDate.now());
-        when(checkboxService.save(any())).thenReturn(new CheckboxResDto(1L, "checkbox", false));
+        when(checkboxService.save(any())).thenReturn(new CheckboxResDto(1L, "checkbox", LocalDate.of(2023, 7, 18), false));
         MockHttpServletRequestBuilder request = post("/checkbox")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxReqDto));
@@ -94,7 +94,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("단건 정상 조회")
     void oneTestNormal() throws Exception {
 
-        when(checkboxService.one(any())).thenReturn(new CheckboxResDto(1L, "checkbox", false));
+        when(checkboxService.one(any())).thenReturn(new CheckboxResDto(1L, "checkbox", LocalDate.of(2023, 7, 18), false));
 
         MockHttpServletRequestBuilder request = get("/checkbox/1");
 
@@ -128,7 +128,7 @@ public class CheckboxControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(checkboxUpdateReqDto));
 
-        when(checkboxService.update(any())).thenReturn(new CheckboxResDto(1L, "updatedTitle", false));
+        when(checkboxService.update(any())).thenReturn(new CheckboxResDto(1L, "updatedTitle", LocalDate.of(2023, 7, 18), false));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -203,7 +203,7 @@ public class CheckboxControllerUnitTest {
 
         MockHttpServletRequestBuilder request = patch("/checkbox/1");
 
-        doReturn(new CheckboxResDto(1L, "title", true)).when(checkboxService).change(any());
+        doReturn(new CheckboxResDto(1L, "checkbox", LocalDate.of(2023, 7, 18), true)).when(checkboxService).change(any());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -225,20 +225,25 @@ public class CheckboxControllerUnitTest {
 
     }
 
+    private List<CheckboxResDto> makeSampleCheckboxes() {
+        List<CheckboxResDto> checkboxes = new ArrayList<>();
+        checkboxes.add(new CheckboxResDto(1L, "checkbox", LocalDate.of(2023, 7, 18), false));
+        checkboxes.add(new CheckboxResDto(1L, "checkbox", LocalDate.of(2023, 7, 18), false));
+        checkboxes.add(new CheckboxResDto(1L, "checkbox", LocalDate.of(2023, 7, 18), false));
+        return checkboxes;
+    }
+
     @Test
     @DisplayName("정상 순수 컬렉션 조회 - by plan")
     void allTestNormal_byPlan() throws Exception {
 
-        List<CheckboxResDto> checkboxes = new ArrayList<>();
-        checkboxes.add(new CheckboxResDto(1L, "title", false));
-        checkboxes.add(new CheckboxResDto(1L, "title", true));
-        checkboxes.add(new CheckboxResDto(1L, "title", false));
+        List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
 
         when(checkboxService.allByPlan(any())).thenReturn(checkboxes);
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "plan")
-                .param("id", "1");
+                .param("standardId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -250,16 +255,13 @@ public class CheckboxControllerUnitTest {
     @DisplayName("정상 순수 컬렉션 조회 - by group")
     void allTestNormal_byGroup() throws Exception {
 
-        List<CheckboxResDto> checkboxes = new ArrayList<>();
-        checkboxes.add(new CheckboxResDto(1L, "title", false));
-        checkboxes.add(new CheckboxResDto(1L, "title", true));
-        checkboxes.add(new CheckboxResDto(1L, "title", false));
+        List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
 
         when(checkboxService.allByGroup(any())).thenReturn(checkboxes);
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "group")
-                        .param("id", "1");
+                        .param("standardId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -275,7 +277,7 @@ public class CheckboxControllerUnitTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "plan")
-                .param("id", "1");
+                .param("standardId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
@@ -291,11 +293,98 @@ public class CheckboxControllerUnitTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "group")
-                .param("id", "1");
+                .param("standardId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 일별 컬렉션 조회 - by group")
+    void collectionFilteredByDateTestNormal_byGroup() throws Exception {
+
+        List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", "1")
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        when(checkboxService.allByGroup(any(), any())).thenReturn(checkboxes);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("정상 일별 컬렉션 조회 - by group - Resource not found")
+    void collectionFilteredByDateTestAbnormal_byGroup() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", String.valueOf(Long.MAX_VALUE))
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any(), any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 일별 컬렉션 조회 - by plan")
+    void collectionFilteredByDateTestNormal_byPlan() throws Exception {
+
+        List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", "1")
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        when(checkboxService.allByPlan(any(), any())).thenReturn(checkboxes);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 일별 컬렉션 조회 - by plan - Resource not found")
+    void collectionFilteredByDateTestAbnormal_byPlan() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", String.valueOf(Long.MAX_VALUE))
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any(), any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 일별 컬렉션 조회 - invalid requestParam")
+    void collectionFilteredByDateTestAbnormal_invalidRequestParam() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "gorilla")
+                .param("standardId", "1")
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.standard").exists());
 
     }
 

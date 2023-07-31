@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import yeonleaf.plantodo.domain.Checkbox;
 import yeonleaf.plantodo.domain.Member;
+import yeonleaf.plantodo.domain.Plan;
+import yeonleaf.plantodo.domain.PlanStatus;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
@@ -304,7 +306,7 @@ public class CheckboxControllerTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "plan")
-                .param("id", planId.toString());
+                .param("standardId", planId.toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -326,7 +328,7 @@ public class CheckboxControllerTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "group")
-                .param("id", groupId.toString());
+                .param("standardId", groupId.toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -348,7 +350,7 @@ public class CheckboxControllerTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "GRoup")
-                .param("id", groupId.toString());
+                .param("standardId", groupId.toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -362,7 +364,7 @@ public class CheckboxControllerTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "plan")
-                .param("id", String.valueOf(Long.MAX_VALUE));
+                .param("standardId", String.valueOf(Long.MAX_VALUE));
 
 
         mockMvc.perform(request)
@@ -377,7 +379,7 @@ public class CheckboxControllerTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "group")
-                .param("id", String.valueOf(Long.MAX_VALUE));
+                .param("standardId", String.valueOf(Long.MAX_VALUE));
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
@@ -391,7 +393,7 @@ public class CheckboxControllerTest {
 
         MockHttpServletRequestBuilder request = get("/checkboxes")
                 .param("standard", "member")
-                .param("id", String.valueOf(Long.MAX_VALUE));
+                .param("standardId", String.valueOf(Long.MAX_VALUE));
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest())
@@ -399,7 +401,84 @@ public class CheckboxControllerTest {
 
     }
 
+    @Test
+    @DisplayName("정상 일별 컬렉션 조회 - by group")
+    void collectionFilteredByDateTestNormal_byGroup() throws Exception {
 
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
+        LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", String.valueOf(groupResDto1.getId()))
+                .param("dateKey", dateKey.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(1));
+
+    }
+
+    @Test
+    @DisplayName("비정상 일별 컬렉션 조회 - by group - Resource not found")
+    void collectionFilteredByDateTestAbnormal_byGroup() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", String.valueOf(Long.MAX_VALUE))
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 일별 컬렉션 조회 - by plan")
+    void collectionFilteredByDateTestNormal_byPlan() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title3", 1, makeArrToList(), planId));
+
+        checkboxService.save(new CheckboxReqDto("title4", planId, LocalDate.of(2023, 7, 19)));
+        checkboxService.save(new CheckboxReqDto("title5", planId, LocalDate.of(2023, 7, 19)));
+        checkboxService.save(new CheckboxReqDto("title6", planId, LocalDate.of(2023, 7, 19)));
+
+        LocalDate dateKey = LocalDate.of(2023, 7, 19);
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", String.valueOf(planId))
+                .param("dateKey", dateKey.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(5));
+
+    }
+
+    @Test
+    @DisplayName("비정상 일별 컬렉션 조회 - by group - Resource not found")
+    void collectionFilteredByDateTestAbnormal_byPlan() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", String.valueOf(Long.MAX_VALUE))
+                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
 
 }

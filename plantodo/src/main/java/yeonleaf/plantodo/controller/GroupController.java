@@ -22,6 +22,8 @@ import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
+import java.time.LocalDate;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -113,16 +115,30 @@ public class GroupController {
 
     }
 
-    @Operation(summary = "Plan 내에 있는 모든 Group 조회")
+    @Operation(summary = "Plan 내의 모든 Group 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping("/groups")
+    @GetMapping(value = "/groups", params = {"planId"})
     public ResponseEntity<?> all(@RequestParam Long planId) {
 
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId));
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    @Operation(summary = "여러 개의 Group 조회 (날짜로 필터)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/groups", params = {"planId", "dateKey"})
+    public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate dateKey) {
+
+        CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, dateKey));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }

@@ -146,11 +146,28 @@ public class PlanController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping("/plans")
+    @GetMapping(value = "/plans", params = {"memberId"})
     public ResponseEntity<?> all(@RequestParam Long memberId) {
 
         List<EntityModel<PlanResDto>> all = planService.all(memberId).stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all, linkTo(methodOn(PlanController.class)).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    @Operation(summary = "여러 개의 Plan 조회 (날짜로 필터)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/plans", params = {"memberId", "dateKey"})
+    public ResponseEntity<?> all(@RequestParam Long memberId, @RequestParam LocalDate dateKey) {
+
+        List<EntityModel<PlanResDto>> all = planService.all(memberId, dateKey).stream().map(planModelAssembler::toModel).toList();
+        CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
+                linkTo(methodOn(PlanController.class).all(memberId, dateKey)).withSelfRel(),
+                linkTo(methodOn(PlanController.class).all(memberId)).withRel("collection"));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }

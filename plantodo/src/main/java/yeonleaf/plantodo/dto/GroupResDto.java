@@ -28,6 +28,13 @@ public class GroupResDto {
         this.repValue = repValue;
     }
 
+    public GroupResDto(Group group, RepInputDto repInputDto) {
+        this.id = group.getId();
+        this.title = group.getTitle();
+        this.repOption = repInputDto.getRepOption();
+        this.repValue = repInputDto.getRepValue();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

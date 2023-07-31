@@ -320,4 +320,66 @@ public class GroupServiceUnitTest {
 
     }
 
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - all matched with key")
+    void collectionFilteredByDateTestNormal_allMatchedWithKey() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 2, makeArrToList("2"), plan.getId()));
+        Long planId = plan.getId();
+        LocalDate dateKey = LocalDate.of(2023, 7, 25);
+
+        List<GroupResDto> filteredAll = groupService.all(planId, dateKey);
+
+        assertThat(filteredAll.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - part of them matched with key")
+    void collectionFilteredByDateTestNormal_partOfThemMatchedWithKey() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 2, makeArrToList("2"), plan.getId()));
+        Long planId = plan.getId();
+        LocalDate dateKey = LocalDate.of(2023, 7, 19);
+
+        List<GroupResDto> filteredAll = groupService.all(planId, dateKey);
+
+        assertThat(filteredAll.size()).isEqualTo(2);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - empty result")
+    void collectionFilteredByDateTestNormal_emptyResult() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 2, makeArrToList("2"), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 2, makeArrToList("3"), plan.getId()));
+        Long planId = plan.getId();
+        LocalDate dateKey = LocalDate.of(2023, 7, 20);
+
+        List<GroupResDto> filteredAll = groupService.all(planId, dateKey);
+
+        assertThat(filteredAll).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 비정상 조회 - Resource not found")
+    void collectionFilteredByDateTestNormal_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> groupService.all(Long.MAX_VALUE, LocalDate.of(2023, 7, 19)));
+    }
+
+
 }

@@ -17,13 +17,16 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.GroupReqDto;
+import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.GroupUpdateReqDto;
+import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
+import yeonleaf.plantodo.service.GroupService;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDate;
@@ -31,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -54,6 +58,9 @@ public class GroupControllerTest {
 
     @Autowired
     private CheckboxRepository checkboxRepository;
+
+    @Autowired
+    private GroupService groupService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -299,6 +306,40 @@ public class GroupControllerTest {
 
         MockHttpServletRequestBuilder request = get("/groups")
                 .param("planId", String.valueOf(Long.MAX_VALUE));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회")
+    void collectionFilteredByDateTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("월", "수", "금"), plan.getId()));
+        groupService.save(new GroupReqDto("title2", 3, makeArrToList("월", "일"), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "토"), plan.getId()));
+
+        MockHttpServletRequestBuilder request = get("/groups")
+                .param("planId", String.valueOf(plan.getId()))
+                .param("dateKey", LocalDate.now().toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(2));
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 비정상 조회")
+    void collectionFilteredByDateTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/groups")
+                .param("planId", String.valueOf(Long.MAX_VALUE))
+                .param("dateKey", LocalDate.now().toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())

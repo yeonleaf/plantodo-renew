@@ -12,6 +12,7 @@ import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,5 +102,15 @@ public class CheckboxServiceTestImpl implements CheckboxService {
         groupRepository.findByPlanId(planId).forEach(group -> checkboxes.addAll(checkboxRepository.findByGroupId(group.getId())));
         return checkboxes.stream().map(CheckboxResDto::new).toList();
 
+    }
+
+    @Override
+    public List<CheckboxResDto> allByGroup(Long groupId, LocalDate dateKey) {
+        return allByGroup(groupId).stream().filter(checkboxResDto -> checkboxResDto.getDate().equals(dateKey)).toList();
+    }
+
+    @Override
+    public List<CheckboxResDto> allByPlan(Long planId, LocalDate dateKey) {
+        return allByPlan(planId).stream().filter(checkboxResDto -> checkboxResDto.getDate().equals(dateKey)).toList();
     }
 }

@@ -2,6 +2,7 @@ package yeonleaf.plantodo.repository;
 
 import yeonleaf.plantodo.domain.Checkbox;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
@@ -36,6 +37,7 @@ public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
     }
 
     public List<Checkbox> findByGroupId(Long groupId) {
+
         List<Checkbox> res = new ArrayList<>();
         for (Checkbox checkbox : data.values()) {
             if (checkbox.getGroup().getId().equals(groupId)) {
@@ -43,6 +45,19 @@ public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
             }
         }
         return res;
+
+    }
+
+    public List<Checkbox> findAllByGroupIdAndDate(Long groupId, LocalDate dateKey) {
+
+        List<Checkbox> res = new ArrayList<>();
+        for (Checkbox checkbox : data.values()) {
+            if (checkbox.getGroup().getId().equals(groupId) && checkbox.getDate().equals(dateKey)) {
+                res.add(checkbox);
+            }
+        }
+        return res;
+        
     }
 
 }

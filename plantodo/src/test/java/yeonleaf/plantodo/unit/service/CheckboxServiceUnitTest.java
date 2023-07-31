@@ -10,6 +10,7 @@ import yeonleaf.plantodo.ServiceTestConfig;
 import yeonleaf.plantodo.domain.Checkbox;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
+import yeonleaf.plantodo.domain.PlanStatus;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
@@ -264,6 +265,127 @@ public class CheckboxServiceUnitTest {
     void allTestAbnormal_byGroupId() {
 
         assertThrows(ResourceNotFoundException.class, () -> checkboxService.allByGroup(Long.MAX_VALUE));
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - by group - all matched with key")
+    void collectionFilteredByDateTestNormal_byGroup_allMatchedWithKey() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
+        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
+        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), plan.getId()));
+        LocalDate dateKey = LocalDate.of(2023, 7, 25);
+
+        assertThat(checkboxService.allByGroup(groupResDto1.getId(), dateKey).size()).isEqualTo(1);
+        assertThat(checkboxService.allByGroup(groupResDto2.getId(), dateKey).size()).isEqualTo(1);
+        assertThat(checkboxService.allByGroup(groupResDto3.getId(), dateKey).size()).isEqualTo(1);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - by group - part of them matched with key")
+    void collectionFilteredByDateTestNormal_byGroup_partOfThemMatchedWithKey() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
+        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
+        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), plan.getId()));
+        LocalDate dateKey = LocalDate.of(2023, 7, 19);
+
+        assertThat(checkboxService.allByGroup(groupResDto1.getId(), dateKey).size()).isEqualTo(0);
+        assertThat(checkboxService.allByGroup(groupResDto2.getId(), dateKey).size()).isEqualTo(1);
+        assertThat(checkboxService.allByGroup(groupResDto3.getId(), dateKey).size()).isEqualTo(1);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - by group - no one matched with key")
+    void collectionFilteredByDateTestNormal_byGroup_emptyResult() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
+        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
+        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), plan.getId()));
+        LocalDate dateKey = LocalDate.of(2023, 7, 18);
+
+        assertThat(checkboxService.allByGroup(groupResDto1.getId(), dateKey).size()).isEqualTo(0);
+        assertThat(checkboxService.allByGroup(groupResDto2.getId(), dateKey).size()).isEqualTo(0);
+        assertThat(checkboxService.allByGroup(groupResDto3.getId(), dateKey).size()).isEqualTo(0);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - by plan - all matched with key")
+    void collectionFilteredByDateTestNormal_byPlan_allMatchedWithKey() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+
+        // daily checkbox
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 23)));
+
+        // group
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+
+        LocalDate dateKey = LocalDate.of(2023, 7, 23);
+
+        assertThat(checkboxService.allByPlan(planId, dateKey).size()).isEqualTo(4);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - by plan - part of them matched with key")
+    void collectionFilteredByDateTestNormal_byPlan_partOfThemMatchedWithKey() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+
+        // daily checkbox
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 19)));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 23)));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 27)));
+
+        // group
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+
+        LocalDate dateKey = LocalDate.of(2023, 7, 23);
+
+        assertThat(checkboxService.allByPlan(planId, dateKey).size()).isEqualTo(4);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - by plan - empty result")
+    void collectionFilteredByDateTestNormal_byPlan_emptyResult() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+
+        // daily checkbox
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 19)));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 23)));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 27)));
+
+        // group
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+
+        LocalDate dateKey = LocalDate.of(2023, 7, 18);
+
+        assertThat(checkboxService.allByPlan(planId, dateKey).size()).isEqualTo(0);
 
     }
 

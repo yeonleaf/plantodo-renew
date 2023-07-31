@@ -10,10 +10,7 @@ import yeonleaf.plantodo.ServiceTestConfig;
 import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
-import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
-import yeonleaf.plantodo.repository.MemoryGroupRepository;
-import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.repository.MemoryRepetitionRepository;
+import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.GroupServiceTestImpl;
 import yeonleaf.plantodo.service.PlanServiceTestImpl;
 
@@ -37,6 +34,9 @@ public class GroupServiceUnitTest {
     private MemoryCheckboxRepository checkboxRepository;
 
     @Autowired
+    private MemoryMemberRepository memberRepository;
+
+    @Autowired
     private MemoryPlanRepository planRepository;
 
     @Autowired
@@ -50,7 +50,7 @@ public class GroupServiceUnitTest {
 
     private Member makeMember(String email, String password) {
         Member member = new Member(email, password);
-        member.setId(1L);
+        memberRepository.save(member);
         return member;
     }
 
@@ -301,12 +301,13 @@ public class GroupServiceUnitTest {
     void allTestNormal() {
 
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
-        groupService.save(new GroupReqDto("title2", 3, makeArrToList("화", "목"), plan.getId()));
-        groupService.save(new GroupReqDto("title3", 3, makeArrToList("화", "목"), plan.getId()));
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 3, makeArrToList("화", "목"), planId));
+        groupService.save(new GroupReqDto("title3", 3, makeArrToList("화", "목"), planId));
 
-        List<GroupResDto> all = groupService.all(plan.getId());
+        List<GroupResDto> all = groupService.all(planId);
 
         assertThat(all.size()).isEqualTo(3);
 
@@ -325,11 +326,11 @@ public class GroupServiceUnitTest {
     void collectionFilteredByDateTestNormal_allMatchedWithKey() {
 
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
-        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
-        groupService.save(new GroupReqDto("title1", 2, makeArrToList("2"), plan.getId()));
-        Long planId = plan.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
         List<GroupResDto> filteredAll = groupService.all(planId, dateKey);
@@ -343,11 +344,11 @@ public class GroupServiceUnitTest {
     void collectionFilteredByDateTestNormal_partOfThemMatchedWithKey() {
 
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
-        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
-        groupService.save(new GroupReqDto("title1", 2, makeArrToList("2"), plan.getId()));
-        Long planId = plan.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         List<GroupResDto> filteredAll = groupService.all(planId, dateKey);
@@ -361,11 +362,11 @@ public class GroupServiceUnitTest {
     void collectionFilteredByDateTestNormal_emptyResult() {
 
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
-        Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), plan.getId()));
-        groupService.save(new GroupReqDto("title1", 2, makeArrToList("2"), plan.getId()));
-        groupService.save(new GroupReqDto("title1", 2, makeArrToList("3"), plan.getId()));
-        Long planId = plan.getId();
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 20);
 
         List<GroupResDto> filteredAll = groupService.all(planId, dateKey);

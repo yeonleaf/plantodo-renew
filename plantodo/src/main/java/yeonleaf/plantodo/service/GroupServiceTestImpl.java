@@ -65,7 +65,7 @@ public class GroupServiceTestImpl implements GroupService {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
 
-        return groupRepository.findByPlanId(planId).stream().map(group -> {
+        return groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption() != 0).map(group -> {
             Repetition repetition = group.getRepetition();
             RepInputDto repInputDto = repOutToInConverter.convert(repetition);
             return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());

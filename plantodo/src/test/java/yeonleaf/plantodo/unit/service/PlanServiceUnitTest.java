@@ -70,10 +70,10 @@ public class PlanServiceUnitTest {
         MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
 
-        List<GroupResDto> groups = groupService.all(plan.getId());
+        List<Group> groups = groupRepository.findByPlanId(plan.getId());
 
         assertThat(groups.size()).isEqualTo(1);
-        assertThat(groups.get(0).getRepOption()).isEqualTo(0);
+        assertThat(groups.get(0).getRepetition().getRepOption()).isEqualTo(0);
 
     }
 

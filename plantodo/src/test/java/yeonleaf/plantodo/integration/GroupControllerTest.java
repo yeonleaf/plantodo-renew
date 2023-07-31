@@ -17,11 +17,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import yeonleaf.plantodo.domain.*;
 import yeonleaf.plantodo.dto.GroupReqDto;
-import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.GroupUpdateReqDto;
-import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
-import yeonleaf.plantodo.provider.JwtProvider;
 import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.MemberRepository;
@@ -34,7 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -133,7 +129,7 @@ public class GroupControllerTest {
     void oneTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         MockHttpServletRequestBuilder request = get("/group/" + group.getId())
@@ -195,7 +191,7 @@ public class GroupControllerTest {
     void updateTestAbnormal_argumentResolverValidation() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 0, makeArrToList("화", "목", "토"));
@@ -216,7 +212,7 @@ public class GroupControllerTest {
     void updateTestAbnormal_repInputValidator() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 1, makeArrToList("화", "목", "토"));
@@ -253,7 +249,7 @@ public class GroupControllerTest {
     void deleteTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
         Long groupId = group.getId();
 
@@ -286,7 +282,7 @@ public class GroupControllerTest {
     void allTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
@@ -318,18 +314,18 @@ public class GroupControllerTest {
     void collectionFilteredByDateTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.now(), LocalDate.now().plusDays(3), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
         groupService.save(new GroupReqDto("title1", 3, makeArrToList("월", "수", "금"), plan.getId()));
         groupService.save(new GroupReqDto("title2", 3, makeArrToList("월", "일"), plan.getId()));
         groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "토"), plan.getId()));
 
         MockHttpServletRequestBuilder request = get("/groups")
                 .param("planId", String.valueOf(plan.getId()))
-                .param("dateKey", LocalDate.now().toString());
+                .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(2));
+                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(1));
 
     }
 

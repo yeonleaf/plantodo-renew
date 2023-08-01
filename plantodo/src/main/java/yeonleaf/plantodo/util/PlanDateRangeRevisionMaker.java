@@ -25,12 +25,27 @@ public class PlanDateRangeRevisionMaker {
             return this.resultMap;
         }
 
+        return makeRangeGap(newStart, newEnd, oldStart, oldEnd);
+
+    }
+
+    public boolean isInRange(LocalDate newStart, LocalDate newEnd, LocalDate oldStart, LocalDate oldEnd) {
+
+        HashMap<LocalDate, Integer> rangeGap = makeRangeGap(newStart, newEnd, oldStart, oldEnd);
+        System.out.println(rangeGap);
+        return rangeGap.containsValue(5);
+
+    }
+
+    public HashMap<LocalDate, Integer> makeRangeGap(LocalDate newStart, LocalDate newEnd, LocalDate oldStart, LocalDate oldEnd) {
+
         initiateResultMap(oldStart, oldEnd, newStart, newEnd);
 
         mark(oldStart, oldEnd, 2);
         mark(newStart, newEnd, 3);
 
         return this.resultMap;
+
     }
 
     void mark(LocalDate start, LocalDate end, int ink) {

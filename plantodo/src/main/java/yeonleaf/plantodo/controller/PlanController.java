@@ -20,10 +20,7 @@ import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.dto.PlanUpdateReqDto;
-import yeonleaf.plantodo.exceptions.ApiBindingError;
-import yeonleaf.plantodo.exceptions.ApiSimpleError;
-import yeonleaf.plantodo.exceptions.ArgumentValidationException;
-import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
+import yeonleaf.plantodo.exceptions.*;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.service.PlanService;
@@ -169,6 +166,30 @@ public class PlanController {
                 linkTo(methodOn(PlanController.class).all(memberId, dateKey)).withSelfRel(),
                 linkTo(methodOn(PlanController.class).all(memberId)).withRel("collection"));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    @GetMapping(value = "/plans", params = {"memberId", "searchStart", "searchEnd"})
+    public ResponseEntity<?> all(@RequestParam Long memberId, @RequestParam LocalDate searchStart, @RequestParam LocalDate searchEnd) {
+
+        checkSearchDates(searchStart, searchEnd);
+
+        List<EntityModel<PlanResDto>> all = planService.all(memberId, searchStart, searchEnd).stream().map(planModelAssembler::toModel).toList();
+        CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
+                linkTo(methodOn(PlanController.class).all(memberId, searchStart, searchEnd)).withSelfRel(),
+                linkTo(methodOn(PlanController.class).all(memberId)).withRel("collection"));
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    private void checkSearchDates(LocalDate searchStart, LocalDate searchEnd) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+        if (searchStart.isAfter(searchEnd)) {
+            errors.rejectValue("searchStart", "searchStart는 searchEnd 이전일 수 없습니다.");
+            errors.rejectValue("searchEnd", "searchEnd는 searchStart 이전일 수 없습니다.");
+            throw errors;
+        }
 
     }
 

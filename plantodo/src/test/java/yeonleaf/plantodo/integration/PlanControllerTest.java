@@ -413,4 +413,40 @@ public class PlanControllerTest {
 
     }
 
+    @Test
+    @DisplayName("정상 기간 컬렉션 조회")
+    void collectionFilteredByDateRangeTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 8, 3), memberResDto.getId()));
+        planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
+        planService.save(new PlanReqDto("title", LocalDate.of(2023, 8, 3), LocalDate.of(2023, 8, 5), memberResDto.getId()));
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", String.valueOf(memberResDto.getId()))
+                .param("searchStart", LocalDate.of(2023, 7, 29).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 3).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.planResDtoList.length()").value(2));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회")
+    void collectionFilteredByDateRangeTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 29).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 3).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
+
+    }
+
 }

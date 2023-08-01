@@ -178,4 +178,13 @@ public class PlanServiceImpl implements PlanService {
 
     }
 
+    @Override
+    public List<PlanResDto> all(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
+
+        return all(memberId).stream()
+                .filter(planResDto -> new PlanDateRangeRevisionMaker().isInRange(searchStart, searchEnd, planResDto.getStart(), planResDto.getEnd()))
+                .toList();
+
+    }
+
 }

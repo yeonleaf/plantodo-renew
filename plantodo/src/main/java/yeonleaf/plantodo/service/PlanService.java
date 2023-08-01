@@ -15,13 +15,11 @@ public interface PlanService {
 
     PlanResDto save(PlanReqDto planReqDto);
     PlanResDto one(Long id);
-
     PlanResDto update(PlanUpdateReqDto planUpdateReqDto);
-
     void delete(Long id);
-
     List<PlanResDto> all(Long memberId);
     List<PlanResDto> all(Long memberId, LocalDate dateKey);
+    List<PlanResDto> all(Long memberId, LocalDate searchStart, LocalDate searchEnd);
     PlanResDto change(Long id);
 
 }

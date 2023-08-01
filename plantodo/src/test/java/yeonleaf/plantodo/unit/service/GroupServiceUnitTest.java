@@ -382,5 +382,73 @@ public class GroupServiceUnitTest {
         assertThrows(ResourceNotFoundException.class, () -> groupService.all(Long.MAX_VALUE, LocalDate.of(2023, 7, 19)));
     }
 
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 모든 group이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allGroupSucceeded() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+
+        LocalDate searchStart = LocalDate.of(2023, 7, 25);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 25);
+
+        List<GroupResDto> filteredAll = groupService.all(planId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 등록한 Group의 일부만 조회됨")
+    void collectionFilteredByDateRangeTestNormal_partOfThemSucceeded() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+
+        LocalDate searchStart = LocalDate.of(2023, 7, 26);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 29);
+
+        List<GroupResDto> filteredAll = groupService.all(planId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(2);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 등록한 Group이 모두 조회되지 않음")
+    void collectionFilteredByDateRangeTestNormal_emptyResult() {
+
+        Member member = makeMember("test@abc.co.kr", "3d^$a2df");
+        PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+
+        LocalDate searchStart = LocalDate.of(2023, 7, 17);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 18);
+
+        List<GroupResDto> filteredAll = groupService.all(planId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(0);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 비정상 조회 - Resource not found")
+    void collectionFilteredByDateRangeTestAbnormal_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> groupService.all(Long.MAX_VALUE, LocalDate.of(2023, 7, 17), LocalDate.of(2023, 7, 18)));
+
+    }
 
 }

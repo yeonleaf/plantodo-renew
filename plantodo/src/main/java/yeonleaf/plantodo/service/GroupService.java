@@ -18,6 +18,7 @@ public interface GroupService {
     GroupResDto one(Long id);
     List<GroupResDto> all(Long planId);
     List<GroupResDto> all(Long planId, LocalDate dateKey);
+    List<GroupResDto> all(Long planId, LocalDate searchStart, LocalDate searchEnd);
     GroupResDto update(GroupUpdateReqDto groupUpdateReqDto);
     void delete(Long id);
 

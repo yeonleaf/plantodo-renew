@@ -19,6 +19,7 @@ import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
+import yeonleaf.plantodo.exceptions.QueryStringValidationException;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
@@ -140,6 +141,26 @@ public class GroupController {
 
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, dateKey));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    @GetMapping(value = "/groups", params = {"planId", "searchStart", "searchEnd"})
+    public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate searchStart, LocalDate searchEnd) {
+
+        checkSearchDates(searchStart, searchEnd);
+        CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, searchStart, searchEnd));
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    private void checkSearchDates(LocalDate searchStart, LocalDate searchEnd) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+        if (searchStart.isAfter(searchEnd)) {
+            errors.rejectValue("searchStart", "searchStart는 searchEnd 이전일 수 없습니다.");
+            errors.rejectValue("searchEnd", "searchEnd는 searchStart 이전일 수 없습니다.");
+            throw errors;
+        }
 
     }
 

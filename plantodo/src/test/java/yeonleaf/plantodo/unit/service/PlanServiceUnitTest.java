@@ -12,6 +12,7 @@ import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.*;
+import yeonleaf.plantodo.util.DateRange;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 import java.time.LocalDate;
@@ -54,7 +55,7 @@ public class PlanServiceUnitTest {
         checkboxRepository = new MemoryCheckboxRepository();
 
         memberService = new MemberServiceTestImpl(memberRepository);
-        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter(), new RepInputValidator());
+        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter(), new RepInputValidator(), new DateRange());
         planService = new PlanServiceTestImpl(memberRepository, planRepository, groupRepository, checkboxRepository, groupService);
         checkboxService = new CheckboxServiceTestImpl(planRepository, groupRepository, checkboxRepository);
     }

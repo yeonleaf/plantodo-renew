@@ -65,7 +65,7 @@ public class GroupServiceTestImpl implements GroupService {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
 
-        return groupRepository.findByPlanId(planId).stream().map(group -> {
+        return groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption() != 0).map(group -> {
             Repetition repetition = group.getRepetition();
             RepInputDto repInputDto = repOutToInConverter.convert(repetition);
             return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
@@ -153,4 +153,17 @@ public class GroupServiceTestImpl implements GroupService {
         groupRepository.delete(group);
 
     }
+
+    @Override
+    public List<GroupResDto> all(Long planId, LocalDate dateKey) {
+
+        return all(planId).stream()
+                .filter(groupResDto -> isNotEmptyToday(groupResDto.getId(), dateKey)).toList();
+
+    }
+
+    private boolean isNotEmptyToday(Long groupId, LocalDate dateKey) {
+        return checkboxRepository.findAllByGroupIdAndDate(groupId, dateKey).size() > 0;
+    }
+
 }

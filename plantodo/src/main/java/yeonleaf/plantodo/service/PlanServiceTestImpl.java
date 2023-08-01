@@ -147,4 +147,20 @@ public class PlanServiceTestImpl implements PlanService {
 
     }
 
+    @Override
+    public List<PlanResDto> all(Long memberId, LocalDate dateKey) {
+
+        memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
+
+        return planRepository.findByMemberId(memberId).stream()
+                .filter(plan -> hasDateKey(plan, dateKey))
+                .map(PlanResDto::new).toList();
+
+    }
+
+    private boolean hasDateKey(Plan plan, LocalDate dateKey) {
+
+        return !(dateKey.isBefore(plan.getStart()) || dateKey.isAfter(plan.getEnd()));
+
+    }
 }

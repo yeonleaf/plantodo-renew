@@ -13,6 +13,7 @@ import yeonleaf.plantodo.repository.CheckboxRepository;
 import yeonleaf.plantodo.repository.GroupRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +76,6 @@ public class CheckboxServiceImpl implements CheckboxService {
     public List<CheckboxResDto> allByGroup(Long groupId) {
 
         groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
-
         return checkboxRepository.findByGroupId(groupId).stream().map(CheckboxResDto::new).toList();
 
     }
@@ -90,4 +90,15 @@ public class CheckboxServiceImpl implements CheckboxService {
         return checkboxes.stream().map(CheckboxResDto::new).toList();
 
     }
+
+    @Override
+    public List<CheckboxResDto> allByGroup(Long groupId, LocalDate dateKey) {
+        return allByGroup(groupId).stream().filter(checkboxResDto -> checkboxResDto.getDate().equals(dateKey)).toList();
+    }
+
+    @Override
+    public List<CheckboxResDto> allByPlan(Long planId, LocalDate dateKey) {
+        return allByPlan(planId).stream().filter(checkboxResDto -> checkboxResDto.getDate().equals(dateKey)).toList();
+    }
+
 }

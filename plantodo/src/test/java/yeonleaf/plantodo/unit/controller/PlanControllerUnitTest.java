@@ -345,4 +345,40 @@ public class PlanControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 일별 컬렉션 조회")
+    void collectionFilteredByDateTestNormal() throws Exception {
+
+        List<PlanResDto> plans = new ArrayList<>();
+        plans.add(new PlanResDto(1L, "title1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+        plans.add(new PlanResDto(2L, "title2", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+        plans.add(new PlanResDto(3L, "title3", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", "1")
+                .param("dateKey", LocalDate.of(2023, 7, 19).toString());
+
+        doReturn(plans).when(planService).all(any(), any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.planResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 일별 컬렉션 조회 - Resource not found")
+    void collectionFilteredByDateTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plans")
+                .param("memberId", String.valueOf(Long.MAX_VALUE))
+                .param("dateKey", LocalDate.of(2023, 7, 19).toString());
+
+        doThrow(ResourceNotFoundException.class).when(planService).all(any(), any());
+
+        mockMvc.perform(request)
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

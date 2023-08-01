@@ -7,6 +7,7 @@ import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.dto.PlanUpdateReqDto;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ public interface PlanService {
     void delete(Long id);
 
     List<PlanResDto> all(Long memberId);
-
+    List<PlanResDto> all(Long memberId, LocalDate dateKey);
     PlanResDto change(Long id);
 
 }

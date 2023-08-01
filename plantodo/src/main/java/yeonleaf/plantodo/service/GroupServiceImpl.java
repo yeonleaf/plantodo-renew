@@ -29,6 +29,7 @@ public class GroupServiceImpl implements GroupService {
     private final PlanRepository planRepository;
     private final GroupRepository groupRepository;
     private final CheckboxRepository checkboxRepository;
+    private final CheckboxDslRepository checkboxDslRepository;
     private final RepInToOutConverter repInToOutConverter;
     private final RepOutToInConverter repOutToInConverter;
 
@@ -62,7 +63,7 @@ public class GroupServiceImpl implements GroupService {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
 
-        return groupRepository.findByPlanId(planId).stream().map(group -> {
+        return groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption() != 0).map(group -> {
             Repetition repetition = group.getRepetition();
             RepInputDto repInputDto = repOutToInConverter.convert(repetition);
             return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
@@ -150,4 +151,17 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.delete(group);
 
     }
+
+    @Override
+    public List<GroupResDto> all(Long planId, LocalDate dateKey) {
+
+        return all(planId).stream()
+                .filter(groupResDto -> isNotEmptyToday(groupResDto.getId(), dateKey)).toList();
+
+    }
+
+    private boolean isNotEmptyToday(Long groupId, LocalDate dateKey) {
+        return checkboxDslRepository.findAllByGroupIdAndDate(groupId, dateKey).size() > 0;
+    }
+
 }

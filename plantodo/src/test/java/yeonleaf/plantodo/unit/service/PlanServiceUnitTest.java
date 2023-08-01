@@ -70,10 +70,10 @@ public class PlanServiceUnitTest {
         MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
 
-        List<GroupResDto> groups = groupService.all(plan.getId());
+        List<Group> groups = groupRepository.findByPlanId(plan.getId());
 
         assertThat(groups.size()).isEqualTo(1);
-        assertThat(groups.get(0).getRepOption()).isEqualTo(0);
+        assertThat(groups.get(0).getRepetition().getRepOption()).isEqualTo(0);
 
     }
 
@@ -709,6 +709,64 @@ public class PlanServiceUnitTest {
 
         assertThrows(ResourceNotFoundException.class, () -> planService.all(Long.MAX_VALUE));
 
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - all matched with key")
+    void collectionFilteredByDateTestNormal_allMatchedWithKey() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate dateKey = LocalDate.of(2023, 7, 19);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, dateKey);
+
+        assertThat(filteredAll.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - part of them matched with key")
+    void collectionFilteredByDateTestNormal_partOfThemMatchedWithKey() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate dateKey = LocalDate.of(2023, 7, 19);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, dateKey);
+
+        assertThat(filteredAll.size()).isEqualTo(2);
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 정상 조회 - empty result")
+    void collectionFilteredByDateTestNormal_emptyResult() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate dateKey = LocalDate.of(2023, 7, 19);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, dateKey);
+
+        assertThat(filteredAll).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("일별 컬렉션 비정상 조회 - Resource not found")
+    void collectionFilteredByDateTestNormal_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> planService.all(Long.MAX_VALUE, LocalDate.of(2023, 7, 19)));
     }
 
 }

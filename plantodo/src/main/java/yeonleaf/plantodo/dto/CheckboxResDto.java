@@ -1,11 +1,16 @@
 package yeonleaf.plantodo.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import yeonleaf.plantodo.domain.Checkbox;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
@@ -16,11 +21,17 @@ public class CheckboxResDto {
 
     private Long id;
     private String title;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate date;
+
     private boolean checked;
 
     public CheckboxResDto(Checkbox checkbox) {
         this.id = checkbox.getId();
         this.title = checkbox.getTitle();
+        this.date = checkbox.getDate();
         this.checked = checkbox.isChecked();
     }
 

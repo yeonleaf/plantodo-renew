@@ -7,6 +7,7 @@ import yeonleaf.plantodo.dto.GroupResDto;
 import yeonleaf.plantodo.dto.GroupUpdateReqDto;
 import yeonleaf.plantodo.dto.RepInputDto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,6 +17,7 @@ public interface GroupService {
 
     GroupResDto one(Long id);
     List<GroupResDto> all(Long planId);
+    List<GroupResDto> all(Long planId, LocalDate dateKey);
     GroupResDto update(GroupUpdateReqDto groupUpdateReqDto);
     void delete(Long id);
 

@@ -25,6 +25,7 @@ import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.exceptions.QueryStringValidationException;
 import yeonleaf.plantodo.service.CheckboxService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -127,15 +128,15 @@ public class CheckboxController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping("/checkboxes")
-    public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long id) {
+    @GetMapping(value = "/checkboxes", params = {"standard", "standardId"})
+    public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long standardId) {
 
-        CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(allByEntity(standard, id));
+        CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(allByEntity(standard, standardId));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }
 
-    private List<CheckboxResDto> allByEntity(String standard, Long id) {
+    private List<CheckboxResDto> allByEntity(String standard, Long standardId) {
 
         QueryStringValidationException errors = new QueryStringValidationException();
 
@@ -144,7 +145,34 @@ public class CheckboxController {
             throw errors;
         }
 
-        return standard.equalsIgnoreCase("plan") ? checkboxService.allByPlan(id) : checkboxService.allByGroup(id);
+        return standard.equalsIgnoreCase("plan") ? checkboxService.allByPlan(standardId) : checkboxService.allByGroup(standardId);
+
+    }
+
+    @Operation(summary = "(날짜로 필터) Plan 내에서 여러 개의 Checkbox 조회 (standard = plan) | Group 내에서 여러 개의 Checkbox 조회 (standard = group)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/checkboxes", params = {"standard", "standardId", "dateKey"})
+    public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long standardId, @RequestParam LocalDate dateKey) {
+
+        CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(allByEntity(standard, standardId, dateKey));
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    private List<CheckboxResDto> allByEntity(String standard, Long standardId, LocalDate dateKey) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+
+        if (!standard.equalsIgnoreCase("plan") && !standard.equalsIgnoreCase("group")) {
+            errors.rejectValue("standard", "must be plan or group");
+            throw errors;
+        }
+
+        return standard.equalsIgnoreCase("plan") ? checkboxService.allByPlan(standardId, dateKey) : checkboxService.allByGroup(standardId, dateKey);
 
     }
 

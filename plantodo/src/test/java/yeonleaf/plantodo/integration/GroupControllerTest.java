@@ -319,7 +319,7 @@ public class GroupControllerTest {
         groupService.save(new GroupReqDto("title2", 3, makeArrToList("월", "일"), plan.getId()));
         groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "토"), plan.getId()));
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", String.valueOf(plan.getId()))
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -333,7 +333,7 @@ public class GroupControllerTest {
     @DisplayName("일별 컬렉션 비정상 조회")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -357,7 +357,7 @@ public class GroupControllerTest {
         LocalDate searchStart = LocalDate.of(2023, 7, 26);
         LocalDate searchEnd = LocalDate.of(2023, 7, 29);
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/range")
                 .param("planId", String.valueOf(planId))
                 .param("searchStart", searchStart.toString())
                 .param("searchEnd", searchEnd.toString());
@@ -372,7 +372,7 @@ public class GroupControllerTest {
     @DisplayName("기간 컬렉션 비정상 조회")
     void collectionFilteredByDateRangeTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/range")
                 .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 13).toString());

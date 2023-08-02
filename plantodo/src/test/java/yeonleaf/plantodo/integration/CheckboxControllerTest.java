@@ -411,7 +411,7 @@ public class CheckboxControllerTest {
         GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "group")
                 .param("standardId", String.valueOf(groupResDto1.getId()))
                 .param("dateKey", dateKey.toString());
@@ -426,7 +426,7 @@ public class CheckboxControllerTest {
     @DisplayName("비정상 일별 컬렉션 조회 - by group - Resource not found")
     void collectionFilteredByDateTestAbnormal_byGroup() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "group")
                 .param("standardId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -455,7 +455,7 @@ public class CheckboxControllerTest {
 
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "plan")
                 .param("standardId", String.valueOf(planId))
                 .param("dateKey", dateKey.toString());
@@ -470,7 +470,7 @@ public class CheckboxControllerTest {
     @DisplayName("비정상 일별 컬렉션 조회 - by group - Resource not found")
     void collectionFilteredByDateTestAbnormal_byPlan() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "plan")
                 .param("standardId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -495,7 +495,7 @@ public class CheckboxControllerTest {
         LocalDate searchStart = LocalDate.of(2023, 7, 19);
         LocalDate searchEnd = LocalDate.of(2023, 7, 22);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "group")
                 .param("standardId", String.valueOf(groupId))
                 .param("searchStart", searchStart.toString())
@@ -514,7 +514,7 @@ public class CheckboxControllerTest {
         LocalDate searchStart = LocalDate.of(2023, 7, 22);
         LocalDate searchEnd = LocalDate.of(2023, 7, 20);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "group")
                 .param("standardId", "1")
                 .param("searchStart", searchStart.toString())
@@ -545,7 +545,7 @@ public class CheckboxControllerTest {
         LocalDate searchStart = LocalDate.of(2023, 7, 19);
         LocalDate searchEnd = LocalDate.of(2023, 7, 22);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "plan")
                 .param("standardId", String.valueOf(planId))
                 .param("searchStart", searchStart.toString())
@@ -564,7 +564,7 @@ public class CheckboxControllerTest {
         LocalDate searchStart = LocalDate.of(2023, 7, 22);
         LocalDate searchEnd = LocalDate.of(2023, 7, 20);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "plan")
                 .param("standardId", "1")
                 .param("searchStart", searchStart.toString())

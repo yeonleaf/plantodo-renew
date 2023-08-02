@@ -276,7 +276,7 @@ public class GroupControllerUnitTest {
 
         when(groupService.all(any(), any())).thenReturn(groups);
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -290,7 +290,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 일별 컬렉션 조회")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -310,7 +310,7 @@ public class GroupControllerUnitTest {
 
         when(groupService.all(any(), any(), any())).thenReturn(groups);
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/range")
                 .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 23).toString());
@@ -325,7 +325,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - Invalid query string")
     void collectionFilteredByDateRangeTestAbnormal_invalidQueryString() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/range")
                 .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
@@ -341,7 +341,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - Resource not found")
     void collectionFilteredByDateRangeTestAbnormal_resourceNotFound() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/range")
                 .param("planId", String.valueOf(Long.MAX_VALUE))
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 25).toString());

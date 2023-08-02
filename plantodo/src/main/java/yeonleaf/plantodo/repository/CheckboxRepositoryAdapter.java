@@ -3,7 +3,6 @@ package yeonleaf.plantodo.repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import yeonleaf.plantodo.domain.Checkbox;
-import yeonleaf.plantodo.dto.CheckboxResDto;
 
 import java.time.LocalDate;
 import java.util.List;

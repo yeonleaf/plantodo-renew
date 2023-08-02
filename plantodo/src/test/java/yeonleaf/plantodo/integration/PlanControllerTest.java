@@ -389,7 +389,7 @@ public class PlanControllerTest {
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", String.valueOf(memberResDto.getId()))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -403,7 +403,7 @@ public class PlanControllerTest {
     @DisplayName("비정상 일별 컬렉션 조회")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -422,7 +422,7 @@ public class PlanControllerTest {
         planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.of(2023, 8, 3), LocalDate.of(2023, 8, 5), memberResDto.getId()));
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/range")
                 .param("memberId", String.valueOf(memberResDto.getId()))
                 .param("searchStart", LocalDate.of(2023, 7, 29).toString())
                 .param("searchEnd", LocalDate.of(2023, 8, 3).toString());
@@ -437,7 +437,7 @@ public class PlanControllerTest {
     @DisplayName("비정상 기간 컬렉션 조회")
     void collectionFilteredByDateRangeTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/range")
                 .param("memberId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 29).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 3).toString());

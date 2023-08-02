@@ -18,7 +18,6 @@ import yeonleaf.plantodo.assembler.CheckboxModelAssembler;
 import yeonleaf.plantodo.dto.CheckboxReqDto;
 import yeonleaf.plantodo.dto.CheckboxResDto;
 import yeonleaf.plantodo.dto.CheckboxUpdateReqDto;
-import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
@@ -155,7 +154,7 @@ public class CheckboxController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping(value = "/checkboxes", params = {"standard", "standardId", "dateKey"})
+    @GetMapping(value = "/checkboxes/date", params = {"standard", "standardId", "dateKey"})
     public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long standardId, @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(allByEntity(standard, standardId, dateKey));
@@ -176,7 +175,13 @@ public class CheckboxController {
 
     }
 
-    @GetMapping(value = "/checkboxes", params = {"standard", "standardId", "searchStart", "searchEnd"})
+    @Operation(summary = "(기간으로 필터) Plan 내에서 여러 개의 Checkbox 조회 (standard = plan) | Group 내에서 여러 개의 Checkbox 조회 (standard = group)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/checkboxes/range", params = {"standard", "standardId", "searchStart", "searchEnd"})
     public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long standardId,
                                  @RequestParam LocalDate searchStart, @RequestParam LocalDate searchEnd) {
 

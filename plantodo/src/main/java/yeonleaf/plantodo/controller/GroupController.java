@@ -136,7 +136,7 @@ public class GroupController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping(value = "/groups", params = {"planId", "dateKey"})
+    @GetMapping(value = "/groups/date", params = {"planId", "dateKey"})
     public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, dateKey));
@@ -144,7 +144,13 @@ public class GroupController {
 
     }
 
-    @GetMapping(value = "/groups", params = {"planId", "searchStart", "searchEnd"})
+    @Operation(summary = "여러 개의 Group 조회 (기간으로 필터)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/groups/range", params = {"planId", "searchStart", "searchEnd"})
     public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate searchStart, LocalDate searchEnd) {
 
         checkSearchDates(searchStart, searchEnd);

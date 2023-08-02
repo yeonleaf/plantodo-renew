@@ -158,7 +158,7 @@ public class PlanController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping(value = "/plans", params = {"memberId", "dateKey"})
+    @GetMapping(value = "/plans/date", params = {"memberId", "dateKey"})
     public ResponseEntity<?> all(@RequestParam Long memberId, @RequestParam LocalDate dateKey) {
 
         List<EntityModel<PlanResDto>> all = planService.all(memberId, dateKey).stream().map(planModelAssembler::toModel).toList();
@@ -169,7 +169,13 @@ public class PlanController {
 
     }
 
-    @GetMapping(value = "/plans", params = {"memberId", "searchStart", "searchEnd"})
+    @Operation(summary = "여러 개의 Plan 조회 (기간으로 필터)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/plans/range", params = {"memberId", "searchStart", "searchEnd"})
     public ResponseEntity<?> all(@RequestParam Long memberId, @RequestParam LocalDate searchStart, @RequestParam LocalDate searchEnd) {
 
         checkSearchDates(searchStart, searchEnd);

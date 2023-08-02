@@ -307,7 +307,7 @@ public class CheckboxControllerUnitTest {
 
         List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "group")
                 .param("standardId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -324,7 +324,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("정상 일별 컬렉션 조회 - by group - Resource not found")
     void collectionFilteredByDateTestAbnormal_byGroup() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "group")
                 .param("standardId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -343,7 +343,7 @@ public class CheckboxControllerUnitTest {
 
         List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "plan")
                 .param("standardId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -360,7 +360,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 일별 컬렉션 조회 - by plan - Resource not found")
     void collectionFilteredByDateTestAbnormal_byPlan() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "plan")
                 .param("standardId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -377,7 +377,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 일별 컬렉션 조회 - invalid requestParam")
     void collectionFilteredByDateTestAbnormal_invalidRequestParam() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/date")
                 .param("standard", "gorilla")
                 .param("standardId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
@@ -396,7 +396,7 @@ public class CheckboxControllerUnitTest {
 
         when(checkboxService.allByGroup(any(), any(), any())).thenReturn(checkboxes);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "group")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
@@ -412,7 +412,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - by group - Invalid query string")
     void collectionFilteredByDateRangeTest_byGroup_invalidQueryString_1() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "group")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
@@ -430,7 +430,7 @@ public class CheckboxControllerUnitTest {
     void collectionFilteredByDateRangeTest_byGroup_resourceNotFound() throws Exception {
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any(), any(), any());
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "group")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())
@@ -449,7 +449,7 @@ public class CheckboxControllerUnitTest {
 
         when(checkboxService.allByPlan(any(), any(), any())).thenReturn(checkboxes);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "plan")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
@@ -465,7 +465,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - by plan - Invalid query string")
     void collectionFilteredByDateRangeTestAbnormal_byPlan_invalidQueryString() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "plan")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
@@ -483,7 +483,7 @@ public class CheckboxControllerUnitTest {
     void collectionFilteredByDateRangeTestAbnormal_byPlan_resourceNotFound() throws Exception {
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any(), any(), any());
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "plan")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())
@@ -498,7 +498,7 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - Invalid query string")
     void collectionFilteredByDateRangeTest_invalidQueryString() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
+        MockHttpServletRequestBuilder request = get("/checkboxes/range")
                 .param("standard", "gorilla")
                 .param("standardId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())

@@ -18,7 +18,9 @@ public interface CheckboxService {
     CheckboxResDto change(Long id);
     List<CheckboxResDto> allByGroup(Long groupId);
     List<CheckboxResDto> allByGroup(Long groupId, LocalDate dateKey);
+    List<CheckboxResDto> allByGroup(Long groupId, LocalDate searchStart, LocalDate searchEnd);
     List<CheckboxResDto> allByPlan(Long planId);
     List<CheckboxResDto> allByPlan(Long planId, LocalDate dateKey);
+    List<CheckboxResDto> allByPlan(Long planId, LocalDate searchStart, LocalDate searchEnd);
 
 }

@@ -388,4 +388,127 @@ public class CheckboxControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("정상 기간 컬렉션 조회 - by group")
+    void collectionFilteredByDateRangeTest_byGroup() throws Exception {
+
+        List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
+
+        when(checkboxService.allByGroup(any(), any(), any())).thenReturn(checkboxes);
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 23).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - by group - Invalid query string")
+    void collectionFilteredByDateRangeTest_byGroup_invalidQueryString_1() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - by group - Resource not found")
+    void collectionFilteredByDateRangeTest_byGroup_resourceNotFound() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any(), any(), any());
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "group")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 16).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 19).toString());
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 컬렉션 조회 - by plan")
+    void collectionFilteredByDateRangeTest_byPlan() throws Exception {
+
+        List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
+
+        when(checkboxService.allByPlan(any(), any(), any())).thenReturn(checkboxes);
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 23).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - by plan - Invalid query string")
+    void collectionFilteredByDateRangeTestAbnormal_byPlan_invalidQueryString() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - by plan - Resource not found")
+    void collectionFilteredByDateRangeTestAbnormal_byPlan_resourceNotFound() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any(), any(), any());
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "plan")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 16).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 19).toString());
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - Invalid query string")
+    void collectionFilteredByDateRangeTest_invalidQueryString() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/checkboxes")
+                .param("standard", "gorilla")
+                .param("standardId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 16).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 19).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.standard").exists());
+
+    }
+
+
 }

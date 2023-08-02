@@ -60,4 +60,44 @@ public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
         
     }
 
+    public List<Checkbox> findAllByGroupIdAndDateRange(Long groupId, LocalDate searchStart, LocalDate searchEnd) {
+
+        List<Checkbox> res = new ArrayList<>();
+        for (Checkbox checkbox : data.values()) {
+            if (checkbox.getGroup().getId().equals(groupId) && inRange(checkbox.getDate(), searchStart, searchEnd)) {
+                res.add(checkbox);
+            }
+        }
+        return res;
+
+    }
+
+    public List<Checkbox> findAllByPlanIdAndDate(Long planId, LocalDate dateKey) {
+
+        List<Checkbox> res = new ArrayList<>();
+        for (Checkbox checkbox : data.values()) {
+            if (checkbox.getGroup().getPlan().getId().equals(planId) && checkbox.getDate().equals(dateKey)) {
+                res.add(checkbox);
+            }
+        }
+        return res;
+
+    }
+
+    public List<Checkbox> findAllByPlanIdAndDateRange(Long planId, LocalDate searchStart, LocalDate searchEnd) {
+
+        List<Checkbox> res = new ArrayList<>();
+        for (Checkbox checkbox : data.values()) {
+            if (checkbox.getGroup().getPlan().getId().equals(planId) && inRange(checkbox.getDate(), searchStart, searchEnd)) {
+                res.add(checkbox);
+            }
+        }
+        return res;
+
+    }
+
+    private boolean inRange(LocalDate a, LocalDate b, LocalDate c) {
+        return !a.isBefore(b) && !a.isAfter(c);
+    }
+
 }

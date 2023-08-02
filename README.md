@@ -32,11 +32,12 @@
 
 ### Processes
 1. 프로젝트를 로컬에 clone
-2. Settings/Build, Execution, Development/Gradle Projects/Gradle/Gradle - JVM을 Project SDK 17로 설정
-3. Settings/Build, Execution, Development/Gradle Projects/Gradle/Gradle - Build and run using과 Run tests using을 모두 intelliJ로 설정
-4. `/src/main` 에 `resource`라는 이름의 폴더 만들기
-5. `/src/main/resource`에 `application.yaml` 파일 생성
-6. 아래의 내용을 붙여넣기
+2. intelliJ - Settings/Build, Execution, Development/Gradle Projects/Gradle/Gradle
+   - JVM을 Project SDK 17로 설정
+   - Build and run using과 Run tests using을 모두 intelliJ로 설정
+3. `/src/main` 에 `resource`라는 이름의 폴더 만들기
+4. `/src/main/resource`에 `application.yaml` 파일 생성
+5. 아래의 내용을 붙여넣기
 ```
 spring:
   datasource:
@@ -60,9 +61,9 @@ server:
 springdoc:
   override-with-generic-response: false
 ```
-7. application.yaml 내용 수정
+6. application.yaml 내용 수정
 - `(1)` : Prerequisite 3번에서 설정한 db이름
 - `(2)` : Prerequisite 1번에서 설정한 root 비밀번호
 
-8. intelliJ에서 application run
-9. http://localhost:8080/swagger-ui.html
+7. intelliJ에서 application run
+8. http://localhost:8080/swagger-ui.html

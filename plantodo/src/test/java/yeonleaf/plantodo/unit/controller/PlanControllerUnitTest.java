@@ -1,6 +1,5 @@
 package yeonleaf.plantodo.unit.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
@@ -14,14 +13,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import yeonleaf.plantodo.TestConfig;
 import yeonleaf.plantodo.controller.PlanController;
-import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.PlanStatus;
-import yeonleaf.plantodo.dto.MemberResDto;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.dto.PlanUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
-import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.service.PlanService;
 
 import java.time.LocalDate;
@@ -31,7 +27,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Import({TestConfig.class})
@@ -310,14 +305,19 @@ public class PlanControllerUnitTest {
 
     }
 
-    @Test
-    @DisplayName("정상 순수 컬렉션 조회")
-    void allTestNormal() throws Exception {
-
+    private List<PlanResDto> makeSamplePlans() {
         List<PlanResDto> plans = new ArrayList<>();
         plans.add(new PlanResDto(1L, "title1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
         plans.add(new PlanResDto(2L, "title2", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
         plans.add(new PlanResDto(3L, "title3", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+        return plans;
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() throws Exception {
+
+        List<PlanResDto> plans = makeSamplePlans();
 
         when(planService.all(any())).thenReturn(plans);
 
@@ -349,12 +349,9 @@ public class PlanControllerUnitTest {
     @DisplayName("정상 일별 컬렉션 조회")
     void collectionFilteredByDateTestNormal() throws Exception {
 
-        List<PlanResDto> plans = new ArrayList<>();
-        plans.add(new PlanResDto(1L, "title1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
-        plans.add(new PlanResDto(2L, "title2", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
-        plans.add(new PlanResDto(3L, "title3", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), PlanStatus.PAST));
+        List<PlanResDto> plans = makeSamplePlans();
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -370,13 +367,64 @@ public class PlanControllerUnitTest {
     @DisplayName("비정상 일별 컬렉션 조회 - Resource not found")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
         doThrow(ResourceNotFoundException.class).when(planService).all(any(), any());
 
         mockMvc.perform(request)
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 컬렉션 조회")
+    void collectionFilteredByDateRangeTestNormal() throws Exception {
+
+        List<PlanResDto> plans = makeSamplePlans();
+
+        when(planService.all(any(), any(), any())).thenReturn(plans);
+
+        MockHttpServletRequestBuilder request = get("/plans/range")
+                .param("memberId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 25).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.planResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - invalid query string")
+    void collectionFilteredByDateRangeTestAbnormal_invalidQueryString() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plans/range")
+                .param("memberId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - Resource not found")
+    void collectionFilteredByDateRangeTestAbnormal_resourceNotFound() throws Exception {
+
+        doThrow(ResourceNotFoundException.class).when(planService).all(any(), any(), any());
+
+        MockHttpServletRequestBuilder request = get("/plans/range")
+                .param("memberId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 25).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
 
     }

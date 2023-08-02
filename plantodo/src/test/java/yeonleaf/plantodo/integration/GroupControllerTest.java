@@ -129,7 +129,7 @@ public class GroupControllerTest {
     void oneTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         MockHttpServletRequestBuilder request = get("/group/" + group.getId())
@@ -191,7 +191,7 @@ public class GroupControllerTest {
     void updateTestAbnormal_argumentResolverValidation() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 0, makeArrToList("화", "목", "토"));
@@ -212,7 +212,7 @@ public class GroupControllerTest {
     void updateTestAbnormal_repInputValidator() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
         GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 1, makeArrToList("화", "목", "토"));
@@ -249,7 +249,7 @@ public class GroupControllerTest {
     void deleteTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
         Long groupId = group.getId();
 
@@ -282,7 +282,7 @@ public class GroupControllerTest {
     void allTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
@@ -314,12 +314,12 @@ public class GroupControllerTest {
     void collectionFilteredByDateTestNormal() throws Exception {
 
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
-        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.now().plusDays(31), member));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         groupService.save(new GroupReqDto("title1", 3, makeArrToList("월", "수", "금"), plan.getId()));
         groupService.save(new GroupReqDto("title2", 3, makeArrToList("월", "일"), plan.getId()));
         groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "토"), plan.getId()));
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", String.valueOf(plan.getId()))
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -333,13 +333,54 @@ public class GroupControllerTest {
     @DisplayName("일별 컬렉션 비정상 조회")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.now().toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회")
+    void collectionFilteredByDateRangeTestNormal() throws Exception {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
+        Long planId = plan.getId();
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+
+        LocalDate searchStart = LocalDate.of(2023, 7, 26);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 29);
+
+        MockHttpServletRequestBuilder request = get("/groups/range")
+                .param("planId", String.valueOf(planId))
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(2));
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 비정상 조회")
+    void collectionFilteredByDateRangeTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/groups/range")
+                .param("planId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 16).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 13).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
 
     }
 

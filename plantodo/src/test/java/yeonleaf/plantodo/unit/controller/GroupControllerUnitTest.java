@@ -228,14 +228,19 @@ public class GroupControllerUnitTest {
 
     }
 
-    @Test
-    @DisplayName("정상 순수 컬렉션 조회")
-    void allTestNormal() throws Exception {
-
+    private List<GroupResDto> makeSampleGroups() {
         List<GroupResDto> groups = new ArrayList<>();
         groups.add(new GroupResDto(1L, "title1", 1, makeArrToList()));
         groups.add(new GroupResDto(2L, "title1", 1, makeArrToList()));
         groups.add(new GroupResDto(3L, "title1", 1, makeArrToList()));
+        return groups;
+    }
+
+    @Test
+    @DisplayName("정상 순수 컬렉션 조회")
+    void allTestNormal() throws Exception {
+
+        List<GroupResDto> groups = makeSampleGroups();
 
         when(groupService.all(any())).thenReturn(groups);
 
@@ -267,14 +272,11 @@ public class GroupControllerUnitTest {
     @DisplayName("정상 일별 컬렉션 조회")
     void collectionFilteredByDateTestNormal() throws Exception {
 
-        List<GroupResDto> groups = new ArrayList<>();
-        groups.add(new GroupResDto(1L, "title1", 1, makeArrToList()));
-        groups.add(new GroupResDto(2L, "title1", 1, makeArrToList()));
-        groups.add(new GroupResDto(3L, "title1", 1, makeArrToList()));
+        List<GroupResDto> groups = makeSampleGroups();
 
         when(groupService.all(any(), any())).thenReturn(groups);
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -288,7 +290,7 @@ public class GroupControllerUnitTest {
     @DisplayName("비정상 일별 컬렉션 조회")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/groups")
+        MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -299,4 +301,57 @@ public class GroupControllerUnitTest {
                 .andExpect(jsonPath("message").value("Resource not found"));
 
     }
+
+    @Test
+    @DisplayName("정상 기간 컬렉션 조회")
+    void collectionFilteredByDateRangeTestNormal() throws Exception {
+
+        List<GroupResDto> groups = makeSampleGroups();
+
+        when(groupService.all(any(), any(), any())).thenReturn(groups);
+
+        MockHttpServletRequestBuilder request = get("/groups/range")
+                .param("planId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 23).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.groupResDtoList.length()").value(3));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - Invalid query string")
+    void collectionFilteredByDateRangeTestAbnormal_invalidQueryString() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/groups/range")
+                .param("planId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회 - Resource not found")
+    void collectionFilteredByDateRangeTestAbnormal_resourceNotFound() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/groups/range")
+                .param("planId", String.valueOf(Long.MAX_VALUE))
+                .param("searchStart", LocalDate.of(2023, 7, 19).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 25).toString());
+
+        doThrow(ResourceNotFoundException.class).when(groupService).all(any(), any(), any());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
 }

@@ -12,6 +12,7 @@ import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.*;
+import yeonleaf.plantodo.util.DateRange;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 import java.time.LocalDate;
@@ -54,7 +55,7 @@ public class PlanServiceUnitTest {
         checkboxRepository = new MemoryCheckboxRepository();
 
         memberService = new MemberServiceTestImpl(memberRepository);
-        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter(), new RepInputValidator());
+        groupService = new GroupServiceTestImpl(planRepository, groupRepository, checkboxRepository, new RepInToOutConverter(), new RepOutToInConverter(), new RepInputValidator(), new DateRange());
         planService = new PlanServiceTestImpl(memberRepository, planRepository, groupRepository, checkboxRepository, groupService);
         checkboxService = new CheckboxServiceTestImpl(planRepository, groupRepository, checkboxRepository);
     }
@@ -767,6 +768,262 @@ public class PlanServiceUnitTest {
     void collectionFilteredByDateTestNormal_resourceNotFound() {
 
         assertThrows(ResourceNotFoundException.class, () -> planService.all(Long.MAX_VALUE, LocalDate.of(2023, 7, 19)));
+    }
+
+    /**
+     * 기간 컬렉션 정상 조회
+     *
+     * (1) 용어
+     * searchStart = ss, searchEnd = se
+     * original start = os, original end = oe
+     *
+     * (2) 주의사항
+     * 5, 6번을 제외하고 모든 조합이 조회 대상
+     *
+     * (3) 테스트 종류
+     * 생성한 모든 Plan이 조회되는 경우 (7가지)
+     * 생성한 Plan 중 일부분만 조회되는 경우 (2가지)
+     * 생성한 Plan이 모두 조회되지 않는 경우 (1가지)
+     *
+     * (4) 기간 조합 리스트
+     * 1. os ss se oe
+     * 2. ss os oe se
+     * 3. ss os se oe
+     * 4. os ss oe se
+     * 5. ss se os oe (X)
+     * 6. os oe ss se (X)
+     *
+     * 7. (os = ss) se oe
+     * 8. (os = ss) oe se
+     * 9. os ss (oe = se)
+     * 10. ss os (oe = se)
+     * 11. os (oe = ss) se
+     * 12. os (oe = ss = se)
+     * 13. ss (os = se) oe
+     * 14. (ss = os = se) oe
+     * 15. (ss = se = os = oe)
+     */
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_1() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 15, 2, 3
+         * plan1 (ss = se = os = oe)
+         * plan2 (ss os oe se)
+         * plan3 (ss os se oe)
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 25), LocalDate.of(2023, 8, 3), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_2() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 7, 1, 4
+         * plan1 ((os = ss) se oe)
+         * plan2 (os ss se oe)
+         * plan3 (os ss oe se)
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 8, 3), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 8, 3), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 29), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_3() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 10, 8, 9
+         * plan1 (ss os (oe = se))
+         * plan2 ((os = ss) oe se)
+         * plan3 9. os ss (oe = se)
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 29), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(3);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_4() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 11
+         * plan1 (os (oe = ss) se)
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(1);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_5() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 12
+         * plan1 (os (oe = ss = se))
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 20), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 20);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(1);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_6() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 13
+         * plan1 (ss (os = se) oe)
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 19);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 23);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(1);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 모든 Plan이 조회됨")
+    void collectionFilteredByDateRangeTestNormal_allPlanSucceeded_7() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 14
+         * plan1 ((ss = os = se) oe)
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 23);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 23);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(1);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 Plan의 일부만 조회됨")
+    void collectionFilteredByDateRangeTestNormal_partOfThemSucceeded_1() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 3, 4, 5
+         * plan1 (ss os se oe)
+         * plan2 (os ss oe se)
+         * plan3 (ss se os oe) -> 조회되면 안 됨
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 8, 3), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 8, 3), LocalDate.of(2023, 8, 5), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(2);
+        assertThat(filteredAll.stream().map(PlanResDto::getTitle).toList()).doesNotContain("plan3");
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 Plan의 일부만 조회됨")
+    void collectionFilteredByDateRangeTestNormal_partOfThemSucceeded_2() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 1, 2, 6
+         * plan1 (os ss se oe)
+         * plan2 (ss os oe se)
+         * plan3 (os oe ss se) -> 조회되면 안 됨
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 8, 3), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 25), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan3", LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 18), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(2);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - 생성한 Plan이 모두 조회되지 않음")
+    void collectionFilteredByDateRangeTestNormal_emptyResult() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "a63d@$ga"));
+        /**
+         * case 5, 6
+         * plan1 (ss se os oe) -> 조회되면 안 됨
+         * plan2 (os oe ss se) -> 조회되면 안 됨
+         */
+        planRepository.save(new Plan("plan1", LocalDate.of(2023, 8, 3), LocalDate.of(2023, 8, 5), member, PlanStatus.NOW));
+        planRepository.save(new Plan("plan2", LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 18), member, PlanStatus.NOW));
+        Long memberId = member.getId();
+        LocalDate searchStart = LocalDate.of(2023, 7, 20);
+        LocalDate searchEnd = LocalDate.of(2023, 7, 31);
+
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+
+        assertThat(filteredAll.size()).isEqualTo(0);
+
     }
 
 }

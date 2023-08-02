@@ -8,6 +8,7 @@ import yeonleaf.plantodo.dto.CheckboxReqDto;
 import yeonleaf.plantodo.dto.CheckboxResDto;
 import yeonleaf.plantodo.dto.CheckboxUpdateReqDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
+import yeonleaf.plantodo.repository.CheckboxDslRepository;
 import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
 import yeonleaf.plantodo.repository.MemoryGroupRepository;
 import yeonleaf.plantodo.repository.MemoryPlanRepository;
@@ -106,11 +107,34 @@ public class CheckboxServiceTestImpl implements CheckboxService {
 
     @Override
     public List<CheckboxResDto> allByGroup(Long groupId, LocalDate dateKey) {
-        return allByGroup(groupId).stream().filter(checkboxResDto -> checkboxResDto.getDate().equals(dateKey)).toList();
+
+        groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
+        return checkboxRepository.findAllByGroupIdAndDate(groupId, dateKey).stream().map(CheckboxResDto::new).toList();
+
     }
 
     @Override
     public List<CheckboxResDto> allByPlan(Long planId, LocalDate dateKey) {
-        return allByPlan(planId).stream().filter(checkboxResDto -> checkboxResDto.getDate().equals(dateKey)).toList();
+
+        planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+        return checkboxRepository.findAllByPlanIdAndDate(planId, dateKey).stream().map(CheckboxResDto::new).toList();
+
     }
+
+    @Override
+    public List<CheckboxResDto> allByGroup(Long groupId, LocalDate searchStart, LocalDate searchEnd) {
+
+        groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
+        return checkboxRepository.findAllByGroupIdAndDateRange(groupId, searchStart, searchEnd).stream().map(CheckboxResDto::new).toList();
+
+    }
+
+    @Override
+    public List<CheckboxResDto> allByPlan(Long planId, LocalDate searchStart, LocalDate searchEnd) {
+
+        planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
+        return checkboxRepository.findAllByPlanIdAndDateRange(planId, searchStart, searchEnd).stream().map(CheckboxResDto::new).toList();
+
+    }
+
 }

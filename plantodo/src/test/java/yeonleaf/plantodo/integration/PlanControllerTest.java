@@ -389,7 +389,7 @@ public class PlanControllerTest {
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", String.valueOf(memberResDto.getId()))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -403,13 +403,49 @@ public class PlanControllerTest {
     @DisplayName("비정상 일별 컬렉션 조회")
     void collectionFilteredByDateTestAbnormal() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/plans")
+        MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.now().toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
+
+    }
+
+    @Test
+    @DisplayName("정상 기간 컬렉션 조회")
+    void collectionFilteredByDateRangeTestNormal() throws Exception {
+
+        MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 8, 3), memberResDto.getId()));
+        planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
+        planService.save(new PlanReqDto("title", LocalDate.of(2023, 8, 3), LocalDate.of(2023, 8, 5), memberResDto.getId()));
+
+        MockHttpServletRequestBuilder request = get("/plans/range")
+                .param("memberId", String.valueOf(memberResDto.getId()))
+                .param("searchStart", LocalDate.of(2023, 7, 29).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 3).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.planResDtoList.length()").value(2));
+
+    }
+
+    @Test
+    @DisplayName("비정상 기간 컬렉션 조회")
+    void collectionFilteredByDateRangeTestAbnormal() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/plans/range")
+                .param("memberId", "1")
+                .param("searchStart", LocalDate.of(2023, 7, 29).toString())
+                .param("searchEnd", LocalDate.of(2023, 7, 3).toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors.searchStart").exists())
+                .andExpect(jsonPath("errors.searchEnd").exists());
 
     }
 

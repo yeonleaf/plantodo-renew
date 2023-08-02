@@ -18,7 +18,6 @@ import yeonleaf.plantodo.assembler.CheckboxModelAssembler;
 import yeonleaf.plantodo.dto.CheckboxReqDto;
 import yeonleaf.plantodo.dto.CheckboxResDto;
 import yeonleaf.plantodo.dto.CheckboxUpdateReqDto;
-import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
@@ -155,7 +154,7 @@ public class CheckboxController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping(value = "/checkboxes", params = {"standard", "standardId", "dateKey"})
+    @GetMapping(value = "/checkboxes/date", params = {"standard", "standardId", "dateKey"})
     public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long standardId, @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(allByEntity(standard, standardId, dateKey));
@@ -173,6 +172,48 @@ public class CheckboxController {
         }
 
         return standard.equalsIgnoreCase("plan") ? checkboxService.allByPlan(standardId, dateKey) : checkboxService.allByGroup(standardId, dateKey);
+
+    }
+
+    @Operation(summary = "(기간으로 필터) Plan 내에서 여러 개의 Checkbox 조회 (standard = plan) | Group 내에서 여러 개의 Checkbox 조회 (standard = group)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/checkboxes/range", params = {"standard", "standardId", "searchStart", "searchEnd"})
+    public ResponseEntity<?> all(@RequestParam String standard, @RequestParam Long standardId,
+                                 @RequestParam LocalDate searchStart, @RequestParam LocalDate searchEnd) {
+
+        checkSearchDates(searchStart, searchEnd);
+        CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(allByEntity(standard, standardId, searchStart, searchEnd));
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    private List<CheckboxResDto> allByEntity(String standard, Long standardId, LocalDate searchStart, LocalDate searchEnd) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+
+        if (!standard.equalsIgnoreCase("plan") && !standard.equalsIgnoreCase("group")) {
+            errors.rejectValue("standard", "must be plan or group");
+            throw errors;
+        }
+
+        return standard.equalsIgnoreCase("plan")
+                ? checkboxService.allByPlan(standardId, searchStart, searchEnd)
+                : checkboxService.allByGroup(standardId, searchStart, searchEnd);
+
+    }
+
+    private void checkSearchDates(LocalDate searchStart, LocalDate searchEnd) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+        if (searchStart.isAfter(searchEnd)) {
+            errors.rejectValue("searchStart", "searchStart는 searchEnd 이전일 수 없습니다.");
+            errors.rejectValue("searchEnd", "searchEnd는 searchStart 이전일 수 없습니다.");
+            throw errors;
+        }
 
     }
 

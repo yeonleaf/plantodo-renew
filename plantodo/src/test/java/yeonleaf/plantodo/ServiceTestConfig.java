@@ -10,6 +10,7 @@ import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.*;
+import yeonleaf.plantodo.util.DateRange;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 @TestConfiguration
@@ -57,7 +58,8 @@ public class ServiceTestConfig {
 
     @Bean
     public GroupServiceTestImpl groupService() {
-        return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxRepository(), repInToOutConverter(), repOutToInConverter(), repInputValidator());
+        return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxRepository(),
+                repInToOutConverter(), repOutToInConverter(), repInputValidator(), dateRange());
     }
 
     @Bean
@@ -73,6 +75,11 @@ public class ServiceTestConfig {
     @Bean
     public RepInputValidator repInputValidator() {
         return new RepInputValidator();
+    }
+
+    @Bean
+    public DateRange dateRange() {
+        return new DateRange();
     }
 
 }

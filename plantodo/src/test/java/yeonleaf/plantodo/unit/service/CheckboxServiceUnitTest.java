@@ -389,4 +389,129 @@ public class CheckboxServiceUnitTest {
 
     }
 
+    void assertSearchDates(String standard, Long id, LocalDate searchStart, LocalDate searchEnd, int expectedCnt, LocalDate... expectedList) {
+
+        List<CheckboxResDto> filteredAll = (standard == "group"
+                ? checkboxService.allByGroup(id, searchStart, searchEnd)
+                : checkboxService.allByPlan(id, searchStart, searchEnd));
+        assertThat(filteredAll.size()).isEqualTo(expectedCnt);
+        assertThat(filteredAll.stream().map(CheckboxResDto::getDate)).containsOnly(expectedList);
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - by group")
+    void collectionFilteredByDateRangeTestNormal_byGroup() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목", "일"), planId));
+        Long groupId = groupResDto.getId();
+
+        assertSearchDates(
+                "group",
+                groupId,
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 31),
+                5,
+                LocalDate.of(2023, 7, 20),
+                LocalDate.of(2023, 7, 23),
+                LocalDate.of(2023, 7, 25),
+                LocalDate.of(2023, 7, 27),
+                LocalDate.of(2023, 7, 30)
+        );
+
+        assertSearchDates(
+                "group",
+                groupId,
+                LocalDate.of(2023, 7, 23),
+                LocalDate.of(2023, 7, 26),
+                2,
+                LocalDate.of(2023, 7, 23),
+                LocalDate.of(2023, 7, 25)
+        );
+
+        assertSearchDates(
+                "group",
+                groupId,
+                LocalDate.of(2023, 7, 21),
+                LocalDate.of(2023, 7, 22),
+                0
+        );
+
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 비정상 조회 - by group - Resource not found")
+    void collectionFilteredByDateRangeTestAbnormal_byGroup_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.allByGroup(Long.MAX_VALUE, LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 25)));
+    }
+
+    @Test
+    @DisplayName("기간 컬렉션 정상 조회 - by plan")
+    void collectionFilteredByDateRangeTestNormal_byPlan() {
+
+        Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
+        PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
+        Long planId = planResDto.getId();
+
+        // daily checkbox
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 19)));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 23)));
+        checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 27)));
+
+        // group
+        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+
+        assertSearchDates(
+                "plan",
+                planId,
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 21),
+                4,
+                LocalDate.of(2023, 7, 19),
+                LocalDate.of(2023, 7, 20),
+                LocalDate.of(2023, 7, 21)
+        );
+
+        assertSearchDates(
+                "plan",
+                planId,
+                LocalDate.of(2023, 7, 23),
+                LocalDate.of(2023, 7, 24),
+                3,
+                LocalDate.of(2023, 7, 23)
+        );
+
+        assertSearchDates(
+                "plan",
+                planId,
+                LocalDate.of(2023, 7, 24),
+                LocalDate.of(2023, 7, 28),
+                5,
+                LocalDate.of(2023, 7, 25),
+                LocalDate.of(2023, 7, 27)
+        );
+
+        assertSearchDates(
+                "plan",
+                planId,
+                LocalDate.of(2023, 7, 16),
+                LocalDate.of(2023, 7, 18),
+                0
+        );
+
+    }
+
+    @Test
+    @DisplayName("기간 비정상 조회 - by plan - Resource not found")
+    void collectionFilteredByDateRangeTestAbnormal_byPlan_resourceNotFound() {
+
+        assertThrows(ResourceNotFoundException.class, () -> checkboxService.allByPlan(Long.MAX_VALUE, LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 23)));
+
+    }
+
 }

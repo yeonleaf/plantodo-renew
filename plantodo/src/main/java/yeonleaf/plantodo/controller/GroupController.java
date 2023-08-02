@@ -19,6 +19,7 @@ import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
 import yeonleaf.plantodo.exceptions.ArgumentValidationException;
+import yeonleaf.plantodo.exceptions.QueryStringValidationException;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
@@ -135,11 +136,37 @@ public class GroupController {
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
-    @GetMapping(value = "/groups", params = {"planId", "dateKey"})
+    @GetMapping(value = "/groups/date", params = {"planId", "dateKey"})
     public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, dateKey));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    @Operation(summary = "여러 개의 Group 조회 (기간으로 필터)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
+            @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
+    })
+    @GetMapping(value = "/groups/range", params = {"planId", "searchStart", "searchEnd"})
+    public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate searchStart, LocalDate searchEnd) {
+
+        checkSearchDates(searchStart, searchEnd);
+        CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, searchStart, searchEnd));
+        return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
+
+    }
+
+    private void checkSearchDates(LocalDate searchStart, LocalDate searchEnd) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+        if (searchStart.isAfter(searchEnd)) {
+            errors.rejectValue("searchStart", "searchStart는 searchEnd 이전일 수 없습니다.");
+            errors.rejectValue("searchEnd", "searchEnd는 searchStart 이전일 수 없습니다.");
+            throw errors;
+        }
 
     }
 

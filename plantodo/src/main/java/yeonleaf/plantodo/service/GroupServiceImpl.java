@@ -15,6 +15,7 @@ import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.util.CheckboxDateCreator;
+import yeonleaf.plantodo.util.DateRange;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +33,7 @@ public class GroupServiceImpl implements GroupService {
     private final CheckboxDslRepository checkboxDslRepository;
     private final RepInToOutConverter repInToOutConverter;
     private final RepOutToInConverter repOutToInConverter;
+    private final DateRange dateRange;
 
     @Override
     public GroupResDto save(GroupReqDto groupReqDto) {
@@ -162,6 +164,26 @@ public class GroupServiceImpl implements GroupService {
 
     private boolean isNotEmptyToday(Long groupId, LocalDate dateKey) {
         return checkboxDslRepository.findAllByGroupIdAndDate(groupId, dateKey).size() > 0;
+    }
+
+    @Override
+    public List<GroupResDto> all(Long planId, LocalDate searchStart, LocalDate searchEnd) {
+
+        return all(planId).stream()
+                .filter(groupResDto -> isNotEmptyInRange(groupResDto.getId(), searchStart, searchEnd)).toList();
+
+    }
+
+    private boolean isNotEmptyInRange(Long groupId, LocalDate searchStart, LocalDate searchEnd) {
+
+        List<LocalDate> dates = checkboxRepository.findByGroupId(groupId).stream().map(Checkbox::getDate).toList();
+        for (LocalDate date : dateRange.between(searchStart, searchEnd)) {
+            if (dates.contains(date)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
 }

@@ -1,6 +1,5 @@
 package yeonleaf.plantodo.repository;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,6 +20,27 @@ public class CheckboxDslRepository {
         return qf.selectFrom(qc)
                 .where(qc.group.id.eq(groupId))
                 .where(qc.date.eq(dateKey))
+                .fetch();
+    }
+
+    public List<Checkbox> findAllByGroupIdAndDateRange(Long groupId, LocalDate searchStart, LocalDate searchEnd) {
+        return qf.selectFrom(qc)
+                .where(qc.group.id.eq(groupId))
+                .where(qc.date.between(searchStart, searchEnd))
+                .fetch();
+    }
+
+    public List<Checkbox> findAllByPlanIdAndDate(Long planId, LocalDate dateKey) {
+        return qf.selectFrom(qc)
+                .where(qc.group.plan.id.eq(planId))
+                .where(qc.date.eq(dateKey))
+                .fetch();
+    }
+
+    public List<Checkbox> findAllByPlanIdAndDateRange(Long planId, LocalDate searchStart, LocalDate searchEnd) {
+        return qf.selectFrom(qc)
+                .where(qc.group.plan.id.eq(planId))
+                .where(qc.date.between(searchStart, searchEnd))
                 .fetch();
     }
 

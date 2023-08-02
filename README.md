@@ -1,0 +1,21 @@
+# PLANTODO
+할 일 관리 웹 페이지
+
+## Environments
+
+<img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white"/><img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+<img src="https://img.shields.io/badge/intellijidea-000000?style=for-the-badge&logo=intellijidea&logoColor=white"><img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
+<img src="https://img.shields.io/badge/hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white"><img src="https://img.shields.io/badge/mariadb-003545?style=for-the-badge&logo=mariadb&logoColor=white">
+
+- Language : java 17
+- IDE : IntelliJ Ultimate 2021.2
+- Framework : SpringBoot 3.1.1 
+- Database : MariaDB 10.11 (java-client 2.7.2)
+- ORM : JPA (hibernate)
+
+## Features
+- 회원가입, 로그인
+- 일정 관리
+- 할 일 관리
+
+## Quick Start

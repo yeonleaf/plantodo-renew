@@ -4,17 +4,22 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import yeonleaf.plantodo.exceptions.CustomJwtException;
 
 import javax.crypto.SecretKey;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Date;
 
 @NoArgsConstructor
 public class JwtProvider implements JwtBasicProvider {
 
-    private SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private SecretKey key;
+
+    @Value("${custom.jwt.secretKey}")
+    private String plainKey;
 
     @Override
     public JwtBuilder jwtBuilder() {
@@ -24,7 +29,7 @@ public class JwtProvider implements JwtBasicProvider {
                 .setIssuer("fresh")
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis()))
-                .signWith(key, SignatureAlgorithm.HS256);
+                .signWith(secretKey(), SignatureAlgorithm.HS256);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class JwtProvider implements JwtBasicProvider {
 
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(secretKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -71,12 +76,20 @@ public class JwtProvider implements JwtBasicProvider {
 
     @Override
     public SecretKey secretKey() {
+        if (key == null) {
+            key = _getSecretKey();
+        }
         return key;
+    }
+
+    private SecretKey _getSecretKey() {
+        String keyBase64Encoded = Base64.getEncoder().encodeToString(plainKey.getBytes());
+        return Keys.hmacShaKeyFor(keyBase64Encoded.getBytes());
     }
 
     public Long getIdFromToken(String token) {
         Claims body = Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(secretKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

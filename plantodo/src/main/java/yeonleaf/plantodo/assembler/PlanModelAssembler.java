@@ -15,12 +15,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class PlanModelAssembler implements RepresentationModelAssembler<PlanResDto, EntityModel<PlanResDto>> {
-        @Override
+    @Override
     public EntityModel<PlanResDto> toModel(PlanResDto planResDto) {
         return EntityModel.of(planResDto,
                 linkTo(methodOn(PlanController.class).one(planResDto.getId())).withSelfRel(),
-                linkTo(methodOn(GroupController.class).all(planResDto.getId())).withRel("lower-collection"),
-                linkTo(methodOn(CheckboxController.class).all("plan", planResDto.getId())).withRel("lower-collection"),
+                linkTo(methodOn(GroupController.class).all(planResDto.getId())).withRel("groups"),
+                linkTo(methodOn(CheckboxController.class).all("plan", planResDto.getId())).withRel("checkboxes"),
                 linkTo(methodOn(PlanController.class).delete(planResDto.getId())).withRel("deletion"),
                 linkTo(methodOn(PlanController.class).change(planResDto.getId())).withRel("changing")
         );

@@ -22,7 +22,7 @@ public class CheckboxModelAssembler implements RepresentationModelAssembler<Chec
         return EntityModel.of(entity,
                 linkTo(methodOn(CheckboxController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(CheckboxController.class).delete(entity.getId())).withRel("deletion"),
-                linkTo(methodOn(CheckboxController.class).change(entity.getId())).withRel("switch")
+                linkTo(methodOn(CheckboxController.class).change(entity.getId())).withRel("changing")
                 );
     }
 }

@@ -7,14 +7,25 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 
 public class JwtTestProvider implements JwtBasicProvider {
 
-    private SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private String plainKey = "zO61CkG7DzurakzrvCOUodF0dg6Fdfa3rMjk8Wex9NaTO6pWRDh9sy84HtoDgFwhhoFSPLAYxHQHazlVrp765Hl25ApLxtfTcj0c";
+
+    private SecretKey key;
 
     @Override
     public SecretKey secretKey() {
+        if (key == null) {
+            key = _getSecretKey();
+        }
         return key;
+    }
+
+    private SecretKey _getSecretKey() {
+        String keyBase64Encoded = Base64.getEncoder().encodeToString(plainKey.getBytes());
+        return Keys.hmacShaKeyFor(keyBase64Encoded.getBytes());
     }
 
     @Override
@@ -27,7 +38,7 @@ public class JwtTestProvider implements JwtBasicProvider {
     @Override
     public String generateToken(Long id) {
         return jwtBuilder()
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(secretKey(), SignatureAlgorithm.HS256)
                 .claim("id", id)
                 .compact();
     }

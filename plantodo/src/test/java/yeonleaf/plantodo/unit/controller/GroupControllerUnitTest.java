@@ -133,7 +133,7 @@ public class GroupControllerUnitTest {
                 .andExpect(jsonPath("id").value(1L))
                 .andExpect(content().contentType(MediaTypes.HAL_JSON))
                 .andExpect(jsonPath("_links").exists())
-                .andExpect(jsonPath("_links.lower-collection").exists());
+                .andExpect(jsonPath("_links.checkboxes").exists());
 
     }
 

@@ -164,7 +164,7 @@ public class PlanController {
         List<EntityModel<PlanResDto>> all = planService.all(memberId, dateKey).stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
                 linkTo(methodOn(PlanController.class).all(memberId, dateKey)).withSelfRel(),
-                linkTo(methodOn(PlanController.class).all(memberId)).withRel("collection"));
+                linkTo(methodOn(PlanController.class).all(memberId)).withRel("plans"));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }
@@ -183,7 +183,7 @@ public class PlanController {
         List<EntityModel<PlanResDto>> all = planService.all(memberId, searchStart, searchEnd).stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
                 linkTo(methodOn(PlanController.class).all(memberId, searchStart, searchEnd)).withSelfRel(),
-                linkTo(methodOn(PlanController.class).all(memberId)).withRel("collection"));
+                linkTo(methodOn(PlanController.class).all(memberId)).withRel("plans"));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }

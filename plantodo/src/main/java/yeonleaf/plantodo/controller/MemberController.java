@@ -75,7 +75,7 @@ public class MemberController {
 
         Long memberId = memberService.login(memberReqDto);
         JwtTokenDto token = new JwtTokenDto(jwtProvider.generateToken(memberId));
-        EntityModel<JwtTokenDto> entityModel = EntityModel.of(token, linkTo(methodOn(PlanController.class).all(memberId)).withRel("lower-collection"));
+        EntityModel<JwtTokenDto> entityModel = EntityModel.of(token, linkTo(methodOn(PlanController.class).all(memberId)).withRel("plans"));
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
     }
 

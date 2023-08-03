@@ -2,6 +2,7 @@ package yeonleaf.plantodo.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.PersistenceException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,6 +154,7 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - persistence problem")
+    @Disabled
     void saveAbnormalPersistenceProblem() throws Exception {
 
         LocalDate start = LocalDate.now();

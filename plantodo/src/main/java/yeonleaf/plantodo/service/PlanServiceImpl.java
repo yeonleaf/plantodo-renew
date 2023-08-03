@@ -84,7 +84,7 @@ public class PlanServiceImpl implements PlanService {
         oldPlan.setEnd(planUpdateReqDto.getEnd());
         Plan updatedPlan = planRepository.save(oldPlan);
 
-        List<Group> groups = groupRepository.findByPlanId(updatedPlan.getId());
+        List<Group> groups = groupRepository.findByPlanIdEntityGraph(updatedPlan.getId());
         for (Group group : groups) {
             if (needResetMode(group)) {
                 updateResetMode(group, updatedPlan);
@@ -139,7 +139,7 @@ public class PlanServiceImpl implements PlanService {
     public void delete(Long id) {
 
         Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        groupRepository.findByPlanId(plan.getId()).forEach(group -> groupService.delete(group.getId()));
+        groupRepository.findByPlanIdEntityGraph(plan.getId()).forEach(group -> groupService.delete(group.getId()));
         planRepository.delete(plan);
 
     }

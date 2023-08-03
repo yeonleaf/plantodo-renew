@@ -89,7 +89,6 @@ public class CheckboxServiceTestImpl implements CheckboxService {
     public List<CheckboxResDto> allByGroup(Long groupId) {
 
         groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
-
         return checkboxRepository.findByGroupId(groupId).stream().map(CheckboxResDto::new).toList();
 
     }

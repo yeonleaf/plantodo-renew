@@ -63,7 +63,7 @@ public class GroupRepositoryUnitTest {
         Repetition repetition = new Repetition(2, "0000001");
         Group group = groupRepository.save(new Group(plan, "title", repetition));
 
-        Group findGroup = groupRepository.findById(group.getId()).orElseThrow(ResourceNotFoundException::new);
+        Group findGroup = groupRepository.findByIdEntityGraph(group.getId()).orElseThrow(ResourceNotFoundException::new);
         assertThat(group.equals(findGroup)).isTrue();
 
     }

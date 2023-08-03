@@ -62,7 +62,7 @@ public class PlanController {
         }
 
         PlanResDto planResDto = planService.save(planReqDto);
-        EntityModel<PlanResDto> entityModel = EntityModel.of(planResDto, linkTo(methodOn(PlanController.class).one(planResDto.getId())).withSelfRel());
+        EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
 
     }
@@ -133,7 +133,8 @@ public class PlanController {
     public ResponseEntity<?> change(@PathVariable Long id) {
 
         PlanResDto planResDto = planService.change(id);
-        return ResponseEntity.status(HttpStatus.OK).body(planResDto);
+        EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
+        return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 
     }
 

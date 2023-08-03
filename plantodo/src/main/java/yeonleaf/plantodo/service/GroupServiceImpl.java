@@ -65,7 +65,7 @@ public class GroupServiceImpl implements GroupService {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
 
-        return groupRepository.findByPlanId(planId).stream().filter(group -> group.getRepetition().getRepOption() != 0).map(group -> {
+        return groupRepository.findByPlanIdEntityGraph(planId).stream().filter(group -> group.getRepetition().getRepOption() != 0).map(group -> {
             Repetition repetition = group.getRepetition();
             RepInputDto repInputDto = repOutToInConverter.convert(repetition);
             return new GroupResDto(group, repInputDto.getRepOption(), repInputDto.getRepValue());
@@ -76,7 +76,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResDto one(Long id) {
 
-        Group group = groupRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Group group = groupRepository.findByIdEntityGraph(id).orElseThrow(ResourceNotFoundException::new);
         Repetition repetition = group.getRepetition();
         RepInputDto repInputDto = repOutToInConverter.convert(repetition);
         assert repInputDto != null;
@@ -87,7 +87,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResDto update(GroupUpdateReqDto groupUpdateReqDto) {
 
-        Group oldGroup = groupRepository.findById(groupUpdateReqDto.getId()).orElseThrow(ResourceNotFoundException::new);
+        Group oldGroup = groupRepository.findByIdEntityGraph(groupUpdateReqDto.getId()).orElseThrow(ResourceNotFoundException::new);
 
         String oldTitle = oldGroup.getTitle();
         int oldRepOption = oldGroup.getRepetition().getRepOption();

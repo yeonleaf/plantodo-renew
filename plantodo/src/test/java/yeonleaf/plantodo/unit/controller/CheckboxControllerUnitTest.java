@@ -241,13 +241,13 @@ public class CheckboxControllerUnitTest {
 
         when(checkboxService.allByPlan(any())).thenReturn(checkboxes);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
-                .param("standard", "plan")
-                .param("standardId", "1");
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan")
+                .param("planId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3))
+                .andExpect(jsonPath("_links.plan").exists());
 
     }
 
@@ -259,13 +259,13 @@ public class CheckboxControllerUnitTest {
 
         when(checkboxService.allByGroup(any())).thenReturn(checkboxes);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
-                .param("standard", "group")
-                        .param("standardId", "1");
+        MockHttpServletRequestBuilder request = get("/checkboxes/group")
+                .param("groupId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3));
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(3))
+                .andExpect(jsonPath("_links.group").exists());
 
     }
 
@@ -275,9 +275,8 @@ public class CheckboxControllerUnitTest {
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any());
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
-                .param("standard", "plan")
-                .param("standardId", "1");
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan")
+                .param("planId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
@@ -291,9 +290,8 @@ public class CheckboxControllerUnitTest {
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any());
 
-        MockHttpServletRequestBuilder request = get("/checkboxes")
-                .param("standard", "group")
-                .param("standardId", "1");
+        MockHttpServletRequestBuilder request = get("/checkboxes/group")
+                .param("groupId", "1");
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
@@ -307,9 +305,8 @@ public class CheckboxControllerUnitTest {
 
         List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/date")
-                .param("standard", "group")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/group/date")
+                .param("groupId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
 
         when(checkboxService.allByGroup(any(), any())).thenReturn(checkboxes);
@@ -324,9 +321,8 @@ public class CheckboxControllerUnitTest {
     @DisplayName("정상 일별 컬렉션 조회 - by group - Resource not found")
     void collectionFilteredByDateTestAbnormal_byGroup() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/date")
-                .param("standard", "group")
-                .param("standardId", String.valueOf(Long.MAX_VALUE))
+        MockHttpServletRequestBuilder request = get("/checkboxes/group/date")
+                .param("groupId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any(), any());
@@ -343,9 +339,8 @@ public class CheckboxControllerUnitTest {
 
         List<CheckboxResDto> checkboxes = makeSampleCheckboxes();
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/date")
-                .param("standard", "plan")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan/date")
+                .param("planId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
 
         when(checkboxService.allByPlan(any(), any())).thenReturn(checkboxes);
@@ -360,9 +355,8 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 일별 컬렉션 조회 - by plan - Resource not found")
     void collectionFilteredByDateTestAbnormal_byPlan() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/date")
-                .param("standard", "plan")
-                .param("standardId", String.valueOf(Long.MAX_VALUE))
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan/date")
+                .param("planId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any(), any());
@@ -374,21 +368,6 @@ public class CheckboxControllerUnitTest {
     }
 
     @Test
-    @DisplayName("비정상 일별 컬렉션 조회 - invalid requestParam")
-    void collectionFilteredByDateTestAbnormal_invalidRequestParam() throws Exception {
-
-        MockHttpServletRequestBuilder request = get("/checkboxes/date")
-                .param("standard", "gorilla")
-                .param("standardId", "1")
-                .param("dateKey", LocalDate.of(2023, 7, 31).toString());
-
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("errors.standard").exists());
-
-    }
-
-    @Test
     @DisplayName("정상 기간 컬렉션 조회 - by group")
     void collectionFilteredByDateRangeTest_byGroup() throws Exception {
 
@@ -396,9 +375,8 @@ public class CheckboxControllerUnitTest {
 
         when(checkboxService.allByGroup(any(), any(), any())).thenReturn(checkboxes);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "group")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/group/range")
+                .param("groupId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 23).toString());
 
@@ -412,9 +390,8 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - by group - Invalid query string")
     void collectionFilteredByDateRangeTest_byGroup_invalidQueryString_1() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "group")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/group/range")
+                .param("groupId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
 
@@ -430,9 +407,8 @@ public class CheckboxControllerUnitTest {
     void collectionFilteredByDateRangeTest_byGroup_resourceNotFound() throws Exception {
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByGroup(any(), any(), any());
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "group")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/group/range")
+                .param("groupId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 19).toString());
         mockMvc.perform(request)
@@ -449,9 +425,8 @@ public class CheckboxControllerUnitTest {
 
         when(checkboxService.allByPlan(any(), any(), any())).thenReturn(checkboxes);
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "plan")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan/range")
+                .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 23).toString());
 
@@ -465,9 +440,8 @@ public class CheckboxControllerUnitTest {
     @DisplayName("비정상 기간 컬렉션 조회 - by plan - Invalid query string")
     void collectionFilteredByDateRangeTestAbnormal_byPlan_invalidQueryString() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "plan")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan/range")
+                .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 16).toString());
 
@@ -483,9 +457,8 @@ public class CheckboxControllerUnitTest {
     void collectionFilteredByDateRangeTestAbnormal_byPlan_resourceNotFound() throws Exception {
 
         doThrow(ResourceNotFoundException.class).when(checkboxService).allByPlan(any(), any(), any());
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "plan")
-                .param("standardId", "1")
+        MockHttpServletRequestBuilder request = get("/checkboxes/plan/range")
+                .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 19).toString());
         mockMvc.perform(request)
@@ -493,22 +466,5 @@ public class CheckboxControllerUnitTest {
                 .andExpect(jsonPath("message").value("Resource not found"));
 
     }
-
-    @Test
-    @DisplayName("비정상 기간 컬렉션 조회 - Invalid query string")
-    void collectionFilteredByDateRangeTest_invalidQueryString() throws Exception {
-
-        MockHttpServletRequestBuilder request = get("/checkboxes/range")
-                .param("standard", "gorilla")
-                .param("standardId", "1")
-                .param("searchStart", LocalDate.of(2023, 7, 16).toString())
-                .param("searchEnd", LocalDate.of(2023, 7, 19).toString());
-
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("errors.standard").exists());
-
-    }
-
 
 }

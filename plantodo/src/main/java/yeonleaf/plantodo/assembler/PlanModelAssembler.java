@@ -20,7 +20,7 @@ public class PlanModelAssembler implements RepresentationModelAssembler<PlanResD
         return EntityModel.of(planResDto,
                 linkTo(methodOn(PlanController.class).one(planResDto.getId())).withSelfRel(),
                 linkTo(methodOn(GroupController.class).all(planResDto.getId())).withRel("groups"),
-                linkTo(methodOn(CheckboxController.class).all("plan", planResDto.getId())).withRel("checkboxes"),
+                linkTo(methodOn(CheckboxController.class).allByPlan(planResDto.getId())).withRel("checkboxes"),
                 linkTo(methodOn(PlanController.class).delete(planResDto.getId())).withRel("deletion"),
                 linkTo(methodOn(PlanController.class).change(planResDto.getId())).withRel("changing")
         );

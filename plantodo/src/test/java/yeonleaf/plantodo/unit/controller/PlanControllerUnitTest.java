@@ -154,7 +154,6 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - persistence problem")
-    @Disabled
     void saveAbnormalPersistenceProblem() throws Exception {
 
         LocalDate start = LocalDate.now();

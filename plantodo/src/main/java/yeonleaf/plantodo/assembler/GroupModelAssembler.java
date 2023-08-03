@@ -24,7 +24,7 @@ public class GroupModelAssembler implements RepresentationModelAssembler<GroupRe
 
         return EntityModel.of(entity,
                 linkTo(methodOn(GroupController.class).one(entity.getId())).withSelfRel(),
-                linkTo(methodOn(CheckboxController.class).all("group", entity.getId())).withRel("checkboxes"),
+                linkTo(methodOn(CheckboxController.class).allByGroup(entity.getId())).withRel("checkboxes"),
                 linkTo(methodOn(GroupController.class).delete(entity.getId())).withRel("deletion"));
 
     }

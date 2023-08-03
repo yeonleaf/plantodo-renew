@@ -41,13 +41,13 @@ public class GlobalControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
     }
 
-//    @ExceptionHandler(PersistenceException.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    ResponseEntity<?> persistenceExceptionHandler(PersistenceException ex) throws JsonProcessingException {
-//        ApiSimpleError apiSimpleError = new ApiSimpleError("Possible server error", "Entity couldn't be persisted safely due to db error or network problem");
-//        String responseData = objectMapper.writeValueAsString(apiSimpleError);
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
-//    }
+    @ExceptionHandler(PersistenceException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    ResponseEntity<?> persistenceExceptionHandler(PersistenceException ex) throws JsonProcessingException {
+        ApiSimpleError apiSimpleError = new ApiSimpleError("Possible server error", "Entity couldn't be persisted safely due to db error or network problem");
+        String responseData = objectMapper.writeValueAsString(apiSimpleError);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+    }
 
     @ExceptionHandler(QueryStringValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

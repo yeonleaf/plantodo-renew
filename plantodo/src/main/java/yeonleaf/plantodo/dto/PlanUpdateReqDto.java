@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,9 +22,11 @@ import java.time.LocalDate;
 public class PlanUpdateReqDto {
 
     @NotNull
+    @Schema(example = "1")
     private Long id;
 
     @NotBlank
+    @Schema(example = "updatePlanTitle")
     private String title;
 
     @NotNull

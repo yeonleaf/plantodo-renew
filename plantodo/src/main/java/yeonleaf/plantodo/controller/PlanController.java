@@ -1,10 +1,12 @@
 package yeonleaf.plantodo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@Tag(name = "plan", description = "일정 API")
 @RestController
 @RequiredArgsConstructor
 public class PlanController {
@@ -82,7 +85,7 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @GetMapping("/plan/{id}")
-    public ResponseEntity<?> one(@PathVariable Long id) {
+    public ResponseEntity<?> one(@Parameter(description = "일정 ID", required = true, example = "1") @PathVariable Long id) {
 
         PlanResDto planResDto = planService.one(id);
         EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
@@ -116,7 +119,7 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @DeleteMapping("/plan/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@Parameter(description = "일정 ID", required = true, example = "1") @PathVariable Long id) {
 
         planService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -130,7 +133,7 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @PatchMapping("/plan/{id}")
-    public ResponseEntity<?> change(@PathVariable Long id) {
+    public ResponseEntity<?> change(@Parameter(description = "일정 ID", required = true, example = "1") @PathVariable Long id) {
 
         PlanResDto planResDto = planService.change(id);
         EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
@@ -145,7 +148,7 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/plans", params = {"memberId"})
-    public ResponseEntity<?> all(@RequestParam Long memberId) {
+    public ResponseEntity<?> all(@Parameter(description = "회원 ID", required = true, example = "1") @RequestParam Long memberId) {
 
         List<EntityModel<PlanResDto>> all = planService.all(memberId).stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all, linkTo(methodOn(PlanController.class)).withSelfRel());
@@ -160,7 +163,8 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/plans/date", params = {"memberId", "dateKey"})
-    public ResponseEntity<?> all(@RequestParam Long memberId, @RequestParam LocalDate dateKey) {
+    public ResponseEntity<?> all(@Parameter(description = "회원 ID", required = true, example = "1") @RequestParam Long memberId,
+                                 @Parameter(description = "검색일", required = true, example = "2023-08-04") @RequestParam LocalDate dateKey) {
 
         List<EntityModel<PlanResDto>> all = planService.all(memberId, dateKey).stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
@@ -177,7 +181,9 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/plans/range", params = {"memberId", "searchStart", "searchEnd"})
-    public ResponseEntity<?> all(@RequestParam Long memberId, @RequestParam LocalDate searchStart, @RequestParam LocalDate searchEnd) {
+    public ResponseEntity<?> all(@Parameter(description = "회원 ID", required = true, example = "1") @RequestParam Long memberId,
+                                 @Parameter(description = "검색 시작일", required = true, example = "2023-08-04") @RequestParam LocalDate searchStart,
+                                 @Parameter(description = "검색 종료일", required = true, example = "2023-08-17")@RequestParam LocalDate searchEnd) {
 
         checkSearchDates(searchStart, searchEnd);
 

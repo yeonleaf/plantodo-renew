@@ -400,7 +400,8 @@ public class CheckboxControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(1));
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(1))
+                .andDo(print());
 
     }
 
@@ -481,7 +482,8 @@ public class CheckboxControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(1));
+                .andExpect(jsonPath("_embedded.checkboxResDtoList.length()").value(1))
+                .andDo(print());
 
     }
 

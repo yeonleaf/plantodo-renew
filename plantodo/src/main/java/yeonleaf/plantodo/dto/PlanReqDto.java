@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,20 +24,24 @@ import java.time.LocalDate;
 public class PlanReqDto {
 
     @NotBlank
+    @Schema(example = "planTitle")
     private String title;
 
     @NotNull
     @FutureOrPresent
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
+    @Schema(description = "일정 시작일")
     private LocalDate start;
 
     @NotNull
     @FutureOrPresent
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
+    @Schema(description = "일정 종료일")
     private LocalDate end;
 
+    @Schema(example = "1")
     private Long memberId;
 
 }

@@ -1,10 +1,12 @@
 package yeonleaf.plantodo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
@@ -31,6 +33,7 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@Tag(name = "checkbox", description = "할 일 API")
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -39,7 +42,7 @@ public class CheckboxController {
     private final CheckboxService checkboxService;
     private final CheckboxModelAssembler checkboxModelAssembler;
 
-    @Operation(summary = "Checkbox 등록")
+    @Operation(summary = "할 일 등록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -58,14 +61,14 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "Checkbox 단건 조회")
+    @Operation(summary = "할 일 단건 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @GetMapping("/checkbox/{id}")
-    public ResponseEntity<?> one(@PathVariable Long id) {
+    public ResponseEntity<?> one(@Parameter(description = "할 일 ID", required = true, example = "1") @PathVariable Long id) {
 
         CheckboxResDto checkboxResDto = checkboxService.one(id);
         EntityModel<CheckboxResDto> entityModel = checkboxModelAssembler.toModel(checkboxResDto);
@@ -73,7 +76,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "Checkbox 수정")
+    @Operation(summary = "할 일 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -93,14 +96,14 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "Checkbox 삭제")
+    @Operation(summary = "할 일 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @DeleteMapping("/checkbox/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@Parameter(description = "할 일 ID", required = true, example = "1") @PathVariable Long id) {
 
         checkboxService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -114,7 +117,7 @@ public class CheckboxController {
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @PatchMapping("/checkbox/{id}")
-    public ResponseEntity<?> change(@PathVariable Long id) {
+    public ResponseEntity<?> change(@Parameter(description = "할 일 ID", required = true, example = "1") @PathVariable Long id) {
 
         CheckboxResDto checkboxResDto = checkboxService.change(id);
         EntityModel<CheckboxResDto> entityModel = checkboxModelAssembler.toModel(checkboxResDto);
@@ -122,14 +125,14 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "Group 내에 있는 모든 Checkbox 조회")
+    @Operation(summary = "그룹 안에 있는 모든 할 일 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/checkboxes/group", params = {"groupId"})
-    public ResponseEntity<?> allByGroup(@RequestParam Long groupId) {
+    public ResponseEntity<?> allByGroup(@Parameter(description = "그룹 ID", required = true, example = "1") @RequestParam Long groupId) {
 
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(checkboxService.allByGroup(groupId));
         Link additionalLink = linkTo(methodOn(GroupController.class).one(groupId)).withRel("group");
@@ -138,14 +141,14 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "Plan 내에 있는 모든 Checkbox 조회")
+    @Operation(summary = "일정 안에 있는 모든 할 일 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/checkboxes/plan", params = {"planId"})
-    public ResponseEntity<?> allByPlan(@RequestParam Long planId) {
+    public ResponseEntity<?> allByPlan(@Parameter(description = "일정 ID", required = true, example = "1") @RequestParam Long planId) {
 
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(checkboxService.allByPlan(planId));
         Link additionalLink = linkTo(methodOn(PlanController.class).one(planId)).withRel("plan");
@@ -154,14 +157,15 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "(날짜로 필터) Group 내에서 여러 개의 Checkbox 조회")
+    @Operation(summary = "그룹 안에 있는 모든 할 일 조회 (날짜로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/checkboxes/group/date", params = {"groupId", "dateKey"})
-    public ResponseEntity<?> allByGroup(@RequestParam Long groupId, @RequestParam LocalDate dateKey) {
+    public ResponseEntity<?> allByGroup(@Parameter(description = "그룹 ID", required = true, example = "1") @RequestParam Long groupId,
+                                        @Parameter(description = "검색일", required = true, example = "2023-08-04") @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(checkboxService.allByGroup(groupId, dateKey));
         Link additionalLink = linkTo(methodOn(GroupController.class).one(groupId)).withRel("group");
@@ -170,14 +174,15 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "(날짜로 필터) Plan 내에서 여러 개의 Checkbox 조회")
+    @Operation(summary = "일정 안에 있는 모든 할 일 조회 (날짜로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/checkboxes/plan/date", params = {"planId", "dateKey"})
-    public ResponseEntity<?> allByPlan(@RequestParam Long planId, @RequestParam LocalDate dateKey) {
+    public ResponseEntity<?> allByPlan(@Parameter(description = "일정 ID", required = true, example = "1") @RequestParam Long planId,
+                                       @Parameter(description = "검색일", required = true, example = "2023-08-04") @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(checkboxService.allByPlan(planId, dateKey));
         Link additionalLink = linkTo(methodOn(PlanController.class).one(planId)).withRel("plan");
@@ -186,15 +191,16 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "(기간으로 필터) Group 내에서 여러 개의 Checkbox 조회")
+    @Operation(summary = "그룹 안에 있는 모든 할 일 조회 (기간으로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/checkboxes/group/range", params = {"groupId", "searchStart", "searchEnd"})
-    public ResponseEntity<?> allByGroup(@RequestParam Long groupId, @RequestParam LocalDate searchStart,
-                                        @RequestParam LocalDate searchEnd) {
+    public ResponseEntity<?> allByGroup(@Parameter(description = "그룹 ID", required = true, example = "1") @RequestParam Long groupId,
+                                        @Parameter(description = "검색 시작일", required = true, example = "2023-08-04") @RequestParam LocalDate searchStart,
+                                        @Parameter(description = "검색 종료일", required = true, example = "2023-08-10") @RequestParam LocalDate searchEnd) {
 
         checkSearchDates(searchStart, searchEnd);
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(checkboxService.allByGroup(groupId, searchStart, searchEnd));
@@ -204,36 +210,22 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "(기간으로 필터) Plan 내에서 여러 개의 Checkbox 조회")
+    @Operation(summary = "일정 안에 있는 모든 할 일 조회 (기간으로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/checkboxes/plan/range", params = {"planId", "searchStart", "searchEnd"})
-    public ResponseEntity<?> allByPlan(@RequestParam Long planId, @RequestParam LocalDate searchStart,
-                                       @RequestParam LocalDate searchEnd) {
+    public ResponseEntity<?> allByPlan(@Parameter(description = "일정 ID", required = true, example = "1") @RequestParam Long planId,
+                                       @Parameter(description = "검색 시작일", required = true, example = "2023-08-04") @RequestParam LocalDate searchStart,
+                                       @Parameter(description = "검색 종료일", required = true, example = "2023-08-10") @RequestParam LocalDate searchEnd) {
 
         checkSearchDates(searchStart, searchEnd);
         CollectionModel<EntityModel<CheckboxResDto>> collectionModel = checkboxModelAssembler.toCollectionModel(checkboxService.allByPlan(planId, searchStart, searchEnd));
         Link additionalLink = linkTo(methodOn(PlanController.class).one(planId)).withRel("plan");
         collectionModel.add(additionalLink);
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
-
-    }
-
-    private List<CheckboxResDto> allByEntity(String standard, Long standardId, LocalDate searchStart, LocalDate searchEnd) {
-
-        QueryStringValidationException errors = new QueryStringValidationException();
-
-        if (!standard.equalsIgnoreCase("plan") && !standard.equalsIgnoreCase("group")) {
-            errors.rejectValue("standard", "must be plan or group");
-            throw errors;
-        }
-
-        return standard.equalsIgnoreCase("plan")
-                ? checkboxService.allByPlan(standardId, searchStart, searchEnd)
-                : checkboxService.allByGroup(standardId, searchStart, searchEnd);
 
     }
 

@@ -1,10 +1,12 @@
 package yeonleaf.plantodo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
@@ -25,9 +27,7 @@ import yeonleaf.plantodo.validator.RepInputValidator;
 
 import java.time.LocalDate;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
+@Tag(name = "group", description = "주기적으로 반복되는 할 일을 관리하는 그룹 API")
 @RestController
 @RequiredArgsConstructor
 public class GroupController {
@@ -35,7 +35,7 @@ public class GroupController {
     private final GroupService groupService;
     private final GroupModelAssembler groupModelAssembler;
 
-    @Operation(summary = "Group 등록")
+    @Operation(summary = "그룹 등록", description = "그룹 등록시 할 일이 자동으로 생성")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = GroupResDto.class))),
             @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -62,14 +62,14 @@ public class GroupController {
 
     }
 
-    @Operation(summary = "Group 단건 조회")
+    @Operation(summary = "그룹 단건 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = GroupResDto.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @GetMapping("/group/{id}")
-    public ResponseEntity<?> one(@PathVariable Long id) {
+    public ResponseEntity<?> one(@Parameter(description = "그룹 ID", required = true, example = "1") @PathVariable Long id) {
 
         GroupResDto groupResDto = groupService.one(id);
         EntityModel<GroupResDto> entityModel = groupModelAssembler.toModel(groupResDto);
@@ -77,7 +77,7 @@ public class GroupController {
 
     }
 
-    @Operation(summary = "Group 수정")
+    @Operation(summary = "그룹 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = GroupResDto.class))),
             @ApiResponse(responseCode = "400", description = "validation errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -102,56 +102,59 @@ public class GroupController {
 
     }
 
-    @Operation(summary = "Group 삭제")
+    @Operation(summary = "그룹 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @DeleteMapping("/group/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@Parameter(description = "그룹 ID", required = true, example = "1") @PathVariable Long id) {
 
         groupService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
-    @Operation(summary = "Plan 내의 모든 Group 조회")
+    @Operation(summary = "일정 내의 모든 그룹을 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/groups", params = {"planId"})
-    public ResponseEntity<?> all(@RequestParam Long planId) {
+    public ResponseEntity<?> all(@Parameter(description = "일정 ID", required = true, example = "1") @RequestParam Long planId) {
 
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }
 
-    @Operation(summary = "여러 개의 Group 조회 (날짜로 필터)")
+    @Operation(summary = "일정 내의 모든 그룹을 조회 (날짜로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/groups/date", params = {"planId", "dateKey"})
-    public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate dateKey) {
+    public ResponseEntity<?> all(@Parameter(description = "일정 ID", required = true, example = "1") @RequestParam Long planId,
+                                 @Parameter(description = "검색일", required = true, example = "2023-08-04") @RequestParam LocalDate dateKey) {
 
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, dateKey));
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
     }
 
-    @Operation(summary = "여러 개의 Group 조회 (기간으로 필터)")
+    @Operation(summary = "일정 내의 모든 그룹을 조회 (기간으로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class)))
     })
     @GetMapping(value = "/groups/range", params = {"planId", "searchStart", "searchEnd"})
-    public ResponseEntity<?> all(@RequestParam Long planId, @RequestParam LocalDate searchStart, LocalDate searchEnd) {
+    public ResponseEntity<?> all(@Parameter(description = "일정 ID", required = true, example = "1") @RequestParam Long planId,
+                                 @Parameter(description = "검색 시작일", required = true, example = "2023-08-04") @RequestParam LocalDate searchStart,
+                                 @Parameter(description = "검색 종료일", required = true, example = "2023-08-15") @RequestParam LocalDate searchEnd) {
 
         checkSearchDates(searchStart, searchEnd);
         CollectionModel<EntityModel<GroupResDto>> collectionModel = groupModelAssembler.toCollectionModel(groupService.all(planId, searchStart, searchEnd));

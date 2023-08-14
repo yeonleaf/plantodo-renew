@@ -32,7 +32,7 @@ import java.time.LocalDate;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Tag(name = "checkbox", description = "할 일 API")
+@Tag(name = "checkbox", description = "할일 API")
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class CheckboxController {
     private final CheckboxService checkboxService;
     private final CheckboxModelAssembler checkboxModelAssembler;
 
-    @Operation(summary = "할 일 등록")
+    @Operation(summary = "할일 등록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "400", description = "argument validation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -60,7 +60,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "할 일 단건 조회")
+    @Operation(summary = "할일 단건 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -75,7 +75,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "할 일 수정")
+    @Operation(summary = "할일 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "400", description = "argument validation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -95,7 +95,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "할 일 삭제")
+    @Operation(summary = "할일 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "successful operation", content = @Content),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -109,7 +109,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "Checkbox 상태 변경 (checked ↔ unchecked)")
+    @Operation(summary = "할일 상태 변경 (checked ↔ unchecked)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CheckboxResDto.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -124,7 +124,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "그룹 안에 있는 모든 할 일 조회")
+    @Operation(summary = "그룹 안에 있는 모든 할일 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CollectionModel.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -140,7 +140,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "일정 안에 있는 모든 할 일 조회")
+    @Operation(summary = "일정 안에 있는 모든 할일 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CollectionModel.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -156,7 +156,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "그룹 안에 있는 모든 할 일 조회 (날짜로 필터)")
+    @Operation(summary = "그룹 안에 있는 모든 할일 조회 (날짜로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CollectionModel.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -173,7 +173,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "일정 안에 있는 모든 할 일 조회 (날짜로 필터)")
+    @Operation(summary = "일정 안에 있는 모든 할일 조회 (날짜로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CollectionModel.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
@@ -190,7 +190,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "그룹 안에 있는 모든 할 일 조회 (기간으로 필터)")
+    @Operation(summary = "그룹 안에 있는 모든 할일 조회 (기간으로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CollectionModel.class))),
             @ApiResponse(responseCode = "400", description = "query string validation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
@@ -210,7 +210,7 @@ public class CheckboxController {
 
     }
 
-    @Operation(summary = "일정 안에 있는 모든 할 일 조회 (기간으로 필터)")
+    @Operation(summary = "일정 안에 있는 모든 할일 조회 (기간으로 필터)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CollectionModel.class))),
             @ApiResponse(responseCode = "400", description = "query string validation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),

@@ -32,4 +32,9 @@ public class MemoryMemberRepository extends MemoryRepository<Member> {
         data.remove(member.getId());
     }
 
+    @Override
+    public void clear() {
+        data.clear();
+    }
+
 }

@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import yeonleaf.plantodo.dto.MemberReqDto;
+import yeonleaf.plantodo.exceptions.ArgumentValidationException;
 import yeonleaf.plantodo.validator.JoinFormatCheckValidator;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,6 +14,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+/**
+ * target : {@link JoinFormatCheckValidator#validate(Object, Errors)}
+ * target description : {@link MemberReqDto}의 email과 password 필드의 형식을 검증하는 validator
+ *
+ * test description : email, password를 입력받아 각각의 형식을 검증합니다.
+ *                    JoinFormatCheckValidator#validate는 어떠한 값도 리턴하지 않습니다.
+ *                    단, email이나 password의 형식에 문제가 있는 경우 bindingError#rejectValue를 호출합니다.
+ *
+ *                    테스트에서 검증하는 것
+ *                    1. {@link ArgumentValidationException} 발생 여부
+ *                    bindingError#rejectValue의 호출 여부를 Mockito.spy가 감지하도록 하고
+ *                    감지되는 경우 ArgumentValidationException을 임의로 발생시킵니다.
+ *
+ *                    2. 아무것도 발생하지 않는 상태
+ *                    올바른 값을 넣어 검증을 통과한다면 아무 일도 일어나지 않습니다.
+ */
 public class JoinValidatorTest {
 
     private JoinFormatCheckValidator validator;
@@ -27,16 +45,26 @@ public class JoinValidatorTest {
 
     void validateThrowException(String email, String password) {
 
+        // given
         MemberReqDto member = new MemberReqDto(email, password);
-        doThrow(IllegalArgumentException.class).when(bindingResult).rejectValue(anyString(), anyString(), anyString());
-        assertThatThrownBy(() -> validator.validate(member, bindingResult)).isInstanceOf(IllegalArgumentException.class);
+
+        // when
+        doThrow(ArgumentValidationException.class).when(bindingResult).rejectValue(anyString(), anyString(), anyString());
+
+        // then
+        assertThatThrownBy(() -> validator.validate(member, bindingResult)).isInstanceOf(ArgumentValidationException.class);
 
     }
 
     void validateNoException(String email, String password) {
 
+        // given
         MemberReqDto member = new MemberReqDto(email, password);
-        doThrow(IllegalArgumentException.class).when(bindingResult).rejectValue(anyString(), anyString(), anyString());
+
+        // when
+        doThrow(ArgumentValidationException.class).when(bindingResult).rejectValue(anyString(), anyString(), anyString());
+
+        // then
         assertDoesNotThrow(() -> validator.validate(member, bindingResult));
 
     }

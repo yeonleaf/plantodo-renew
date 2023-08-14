@@ -8,6 +8,9 @@ import yeonleaf.plantodo.assembler.GroupModelAssembler;
 import yeonleaf.plantodo.assembler.PlanModelAssembler;
 import yeonleaf.plantodo.provider.JwtBasicProvider;
 import yeonleaf.plantodo.provider.JwtTestProvider;
+import yeonleaf.plantodo.repository.*;
+import yeonleaf.plantodo.service.GroupServiceTestImpl;
+import yeonleaf.plantodo.service.MemberServiceTestImpl;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 import javax.crypto.SecretKey;

@@ -49,6 +49,7 @@ public class MemberController {
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> save(@Valid @RequestBody MemberReqDto memberReqDto, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
@@ -60,6 +61,7 @@ public class MemberController {
 
         MemberResDto memberResDto = memberService.save(memberReqDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(memberResDto);
+
     }
 
     @Operation(summary = "로그인", description = "로그인을 통해 jwt 토큰을 발급받습니다.\n" +
@@ -73,6 +75,7 @@ public class MemberController {
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody MemberReqDto memberReqDto, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
@@ -81,6 +84,7 @@ public class MemberController {
         JwtTokenDto token = new JwtTokenDto(jwtProvider.generateToken(memberId));
         EntityModel<JwtTokenDto> entityModel = EntityModel.of(token, linkTo(methodOn(PlanController.class).all(memberId)).withRel("plans"));
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+
     }
 
 }

@@ -13,4 +13,6 @@ public abstract class MemoryRepository<T> {
 
     public abstract void delete(T t);
 
+    public abstract void clear();
+
 }

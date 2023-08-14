@@ -3,8 +3,6 @@ package yeonleaf.plantodo.converter;
 import org.springframework.core.convert.converter.Converter;
 import yeonleaf.plantodo.dto.RepInputDto;
 import yeonleaf.plantodo.domain.Repetition;
-import yeonleaf.plantodo.exceptions.RepConversionException;
-import yeonleaf.plantodo.validator.RepInputValidator;
 
 import java.util.List;
 

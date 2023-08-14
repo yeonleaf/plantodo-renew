@@ -34,4 +34,10 @@ public class MemoryRepetitionRepository extends MemoryRepository<Repetition> {
     public void delete(Repetition repetition) {
 
     }
+
+    @Override
+    public void clear() {
+        data.clear();
+    }
+
 }

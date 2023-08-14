@@ -47,4 +47,9 @@ public class MemoryPlanRepository extends MemoryRepository<Plan> {
         return res;
     }
 
+    @Override
+    public void clear() {
+        data.clear();
+    }
+
 }

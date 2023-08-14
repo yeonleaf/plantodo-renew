@@ -50,4 +50,10 @@ public class MemoryGroupRepository extends MemoryRepository<Group> {
     public void delete(Group group) {
         data.remove(group.getId());
     }
+
+    @Override
+    public void clear() {
+        data.clear();
+    }
+
 }

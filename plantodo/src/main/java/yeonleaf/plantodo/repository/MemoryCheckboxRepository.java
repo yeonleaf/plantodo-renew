@@ -100,4 +100,9 @@ public class MemoryCheckboxRepository extends MemoryRepository<Checkbox> {
         return !a.isBefore(b) && !a.isAfter(c);
     }
 
+    @Override
+    public void clear() {
+        data.clear();
+    }
+
 }

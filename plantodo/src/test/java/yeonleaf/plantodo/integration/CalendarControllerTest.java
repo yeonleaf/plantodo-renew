@@ -78,7 +78,7 @@ public class CalendarControllerTest {
 
     /**
      * 기간 캘린더 조회 API 관련 테스트
-     * 기간별로 일정과 일정과 연관된 할일 (그룹 할일, 일일 할일)을 함께 조회하는 API
+     * 검색 시작일부터 종료일까지의 날짜별로 일정과 일정과 연관된 할일 (그룹 할일, 일일 할일)을 함께 조회하는 API
      * @see CalendarController#getByRange(CalendarRangeReqDto, BindingResult)
      * @throws Exception mockMvc.perform();
      *

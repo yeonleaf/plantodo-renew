@@ -35,7 +35,6 @@ public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
     private final GroupRepository groupRepository;
     private final CheckboxRepository checkboxRepository;
-    private final RepInToOutConverter repInToOutConverter;
     private final RepOutToInConverter repOutToInConverter;
     private final GroupService groupService;
 

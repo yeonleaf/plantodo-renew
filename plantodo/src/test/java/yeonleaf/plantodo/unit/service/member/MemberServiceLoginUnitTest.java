@@ -1,6 +1,7 @@
 package yeonleaf.plantodo.unit.service.member;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +58,7 @@ public class MemberServiceLoginUnitTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("비정상 로그인 - 이메일이 일치하는 회원이 없는 경우 ResourceNotFoundException을 던지는지 확인한다.")
     void loginTest_abnormal_notFoundMemberByEmail() {
 

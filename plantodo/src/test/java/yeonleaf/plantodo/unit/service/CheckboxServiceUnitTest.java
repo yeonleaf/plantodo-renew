@@ -63,13 +63,6 @@ public class CheckboxServiceUnitTest {
     @Autowired
     private GroupService groupService;
 
-    /**
-     * repValue 입력을 위한 보조 메소드
-     */
-    private List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
 
     /**
      * 일일 할일 저장 메소드 관련 테스트
@@ -169,7 +162,7 @@ public class CheckboxServiceUnitTest {
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, List.of(), planResDto.getId()));
         Checkbox checkbox = checkboxRepository.findByGroupId(groupResDto.getId()).get(0);
         CheckboxUpdateReqDto checkboxUpdateReqDto = new CheckboxUpdateReqDto(checkbox.getId(), "updatedTitle");
 
@@ -304,7 +297,7 @@ public class CheckboxServiceUnitTest {
         checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        groupService.save(new GroupReqDto("title", 1, List.of(), planResDto.getId()));
 
         // when
         List<CheckboxResDto> allByPlan = checkboxService.allByPlan(planResDto.getId());
@@ -337,7 +330,7 @@ public class CheckboxServiceUnitTest {
         checkboxService.save(new CheckboxReqDto("title", planResDto.getId(), LocalDate.now()));
 
         // 그룹 할일 등록
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, List.of(), planResDto.getId()));
 
         // when
         List<CheckboxResDto> allByGroup = checkboxService.allByGroup(groupResDto.getId());
@@ -374,9 +367,9 @@ public class CheckboxServiceUnitTest {
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
-        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
-        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), plan.getId()));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), plan.getId()));
+        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, List.of(), plan.getId()));
+        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, List.of("2"), plan.getId()));
         LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
         // when - then
@@ -393,9 +386,9 @@ public class CheckboxServiceUnitTest {
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
-        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
-        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), plan.getId()));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), plan.getId()));
+        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, List.of(), plan.getId()));
+        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, List.of("2"), plan.getId()));
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         // when - then
@@ -412,9 +405,9 @@ public class CheckboxServiceUnitTest {
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         Plan plan = planRepository.save(new Plan("plan1", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member, PlanStatus.NOW));
-        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, makeArrToList(), plan.getId()));
-        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), plan.getId()));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), plan.getId()));
+        GroupResDto groupResDto2 = groupService.save(new GroupReqDto("title2", 1, List.of(), plan.getId()));
+        GroupResDto groupResDto3 = groupService.save(new GroupReqDto("title3", 2, List.of("2"), plan.getId()));
         LocalDate dateKey = LocalDate.of(2023, 7, 18);
 
         // when - then
@@ -437,9 +430,9 @@ public class CheckboxServiceUnitTest {
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 23)));
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 1, List.of(), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("2"), planId));
 
         LocalDate dateKey = LocalDate.of(2023, 7, 23);
 
@@ -463,9 +456,9 @@ public class CheckboxServiceUnitTest {
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 27)));
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 1, List.of(), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("2"), planId));
 
         LocalDate dateKey = LocalDate.of(2023, 7, 23);
 
@@ -489,9 +482,9 @@ public class CheckboxServiceUnitTest {
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 27)));
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 1, List.of(), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("2"), planId));
 
         LocalDate dateKey = LocalDate.of(2023, 7, 18);
 
@@ -542,7 +535,7 @@ public class CheckboxServiceUnitTest {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         PlanResDto planResDto = planService.save(new PlanReqDto("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목", "일"), planId));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 3, List.of("화", "목", "일"), planId));
         Long groupId = groupResDto.getId();
 
         // when - then
@@ -601,8 +594,8 @@ public class CheckboxServiceUnitTest {
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 27)));
 
         // group
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("2"), planId));
 
         assertSearchDates(
                 "plan",

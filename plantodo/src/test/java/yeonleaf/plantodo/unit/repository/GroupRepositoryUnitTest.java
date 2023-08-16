@@ -38,10 +38,6 @@ public class GroupRepositoryUnitTest {
     @Autowired
     private RepetitionRepository repetitionRepository;
 
-    private List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
     @Test
     @DisplayName("정상 등록")
     void saveTestNormal() {

@@ -22,11 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * test description : 날짜 리스트의 사이즈가 예측한 것과 같은지 검증
  */
 public class CheckboxDateCreatorTest {
-
-    private List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
+    
     /**
      * 테스트 메이커
      * @param start (LocalDate) 일정 시작일
@@ -56,7 +52,7 @@ public class CheckboxDateCreatorTest {
     void createTestRepOption1_EndGreaterThanStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 1, makeArrToList(), 14);
+                LocalDate.of(2023, 7, 31), 1, List.of(), 14);
 
     }
 
@@ -65,7 +61,7 @@ public class CheckboxDateCreatorTest {
     void createTestRepOption1_EndEqualToStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 18), 1, makeArrToList(), 1);
+                LocalDate.of(2023, 7, 18), 1, List.of(), 1);
 
     }
 
@@ -75,11 +71,11 @@ public class CheckboxDateCreatorTest {
     void createTestRepOption2_EndGreaterThanStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 2, makeArrToList("2"), 7);
+                LocalDate.of(2023, 7, 31), 2, List.of("2"), 7);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 20), 2, makeArrToList("2"), 2);
+                LocalDate.of(2023, 7, 20), 2, List.of("2"), 2);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 19), 2, makeArrToList("2"), 1);
+                LocalDate.of(2023, 7, 19), 2, List.of("2"), 1);
 
     }
 
@@ -88,7 +84,7 @@ public class CheckboxDateCreatorTest {
     void createTestRepOption2L_EndEqualToStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 18), 2, makeArrToList("2"), 1);
+                LocalDate.of(2023, 7, 18), 2, List.of("2"), 1);
 
     }
 
@@ -97,11 +93,11 @@ public class CheckboxDateCreatorTest {
     void createTestRepOption3_EndGreaterThanStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 3, makeArrToList("월", "수", "금"), 6);
+                LocalDate.of(2023, 7, 31), 3, List.of("월", "수", "금"), 6);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 3, makeArrToList("월", "화", "수", "목", "금", "토", "일"), 14);
+                LocalDate.of(2023, 7, 31), 3, List.of("월", "화", "수", "목", "금", "토", "일"), 14);
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 31), 3, makeArrToList("월"), 2);
+                LocalDate.of(2023, 7, 31), 3, List.of("월"), 2);
 
     }
 
@@ -110,7 +106,7 @@ public class CheckboxDateCreatorTest {
     void createTestRepOption3L_EndEqualToStart() {
 
         makeCreateTestRepOption(LocalDate.of(2023, 7, 18),
-                LocalDate.of(2023, 7, 18), 3, makeArrToList("월", "수", "금"), 0);
+                LocalDate.of(2023, 7, 18), 3, List.of("월", "수", "금"), 0);
 
     }
 

@@ -11,6 +11,7 @@ import yeonleaf.plantodo.provider.JwtTestProvider;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.GroupServiceTestImpl;
 import yeonleaf.plantodo.service.MemberServiceTestImpl;
+import yeonleaf.plantodo.util.DateRange;
 import yeonleaf.plantodo.validator.RepInputValidator;
 
 import javax.crypto.SecretKey;
@@ -20,8 +21,11 @@ public class TestConfig {
 
     private ObjectMapper objectMapper;
 
+    private DateRange dateRange;
+
     public TestConfig() {
         this.objectMapper = new ObjectMapper();
+        this.dateRange = new DateRange();
     }
 
     @Bean
@@ -52,6 +56,11 @@ public class TestConfig {
     @Bean
     public CheckboxModelAssembler checkboxModelAssembler() {
         return new CheckboxModelAssembler();
+    }
+
+    @Bean
+    public DateRange dateRange() {
+        return dateRange;
     }
 
 }

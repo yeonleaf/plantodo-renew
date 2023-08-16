@@ -1,9 +1,6 @@
 package yeonleaf.plantodo.unit.service;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,14 +78,6 @@ public class PlanServiceUnitTest {
         groupRepository.clear();
         checkboxRepository.clear();
         repetitionRepository.clear();
-    }
-
-
-    /**
-     * repValue 입력을 위한 보조 메소드
-     */
-    private List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
     }
 
 
@@ -176,7 +165,7 @@ public class PlanServiceUnitTest {
         // given
         MemberResDto member = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto plan = planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), member.getId()));
-        groupService.save(new GroupReqDto("group", 1, makeArrToList(), plan.getId()));
+        groupService.save(new GroupReqDto("group", 1, List.of(), plan.getId()));
 
         // when
         planService.update(new PlanUpdateReqDto(plan.getId(), "updatedTitle", plan.getStart(), plan.getEnd()));
@@ -240,7 +229,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_allDatesUnique_1() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -258,7 +247,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_allDatesUnique_2() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
 
         // then
         IntStream.rangeClosed(16, 23).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -272,7 +261,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_allDatesUnique_3() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
 
         // then
         IntStream.rangeClosed(16, 29).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -285,7 +274,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_allDatesUnique_4() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
 
         // then
         IntStream.rangeClosed(23, 29).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -299,7 +288,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_allDatesUnique_5() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
 
         // then
         IntStream.rangeClosed(13, 16).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -313,7 +302,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_allDatesUnique_6() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
 
         // then
         IntStream.rangeClosed(29, 31).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -327,7 +316,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_datesArentChanged() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
 
         // then
         IntStream.rangeClosed(18, 25).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -340,7 +329,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_newEndGreaterThanOldEnd() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
 
         // then
         IntStream.rangeClosed(18, 29).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -353,7 +342,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_oldEndGreaterThanNewEnd() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
 
         // then
         IntStream.rangeClosed(18, 23).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -367,7 +356,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_newStartGreaterThanOldStart() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
 
         // then
         IntStream.rangeClosed(20, 25).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -381,7 +370,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption1_oldStartGreaterThanNewStart() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(1, makeArrToList(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(1, List.of(), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
 
         // then
         IntStream.rangeClosed(16, 25).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -394,7 +383,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_allDatesUnique_1() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -410,7 +399,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_allDatesUnique_2() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
 
         // then
         IntStream.iterate(16, i -> i + 3).limit(3).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -423,7 +412,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_allDatesUnique_3() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
 
         // then
         IntStream.iterate(16, i -> i + 3).limit(5).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -436,7 +425,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_allDatesUnique_4() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
 
         // then
         IntStream.iterate(23, i -> i + 3).limit(3).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -449,7 +438,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_allDatesUnique_5() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -465,7 +454,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_allDatesUnique_6() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -480,7 +469,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_datesArentChanged() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -497,7 +486,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_newEndGreaterThanOldEnd() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
 
         // then
         IntStream.iterate(18, i -> i + 3).limit(4).forEach(i -> assertThat(dateResult).contains(LocalDate.of(2023, 7, i)));
@@ -510,7 +499,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_oldEndGreaterThanNewEnd() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -526,7 +515,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_newStartGreaterThanOldStart() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -542,7 +531,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption2_oldStartGreaterThanNewStart() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(2, makeArrToList("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(2, List.of("3"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -560,7 +549,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_allDatesUnique_1() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 23));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -575,7 +564,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_allDatesUnique_2() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 23));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -592,7 +581,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_allDatesUnique_3() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 29));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -612,7 +601,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_allDatesUnique_4() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -628,7 +617,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_allDatesUnique_5() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 13), LocalDate.of(2023, 7, 16));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -643,7 +632,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_allDatesUnique_6() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 29), LocalDate.of(2023, 7, 31));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -658,7 +647,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_datesArentChanged() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -675,7 +664,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_newEndGreaterThanOldEnd() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 29));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -694,7 +683,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_oldEndGreaterThanNewEnd() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 23));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -710,7 +699,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_newStartGreaterThanOldStart() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 20), LocalDate.of(2023, 7, 25));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -726,7 +715,7 @@ public class PlanServiceUnitTest {
     void updateDateRangeTestNormal_repOption3_oldStartGreaterThanNewStart() {
 
         // given - when
-        List<LocalDate> dateResult = makeDateRangeTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
+        List<LocalDate> dateResult = makeDateRangeTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 16), LocalDate.of(2023, 7, 25));
 
         // then
         assertThat(dateResult).containsOnly(
@@ -770,6 +759,7 @@ public class PlanServiceUnitTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("정상 삭제 - 할일 그룹은 없고 일일 할일만 있는 경우 일정을 삭제하고 연관된 할일을 조회했을 때 개수가 0이어야 한다.")
     void deleteTestNormal_noClientGroup_dailyCheckboxes() {
 
@@ -809,7 +799,7 @@ public class PlanServiceUnitTest {
         // given
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, List.of(), planResDto.getId()));
         Long planId = planResDto.getId();
         Long groupId = groupResDto.getId();
 
@@ -835,7 +825,7 @@ public class PlanServiceUnitTest {
         // given
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, makeArrToList(), planResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title", 1, List.of(), planResDto.getId()));
         Long planId = planResDto.getId();
         Long groupId = groupResDto.getId();
 

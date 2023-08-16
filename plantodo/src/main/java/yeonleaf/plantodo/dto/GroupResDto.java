@@ -1,9 +1,6 @@
 package yeonleaf.plantodo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import yeonleaf.plantodo.domain.Group;
 
 import java.util.ArrayList;
@@ -14,6 +11,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class GroupResDto {
 
     private Long id;

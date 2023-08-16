@@ -64,7 +64,6 @@ public class PlanServiceTestImpl implements PlanService {
         }
 
         HashMap<LocalDate, Integer> revisedDateRange = planDateRangeRevisionMaker.revise(planUpdateReqDto, oldPlan);
-        System.out.println(revisedDateRange);
 
         oldPlan.setTitle(planUpdateReqDto.getTitle());
         oldPlan.setStart(planUpdateReqDto.getStart());

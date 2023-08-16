@@ -62,14 +62,7 @@ public class GroupServiceUnitTest {
         memberRepository.save(member);
         return member;
     }
-
-    /**
-     * repValue 입력을 위한 보조 메소드
-     */
-    private List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
+    
     /**
      * 테스트 메이커
      * @param repOption (int) 할 일이 반복되는 양상을 설정하는 옵션
@@ -104,7 +97,7 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 1, start < end으로 할일 그룹을 생성할 경우 (end - start + 1)을 리턴한다.")
     void saveTestRepOption1_EndGreaterThanStart() {
 
-        makeSaveRepOptionTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 14);
+        makeSaveRepOptionTest(1, List.of(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 14);
 
     }
 
@@ -112,7 +105,7 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 1, start = end으로 할일 그룹을 생성할 경우 1을 리턴한다.")
     void saveTestRepOption1_EndEqualToStart() {
 
-        makeSaveRepOptionTest(1, makeArrToList(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
+        makeSaveRepOptionTest(1, List.of(), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
 
     }
 
@@ -120,7 +113,7 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 2, start < end으로 할일 그룹을 생성할 경우 (end - start + 1) / repValue을 리턴한다.")
     void saveTestRepOption2_EndGreaterThanStart() {
 
-        makeSaveRepOptionTest(2, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 7);
+        makeSaveRepOptionTest(2, List.of("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 7);
 
     }
 
@@ -128,7 +121,7 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 2, start = end으로 할일 그룹을 생성할 경우 1을 리턴한다.")
     void saveTestRepOption2_EndEqualToStart() {
 
-        makeSaveRepOptionTest(2, makeArrToList("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
+        makeSaveRepOptionTest(2, List.of("2"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 1);
 
     }
 
@@ -136,7 +129,7 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 3L, start < end으로 할일 그룹을 생성할 경우 일정 시작일부터 종료일까지의 날짜 중에서 요일이 repValue에 있는 날짜에 할일을 생성해야 한다.")
     void saveTestRepOption3L_EndGreaterThanStart() {
 
-        makeSaveRepOptionTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 6);
+        makeSaveRepOptionTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), 6);
 
     }
 
@@ -144,7 +137,7 @@ public class GroupServiceUnitTest {
     @DisplayName("정상 등록 - repOption = 3L, start = end으로 할일 그룹을 생성한 경우 일정 시작일의 요일이 repValue에 있는 경우 1, 아닌 경우 0을 리턴한다.")
     void saveTestRepOption3_EndEqualToStart() {
 
-        makeSaveRepOptionTest(3, makeArrToList("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 0);
+        makeSaveRepOptionTest(3, List.of("월", "수", "금"), LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 18), 0);
 
     }
 
@@ -161,14 +154,14 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, List.of("화", "목"), plan.getId()));
 
         // when
         GroupResDto groupResDto = groupService.one(savedGroup.getId());
 
         // then
         assertThat(groupResDto.equals(savedGroup)).isTrue();
-        assertThat(groupResDto.getRepValue()).isEqualTo(makeArrToList("화", "목"));
+        assertThat(groupResDto.getRepValue()).isEqualTo(List.of("화", "목"));
 
     }
 
@@ -204,8 +197,8 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 3, makeArrToList("화", "목"));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, List.of("화", "목"), plan.getId()));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 3, List.of("화", "목"));
 
         // when
         GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
@@ -225,8 +218,8 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 31), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedGroup", 3, makeArrToList("화", "목"));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, List.of("화", "목"), plan.getId()));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedGroup", 3, List.of("화", "목"));
 
         // when
         groupService.update(groupUpdateReqDto);
@@ -245,8 +238,8 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 2, makeArrToList("3"));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, List.of("화", "목"), plan.getId()));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 2, List.of("3"));
 
         // when
         GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
@@ -268,8 +261,8 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 3, makeArrToList("월", "수", "금"));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("group", 3, List.of("화", "목"), plan.getId()));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "group", 3, List.of("월", "수", "금"));
 
         // when
         GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
@@ -292,8 +285,8 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedTitle", 2, makeArrToList("3"));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, List.of("화", "목"), plan.getId()));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedTitle", 2, List.of("3"));
 
         // when
         GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
@@ -319,8 +312,8 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목"), plan.getId()));
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedTitle", 3, makeArrToList("월", "일"));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, List.of("화", "목"), plan.getId()));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(savedGroup.getId(), "updatedTitle", 3, List.of("월", "일"));
 
         // when
         GroupResDto updatedGroup = groupService.update(groupUpdateReqDto);
@@ -342,7 +335,7 @@ public class GroupServiceUnitTest {
     void updateTestAbnormal_resourceNotFound() {
 
         // given
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedTitle", 3, makeArrToList("월", "일"));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedTitle", 3, List.of("월", "일"));
 
         // when - then
         assertThrows(ResourceNotFoundException.class, () -> groupService.update(groupUpdateReqDto));
@@ -362,7 +355,7 @@ public class GroupServiceUnitTest {
         // given
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
-        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, makeArrToList("화", "목"), plan.getId()));
+        GroupResDto savedGroup = groupService.save(new GroupReqDto("title", 3, List.of("화", "목"), plan.getId()));
         Group findGroup = groupRepository.findById(savedGroup.getId()).orElseThrow(ResourceNotFoundException::new);
         Long groupId = findGroup.getId();
         Long repetitionId = findGroup.getRepetition().getId();
@@ -402,9 +395,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
-        groupService.save(new GroupReqDto("title2", 3, makeArrToList("화", "목"), planId));
-        groupService.save(new GroupReqDto("title3", 3, makeArrToList("화", "목"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 3, List.of("화", "목"), planId));
+        groupService.save(new GroupReqDto("title3", 3, List.of("화", "목"), planId));
 
         // when
         List<GroupResDto> all = groupService.all(planId);
@@ -437,9 +430,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 1, List.of(), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("2"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
         // when
@@ -458,9 +451,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
-        groupService.save(new GroupReqDto("title2", 1, makeArrToList(), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 1, List.of(), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("2"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         // when
@@ -479,9 +472,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("3"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 20);
 
         // when
@@ -515,9 +508,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("3"), planId));
 
         LocalDate searchStart = LocalDate.of(2023, 7, 25);
         LocalDate searchEnd = LocalDate.of(2023, 7, 25);
@@ -538,9 +531,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("3"), planId));
 
         LocalDate searchStart = LocalDate.of(2023, 7, 26);
         LocalDate searchEnd = LocalDate.of(2023, 7, 29);
@@ -561,9 +554,9 @@ public class GroupServiceUnitTest {
         Member member = makeMember("test@abc.co.kr", "3d^$a2df");
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("3"), planId));
 
         LocalDate searchStart = LocalDate.of(2023, 7, 17);
         LocalDate searchEnd = LocalDate.of(2023, 7, 18);

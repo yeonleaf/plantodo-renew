@@ -96,14 +96,7 @@ public class GroupControllerTest {
                 .alwaysDo(print())
                 .build();
     }
-
-    /**
-     * repValue 입력을 위한 보조 메소드
-     */
-    private List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
+    
 
     /**
      * 그룹 등록 API 관련 테스트
@@ -123,7 +116,7 @@ public class GroupControllerTest {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), member));
 
-        GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList(), plan.getId());
+        GroupReqDto groupReqDto = new GroupReqDto("group", 1, List.of(), plan.getId());
 
         MockHttpServletRequestBuilder request = post("/group")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
@@ -144,7 +137,7 @@ public class GroupControllerTest {
     void saveTestAbnormal_RepInputValidatorValidation() throws Exception {
 
         // given
-        GroupReqDto groupReqDto = new GroupReqDto("group", 1, makeArrToList("월"), Long.MAX_VALUE);
+        GroupReqDto groupReqDto = new GroupReqDto("group", 1, List.of("월"), Long.MAX_VALUE);
 
         MockHttpServletRequestBuilder request = post("/group")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE))
@@ -220,7 +213,7 @@ public class GroupControllerTest {
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 24), LocalDate.of(2023, 7, 27), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 3, makeArrToList("화", "목", "토"));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 3, List.of("화", "목", "토"));
         MockHttpServletRequestBuilder request = put("/group")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -250,7 +243,7 @@ public class GroupControllerTest {
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 0, makeArrToList("화", "목", "토"));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 0, List.of("화", "목", "토"));
         MockHttpServletRequestBuilder request = put("/group")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -274,7 +267,7 @@ public class GroupControllerTest {
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Group group = groupRepository.save(new Group(plan, "group", new Repetition(3, "1010100")));
 
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 1, makeArrToList("화", "목", "토"));
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(group.getId(), "updatedGroup", 1, List.of("화", "목", "토"));
         MockHttpServletRequestBuilder request = put("/group")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -293,7 +286,7 @@ public class GroupControllerTest {
     void updateTestAbnormal_resourceNotFound() throws Exception {
 
         // given
-        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedGroup", 1, makeArrToList());
+        GroupUpdateReqDto groupUpdateReqDto = new GroupUpdateReqDto(Long.MAX_VALUE, "updatedGroup", 1, List.of());
         MockHttpServletRequestBuilder request = put("/group")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(Long.MAX_VALUE))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -411,9 +404,9 @@ public class GroupControllerTest {
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("월", "수", "금"), plan.getId()));
-        groupService.save(new GroupReqDto("title2", 3, makeArrToList("월", "일"), plan.getId()));
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "토"), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 3, List.of("월", "수", "금"), plan.getId()));
+        groupService.save(new GroupReqDto("title2", 3, List.of("월", "일"), plan.getId()));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "토"), plan.getId()));
 
         MockHttpServletRequestBuilder request = get("/groups/date")
                 .param("planId", String.valueOf(plan.getId()))
@@ -459,9 +452,9 @@ public class GroupControllerTest {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Long planId = plan.getId();
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
-        groupService.save(new GroupReqDto("title3", 2, makeArrToList("3"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
+        groupService.save(new GroupReqDto("title3", 2, List.of("3"), planId));
 
         LocalDate searchStart = LocalDate.of(2023, 7, 26);
         LocalDate searchEnd = LocalDate.of(2023, 7, 29);

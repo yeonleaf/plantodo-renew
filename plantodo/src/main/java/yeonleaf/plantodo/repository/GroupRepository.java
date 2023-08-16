@@ -13,11 +13,11 @@ import java.util.Optional;
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
-    List<Group> findByPlanId(Long id);
+    List<Group> findByPlanId(Long planId);
 
     @EntityGraph(attributePaths = {"plan", "repetition"})
-    @Query("select g from Group g")
-    List<Group> findByPlanIdEntityGraph(Long id);
+    @Query("select g from Group g where g.plan.id = :planId")
+    List<Group> findByPlanIdEntityGraph(Long planId);
 
     @EntityGraph(attributePaths = {"plan", "repetition"})
     @Query("select g from Group g where g.id = :id")

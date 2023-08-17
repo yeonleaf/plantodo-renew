@@ -18,6 +18,9 @@
 - 일정 관리
 - 할 일 관리
 
+## Link
+[API 테스트 링크 - swagger ui](http://43.201.196.191:8080/swagger-ui/index.html)
+
 ## Quick Start
 
 현재 개발 단계이나 swagger ui를 통해 api를 테스트할 수 있습니다.

@@ -366,13 +366,6 @@ public class CheckboxControllerTest {
 
     }
 
-    /**
-     * repValue 입력을 위한 보조 메소드
-     */
-    public List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
 
     /**
      * 할일 순수 컬렉션 조회 API 관련 테스트
@@ -397,7 +390,7 @@ public class CheckboxControllerTest {
         Long planId = planResDto.getId();
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        groupService.save(new GroupReqDto("group", 3, List.of("월", "수", "금"), planResDto.getId()));
 
         // 일일 할일 등록
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
@@ -422,7 +415,7 @@ public class CheckboxControllerTest {
         Long memberId = member.getId();
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
         Long planId = planResDto.getId();
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, List.of("월", "수", "금"), planResDto.getId()));
         Long groupId = groupResDto.getId();
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
 
@@ -488,7 +481,7 @@ public class CheckboxControllerTest {
         Member member = memberRepository.save(new Member("test@abc.co.kr", "13d^3ea#"));
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
-        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
+        GroupResDto groupResDto1 = groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), planId));
         LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/group/date")
@@ -529,9 +522,9 @@ public class CheckboxControllerTest {
         Long planId = planResDto.getId();
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
-        groupService.save(new GroupReqDto("title3", 1, makeArrToList(), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
+        groupService.save(new GroupReqDto("title3", 1, List.of(), planId));
 
         // 일일 할일 등록
         checkboxService.save(new CheckboxReqDto("title4", planId, LocalDate.of(2023, 7, 19)));
@@ -590,7 +583,7 @@ public class CheckboxControllerTest {
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member.getId()));
         Long planId = planResDto.getId();
 
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "일"), planId));
         Long groupId = groupResDto.getId();
 
         LocalDate searchStart = LocalDate.of(2023, 7, 19);
@@ -641,8 +634,8 @@ public class CheckboxControllerTest {
         Long planId = planResDto.getId();
 
         // 그룹 할일 등록
-        groupService.save(new GroupReqDto("title1", 3, makeArrToList("화", "목", "일"), planId));
-        groupService.save(new GroupReqDto("title2", 2, makeArrToList("2"), planId));
+        groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "일"), planId));
+        groupService.save(new GroupReqDto("title2", 2, List.of("2"), planId));
 
         // 일일 할일 등록
         checkboxService.save(new CheckboxReqDto("title3", planId, LocalDate.of(2023, 7, 19)));

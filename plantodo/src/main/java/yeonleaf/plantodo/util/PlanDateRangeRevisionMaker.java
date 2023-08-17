@@ -32,7 +32,6 @@ public class PlanDateRangeRevisionMaker {
     public boolean isInRange(LocalDate newStart, LocalDate newEnd, LocalDate oldStart, LocalDate oldEnd) {
 
         HashMap<LocalDate, Integer> rangeGap = makeRangeGap(newStart, newEnd, oldStart, oldEnd);
-        System.out.println(rangeGap);
         return rangeGap.containsValue(5);
 
     }

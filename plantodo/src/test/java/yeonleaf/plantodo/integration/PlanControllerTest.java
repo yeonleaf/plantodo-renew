@@ -203,14 +203,6 @@ public class PlanControllerTest {
 
 
     /**
-     * repValue 입력을 위한 보조 메소드
-     */
-    List<String> makeArrToList(String... target) {
-        return Arrays.asList(target);
-    }
-
-
-    /**
      * 일정 수정 API 관련 테스트
      * 시작일이 2023-07-18, 종료일이 2023-07-25인 일정을 수정하고, 변경된 범위에 따라 기존 일정 삭제 / 새 일정 생성이 정상적으로 이루어지는지 확인한다.
      *
@@ -225,7 +217,7 @@ public class PlanControllerTest {
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
         Long memberId = memberResDto.getId();
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
-        GroupResDto group = groupService.save(new GroupReqDto("group", 1, makeArrToList(), planResDto.getId()));
+        GroupResDto group = groupService.save(new GroupReqDto("group", 1, List.of(), planResDto.getId()));
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(planResDto.getId(), "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
         MockHttpServletRequestBuilder request = put("/plan")
@@ -258,7 +250,7 @@ public class PlanControllerTest {
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
         Long memberId = memberResDto.getId();
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
-        GroupResDto group = groupService.save(new GroupReqDto("group", 2, makeArrToList("3"), planResDto.getId()));
+        GroupResDto group = groupService.save(new GroupReqDto("group", 2, List.of("3"), planResDto.getId()));
 
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(planResDto.getId(), "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
@@ -288,7 +280,7 @@ public class PlanControllerTest {
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
         Long memberId = memberResDto.getId();
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
-        GroupResDto group = groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        GroupResDto group = groupService.save(new GroupReqDto("group", 3, List.of("월", "수", "금"), planResDto.getId()));
 
 
         PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(planResDto.getId(), "revisedTitle", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 7, 29));
@@ -344,7 +336,7 @@ public class PlanControllerTest {
         Long memberId = memberResDto.getId();
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberId));
         Long planId = planResDto.getId();
-        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, makeArrToList("월", "수", "금"), planResDto.getId()));
+        GroupResDto groupResDto = groupService.save(new GroupReqDto("group", 3, List.of("월", "수", "금"), planResDto.getId()));
         CheckboxResDto checkboxResDto = checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
         Long groupId = groupResDto.getId();
         Long checkboxId = checkboxResDto.getId();

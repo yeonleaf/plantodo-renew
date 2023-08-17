@@ -19,7 +19,7 @@
 - 할 일 관리
 
 ## Link
-[API 테스트 링크 - swagger ui](http://43.201.196.191:8080/swagger-ui/index.html)
+[API 명세서 / 테스트 링크 - swagger ui](http://43.201.196.191:8080/swagger-ui/index.html)
 
 ## Quick Start
 

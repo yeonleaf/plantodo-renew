@@ -16,7 +16,6 @@ import java.util.Objects;
 public class Checkbox {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "checkbox_id")
     private Long id;
 
     private String title;
@@ -25,6 +24,7 @@ public class Checkbox {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    @Column(name = "date_key")
     private LocalDate date;
     private boolean checked;
 

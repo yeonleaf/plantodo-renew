@@ -14,7 +14,6 @@ import lombok.Setter;
 public class Repetition {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "rep_id")
     private Long id;
 
     private int repOption;

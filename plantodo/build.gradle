@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.1'
 	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.flywaydb.flyway' version '9.19.0'
 }
 
 group = 'yeonleaf'
@@ -33,6 +34,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'org.flywaydb:flyway-mysql'
 
 	// Querydsl
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -56,4 +58,9 @@ task copyPrivate(type: Copy) {
 		include "*.yaml"
 		into 'src/main/resources'
 	}
+}
+
+flyway {
+	url = 'jdbc:mariadb://localhost:3306/ptd'
+	user = 'root'
 }

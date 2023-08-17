@@ -3,7 +3,6 @@ package yeonleaf.plantodo.validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import yeonleaf.plantodo.dto.RepInputDto;
-import yeonleaf.plantodo.exceptions.RepConversionException;
 
 import java.util.Arrays;
 import java.util.List;

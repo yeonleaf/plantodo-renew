@@ -23,10 +23,12 @@ public class Plan {
 
     private String title;
 
+    @Column(name = "start_date")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate start;
 
+    @Column(name = "end_date")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate end;

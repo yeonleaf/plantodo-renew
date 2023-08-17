@@ -1,5 +1,6 @@
 package yeonleaf.plantodo.unit.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +14,7 @@ import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.domain.PlanStatus;
 import yeonleaf.plantodo.dto.*;
 import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
-import yeonleaf.plantodo.repository.MemoryCheckboxRepository;
-import yeonleaf.plantodo.repository.MemoryMemberRepository;
-import yeonleaf.plantodo.repository.MemoryPlanRepository;
-import yeonleaf.plantodo.repository.MemoryRepository;
+import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.service.CheckboxService;
 import yeonleaf.plantodo.service.GroupService;
 import yeonleaf.plantodo.service.PlanService;
@@ -55,6 +53,12 @@ public class CheckboxServiceUnitTest {
     private MemoryCheckboxRepository checkboxRepository;
 
     @Autowired
+    private MemoryGroupRepository groupRepository;
+
+    @Autowired
+    private MemoryRepetitionRepository repetitionRepository;
+
+    @Autowired
     private PlanService planService;
 
     @Autowired
@@ -62,6 +66,19 @@ public class CheckboxServiceUnitTest {
 
     @Autowired
     private GroupService groupService;
+
+    /**
+     * 테스트 종료 후 메모리에 저장된 데이터를 모두 삭제해서 롤백
+     * (DuplicatedMemberException 발생 방지)
+     */
+    @AfterEach
+    void clear() {
+        memberRepository.clear();
+        planRepository.clear();
+        groupRepository.clear();
+        checkboxRepository.clear();
+        repetitionRepository.clear();
+    }
 
 
     /**

@@ -1,5 +1,6 @@
 package yeonleaf.plantodo.unit.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +54,19 @@ public class GroupServiceUnitTest {
 
     @Autowired
     private MemoryRepetitionRepository repetitionRepository;
+
+    /**
+     * 테스트 종료 후 메모리에 저장된 데이터를 모두 삭제해서 롤백
+     * (DuplicatedMemberException 발생 방지)
+     */
+    @AfterEach
+    void clear() {
+        memberRepository.clear();
+        planRepository.clear();
+        groupRepository.clear();
+        checkboxRepository.clear();
+        repetitionRepository.clear();
+    }
 
     /**
      * 회원 등록 보조 메소드

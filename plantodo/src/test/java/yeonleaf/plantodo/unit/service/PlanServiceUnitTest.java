@@ -759,11 +759,11 @@ public class PlanServiceUnitTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("정상 삭제 - 할일 그룹은 없고 일일 할일만 있는 경우 일정을 삭제하고 연관된 할일을 조회했을 때 개수가 0이어야 한다.")
     void deleteTestNormal_noClientGroup_dailyCheckboxes() {
 
         // given
+        System.out.println(memberRepository.findByEmail("test@abc.co.kr").size());
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "3s1@adf2"));
         PlanResDto planResDto = planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
         Long planId = planResDto.getId();

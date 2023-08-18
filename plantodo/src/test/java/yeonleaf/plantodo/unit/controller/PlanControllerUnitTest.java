@@ -316,6 +316,26 @@ public class PlanControllerUnitTest {
 
     }
 
+    @Test
+    @DisplayName("비정상 수정 - ArgumentResolver Validation")
+    void updateTestAbnormal_argumentResolverValidation2() throws Exception {
+
+        // given
+        PlanUpdateReqDto planUpdateReqDto = new PlanUpdateReqDto(1L, "plan-update", LocalDate.now().plusDays(3), LocalDate.now());
+        MockHttpServletRequestBuilder request = put("/plan")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(planUpdateReqDto));
+
+        // when
+        doThrow(ResourceNotFoundException.class).when(planService).update(any());
+
+        // then
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("입력값 타입/내용 오류"));
+
+    }
+
 
     /**
      * 삭제 API 관련 테스트

@@ -24,7 +24,7 @@ public class WebConfig {
             public void addInterceptors(InterceptorRegistry registry) {
                 registry.addInterceptor(new LoginCheckInterceptor(jwtSecretKey, objectMapper))
                         .addPathPatterns("/plan", "/plan/*", "/checkbox", "/checkbox/*", "/group", "/group/*",
-                                "/plans", "/plans/*", "/groups", "/groups/*", "/checkboxes", "/checkboxes/*",
+                                "/plans", "/plans/*", "/groups", "/groups/*", "/checkboxes", "/checkboxes/*", "/checkboxes/*/*",
                                 "/calendar", "/calendar/*");
             }
         };

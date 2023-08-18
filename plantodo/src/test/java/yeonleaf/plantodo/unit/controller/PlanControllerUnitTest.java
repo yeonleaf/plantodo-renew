@@ -89,7 +89,7 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - 파라미터 null")
-    void saveTestAbnormalNullParameters() throws Exception {
+    void saveTestAbnormal_nullParameters() throws Exception {
 
         // given
         PlanReqDto planReqDto = new PlanReqDto(null, null, null, 1L);
@@ -109,7 +109,7 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - format validation - start가 오늘 이전")
-    void saveTestAbnormalFormatValidationStart() throws Exception {
+    void saveTestAbnormal_formatValidationStart() throws Exception {
 
         // given
         LocalDate start = LocalDate.now().minusDays(3);
@@ -133,7 +133,7 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - format validation - end가 start 이전")
-    void saveTestAbnormalFormatValidationEnd() throws Exception {
+    void saveTestAbnormal_formatValidationEnd() throws Exception {
 
         // given
         LocalDate start = LocalDate.now().plusDays(3);
@@ -157,7 +157,7 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - resource not found (member)")
-    void saveTestAbnormalMemberResourceNotFound() throws Exception {
+    void saveTestAbnormal_memberResourceNotFound() throws Exception {
 
         // given
         LocalDate start = LocalDate.now();
@@ -183,7 +183,7 @@ public class PlanControllerUnitTest {
 
     @Test
     @DisplayName("비정상 등록 - plan만 - persistence problem")
-    void saveAbnormalPersistenceProblem() throws Exception {
+    void saveAbnormal_persistenceProblem() throws Exception {
 
         // given
         LocalDate start = LocalDate.now();

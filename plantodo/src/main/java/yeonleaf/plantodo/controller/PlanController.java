@@ -107,6 +107,12 @@ public class PlanController {
             throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
         }
 
+        validateEndIsBeforeStart(planUpdateReqDto.getStart(), planUpdateReqDto.getEnd(), bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            throw new ArgumentValidationException("입력값 형식 오류", bindingResult);
+        }
+
         PlanResDto planResDto = planService.update(planUpdateReqDto);
         EntityModel<PlanResDto> entityModel = planModelAssembler.toModel(planResDto);
         return ResponseEntity.status(HttpStatus.OK).body(entityModel);

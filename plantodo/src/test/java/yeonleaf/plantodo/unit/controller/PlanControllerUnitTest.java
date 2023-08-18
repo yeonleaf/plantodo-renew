@@ -297,7 +297,7 @@ public class PlanControllerUnitTest {
     }
 
     @Test
-    @DisplayName("비정상 수정 - ArgumentResolver Validation")
+    @DisplayName("비정상 수정 - ArgumentResolver Validation - null값이 들어갔을 때 Reso")
     void updateTestAbnormal_argumentResolverValidation() throws Exception {
 
         // given
@@ -306,10 +306,7 @@ public class PlanControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
 
-        // when
-        doThrow(ResourceNotFoundException.class).when(planService).update(any());
-
-        // then
+        // when - then
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value("입력값 타입/내용 오류"));
@@ -326,13 +323,10 @@ public class PlanControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(planUpdateReqDto));
 
-        // when
-        doThrow(ResourceNotFoundException.class).when(planService).update(any());
-
-        // then
+        // when - then
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("message").value("입력값 타입/내용 오류"));
+                .andExpect(jsonPath("message").value("입력값 형식 오류"));
 
     }
 

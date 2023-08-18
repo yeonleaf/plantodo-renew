@@ -396,6 +396,7 @@ public class CheckboxControllerTest {
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
 
         MockHttpServletRequestBuilder request = get("/checkboxes/plan")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("planId", planId.toString());
 
         // when - then
@@ -420,6 +421,7 @@ public class CheckboxControllerTest {
         checkboxService.save(new CheckboxReqDto("title", planId, LocalDate.of(2023, 7, 18)));
 
         MockHttpServletRequestBuilder request = get("/checkboxes/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("groupId", groupId.toString());
 
         // when - then
@@ -436,6 +438,7 @@ public class CheckboxControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/checkboxes/plan")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("planId", String.valueOf(Long.MAX_VALUE));
 
         // when - then
@@ -451,6 +454,7 @@ public class CheckboxControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/checkboxes/group")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("groupId", String.valueOf(Long.MAX_VALUE));
 
         // when - then

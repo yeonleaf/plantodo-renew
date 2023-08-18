@@ -428,11 +428,13 @@ public class PlanControllerTest {
 
         // given
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
 
         MockHttpServletRequestBuilder request = get("/plans")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("memberId", memberResDto.getId().toString());
 
         // when - then
@@ -448,6 +450,7 @@ public class PlanControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/plans")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("memberId", String.valueOf(Long.MAX_VALUE));
 
         // when - then
@@ -470,11 +473,13 @@ public class PlanControllerTest {
 
         // given
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.now(), LocalDate.now().plusDays(3), memberResDto.getId()));
 
         MockHttpServletRequestBuilder request = get("/plans/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("memberId", String.valueOf(memberResDto.getId()))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -491,6 +496,7 @@ public class PlanControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/plans/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("memberId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -514,11 +520,13 @@ public class PlanControllerTest {
 
         // given
         MemberResDto memberResDto = memberService.save(new MemberReqDto("test@abc.co.kr", "a3df!#sac"));
+        Long memberId = memberResDto.getId();
         planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 23), LocalDate.of(2023, 8, 3), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.of(2023, 7, 18), LocalDate.of(2023, 7, 25), memberResDto.getId()));
         planService.save(new PlanReqDto("title", LocalDate.of(2023, 8, 3), LocalDate.of(2023, 8, 5), memberResDto.getId()));
 
         MockHttpServletRequestBuilder request = get("/plans/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("memberId", String.valueOf(memberResDto.getId()))
                 .param("searchStart", LocalDate.of(2023, 7, 29).toString())
                 .param("searchEnd", LocalDate.of(2023, 8, 3).toString());
@@ -536,6 +544,7 @@ public class PlanControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/plans/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("memberId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 29).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 3).toString());

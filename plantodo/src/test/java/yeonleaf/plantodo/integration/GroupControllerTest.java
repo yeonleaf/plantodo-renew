@@ -358,6 +358,7 @@ public class GroupControllerTest {
 
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Long memberId = member.getId();
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
         groupRepository.save(new Group(plan, "group1", new Repetition(3, "1010100")));
@@ -365,6 +366,7 @@ public class GroupControllerTest {
 
         // when - then
         MockHttpServletRequestBuilder request = get("/groups")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("planId", plan.getId().toString());
 
         mockMvc.perform(request)
@@ -379,6 +381,7 @@ public class GroupControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/groups")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("planId", String.valueOf(Long.MAX_VALUE));
 
         // when - then
@@ -403,12 +406,14 @@ public class GroupControllerTest {
 
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Long memberId = member.getId();
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         groupService.save(new GroupReqDto("title1", 3, List.of("월", "수", "금"), plan.getId()));
         groupService.save(new GroupReqDto("title2", 3, List.of("월", "일"), plan.getId()));
         groupService.save(new GroupReqDto("title1", 3, List.of("화", "목", "토"), plan.getId()));
 
         MockHttpServletRequestBuilder request = get("/groups/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("planId", String.valueOf(plan.getId()))
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
@@ -425,6 +430,7 @@ public class GroupControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/groups/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("planId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.now().toString());
 
@@ -450,6 +456,7 @@ public class GroupControllerTest {
 
         // given
         Member member = memberRepository.save(new Member("test@abc.co.kr", "1d%43aV"));
+        Long memberId = member.getId();
         Plan plan = planRepository.save(new Plan("plan", LocalDate.of(2023, 7, 19), LocalDate.of(2023, 7, 31), member));
         Long planId = plan.getId();
         groupService.save(new GroupReqDto("title1", 3, List.of("화"), planId));
@@ -460,6 +467,7 @@ public class GroupControllerTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 29);
 
         MockHttpServletRequestBuilder request = get("/groups/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(memberId))
                 .param("planId", String.valueOf(planId))
                 .param("searchStart", searchStart.toString())
                 .param("searchEnd", searchEnd.toString());
@@ -478,6 +486,7 @@ public class GroupControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/groups/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("planId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 16).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 13).toString());

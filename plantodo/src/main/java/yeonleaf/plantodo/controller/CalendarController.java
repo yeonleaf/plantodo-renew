@@ -19,7 +19,7 @@ import yeonleaf.plantodo.dto.CheckboxResDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
-import yeonleaf.plantodo.exceptions.ArgumentValidationException;
+import yeonleaf.plantodo.exceptions.QueryStringValidationException;
 import yeonleaf.plantodo.service.*;
 import yeonleaf.plantodo.util.DateRange;
 
@@ -41,32 +41,22 @@ public class CalendarController {
     @Operation(summary = "기간 캘린더 조회 API", description = "검색 시작일부터 종료일까지의 날짜를 기준으로 일정과 일정과 연관된 할일 (그룹 할일, 일일 할일)을 함께 조회하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CalendarResDto.class))),
-            @ApiResponse(responseCode = "400", description = "argument validation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
+            @ApiResponse(responseCode = "400", description = "query string validation", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiBindingError.class))),
             @ApiResponse(responseCode = "401", description = "jwt token errors", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
             @ApiResponse(responseCode = "404", description = "resource not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiSimpleError.class))),
     })
     @GetMapping("/range")
-    public ResponseEntity<?> getByRange(@Valid @RequestBody CalendarRangeReqDto calendarRangeReqDto, BindingResult bindingResult) {
+    public ResponseEntity<?> getByRange(@RequestParam Long memberId, @RequestParam LocalDate searchStart,
+                                        @RequestParam LocalDate searchEnd) {
 
-        if (bindingResult.hasErrors()) {
-            throw new ArgumentValidationException("입력값 타입/내용 오류", bindingResult);
-        }
+        checkSearchDates(searchStart, searchEnd);
 
-        LocalDate searchStart = calendarRangeReqDto.getSearchStart();
-        LocalDate searchEnd = calendarRangeReqDto.getSearchEnd();
-
-        validateSearchDates(searchStart, searchEnd, bindingResult);
-
-        if (bindingResult.hasErrors()) {
-            throw new ArgumentValidationException("입력값 형식 오류", bindingResult);
-        }
-
-        Long memberId = calendarRangeReqDto.getMemberId();
         checkMemberExists(memberId);
 
         LinkedHashMap<LocalDate, LinkedHashMap<PlanResDto, List<CheckboxResDto>>> result = makeCalendar(memberId, searchStart, searchEnd);
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
+
     }
 
     private LinkedHashMap<LocalDate, LinkedHashMap<PlanResDto, List<CheckboxResDto>>> makeCalendar(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
@@ -88,11 +78,15 @@ public class CalendarController {
 
     }
 
-    private void validateSearchDates(LocalDate searchStart, LocalDate searchEnd, BindingResult bindingResult) {
-        if (searchStart.isAfter(searchEnd) || searchEnd.isBefore(searchStart)) {
-            bindingResult.rejectValue("searchStart", "시작일은 종료일 이전이어야 합니다.");
-            bindingResult.rejectValue("searchEnd", "종료일은 시작일 이후여야 합니다.");
+    private void checkSearchDates(LocalDate searchStart, LocalDate searchEnd) {
+
+        QueryStringValidationException errors = new QueryStringValidationException();
+        if (searchStart.isAfter(searchEnd)) {
+            errors.rejectValue("searchStart", "searchStart는 searchEnd 이전일 수 없습니다.");
+            errors.rejectValue("searchEnd", "searchEnd는 searchStart 이전일 수 없습니다.");
+            throw errors;
         }
+
     }
 
     private void checkMemberExists(Long memberId) {

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.validation.BindingResult;
@@ -111,11 +110,11 @@ public class CalendarControllerTest {
 
         scenario1_createGroupsAndCheckboxes(plan1.getId(), plan2.getId(), plan3.getId());
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(member.getId(), LocalDate.of(2023, 8, 15), LocalDate.of(2023, 8, 15));
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", member.getId().toString())
+                .param("searchStart", LocalDate.of(2023, 8, 15).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 15).toString());
 
         // when - then
         mockMvc.perform(request)
@@ -142,11 +141,11 @@ public class CalendarControllerTest {
 
         scenario1_createGroupsAndCheckboxes(plan1.getId(), plan2.getId(), plan3.getId());
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(member.getId(), LocalDate.of(2023, 8, 9), LocalDate.of(2023, 8, 9));
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", member.getId().toString())
+                .param("searchStart", LocalDate.of(2023, 8, 9).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 9).toString());
 
         // when - then
         mockMvc.perform(request)
@@ -171,11 +170,11 @@ public class CalendarControllerTest {
 
         scenario1_createGroupsAndCheckboxes(plan1.getId(), plan2.getId(), plan3.getId());
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(member.getId(), LocalDate.of(2023, 8, 14), LocalDate.of(2023, 8, 14));
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", member.getId().toString())
+                .param("searchStart", LocalDate.of(2023, 8, 14).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 14).toString());
 
         // when - then
         mockMvc.perform(request)
@@ -198,11 +197,11 @@ public class CalendarControllerTest {
 
         scenario1_createGroupsAndCheckboxes(plan1.getId(), plan2.getId(), plan3.getId());
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(member.getId(), LocalDate.of(2023, 8, 5), LocalDate.of(2023, 8, 9));
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", member.getId().toString())
+                .param("searchStart", LocalDate.of(2023, 8, 5).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 9).toString());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -227,11 +226,11 @@ public class CalendarControllerTest {
 
         scenario1_createGroupsAndCheckboxes(plan1.getId(), plan2.getId(), plan3.getId());
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(member.getId(), LocalDate.of(2023, 8, 10), LocalDate.of(2023, 8, 12));
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", member.getId().toString())
+                .param("searchStart", LocalDate.of(2023, 8, 10).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 12).toString());
 
         // when - then
         mockMvc.perform(request)
@@ -258,11 +257,11 @@ public class CalendarControllerTest {
 
         scenario1_createGroupsAndCheckboxes(plan1.getId(), plan2.getId(), plan3.getId());
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(member.getId(), LocalDate.of(2023, 8, 16), LocalDate.of(2023, 8, 18));
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", member.getId().toString())
+                .param("searchStart", LocalDate.of(2023, 8, 16).toString())
+                .param("searchEnd", LocalDate.of(2023, 8, 18).toString());
 
         // when - then
         mockMvc.perform(request)

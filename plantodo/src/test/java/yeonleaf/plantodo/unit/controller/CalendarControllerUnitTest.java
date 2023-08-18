@@ -72,11 +72,10 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 30);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
         // when - then
         mockMvc.perform(request)
@@ -92,39 +91,18 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 30);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         doThrow(ResourceNotFoundException.class).when(memberService).findById(any());
 
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
 
         // when - then
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").value("Resource not found"));
-
-    }
-
-    @Test
-    @DisplayName("검색 시작일이나 종료일에 null값이 들어가 있는 경우 ArgumentValidationException을 던지는지 확인한다.")
-    void range_abnormalTest_nullArguments_argumentValidationException() throws Exception {
-
-        // given
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, null, null);
-
-        MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
-
-
-        // when - then
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("errors.searchStart").exists())
-                .andExpect(jsonPath("errors.searchEnd").exists());
 
     }
 
@@ -136,11 +114,10 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 30);
         LocalDate searchEnd = LocalDate.of(2023, 8, 15);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
         // when - then
         mockMvc.perform(request)
@@ -158,11 +135,10 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 15);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
         // when - then
         mockMvc.perform(request)
@@ -180,11 +156,10 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 18);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
         // when - then
         mockMvc.perform(request)
@@ -211,11 +186,10 @@ public class CalendarControllerUnitTest {
 
         when(planService.all(any(), any())).thenReturn(plans);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
         // when - then
         mockMvc.perform(request)
@@ -245,11 +219,10 @@ public class CalendarControllerUnitTest {
 
         when(checkboxService.allByPlan(any(), any())).thenReturn(checkboxes);
 
-        CalendarRangeReqDto calendarRangeReqDto = new CalendarRangeReqDto(1L, searchStart, searchEnd);
-
         MockHttpServletRequestBuilder request = get("/calendar/range")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(calendarRangeReqDto));
+                .param("memberId", "1")
+                .param("searchStart", searchStart.toString())
+                .param("searchEnd", searchEnd.toString());
 
         // when - then
         mockMvc.perform(request)

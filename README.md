@@ -18,14 +18,14 @@
 <br>
 
 ## Features
-- 회원가입, 로그인
+- 회원가입, 로그인 (JWT Bearer)
 - 일정 관리
-- 할 일 관리
+- 할일 관리
 
 <br>
 
 ## Architecture
-![ptd-renew-architecture](https://github.com/yeonleaf/plantodo-renew/assets/91470133/11632caa-70d8-442d-bdd0-855b0f3b4ec4)
+![ptd-renew-architecture](https://github.com/yeonleaf/plantodo-renew/assets/91470133/247b931e-94c5-4e18-ab13-00fb17f79ca7)
 
 <br>
 

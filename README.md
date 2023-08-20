@@ -1,6 +1,8 @@
 # PLANTODO
 할 일 관리 웹 페이지
 
+<br>
+
 ## Environments
 
 <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white"/><img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
@@ -13,10 +15,19 @@
 - Database : MariaDB 10.11 (java-client 2.7.2)
 - ORM : JPA (hibernate)
 
+<br>
+
 ## Features
 - 회원가입, 로그인
 - 일정 관리
 - 할 일 관리
+
+<br>
+
+## Architecture
+![ptd-renew-architecture](https://github.com/yeonleaf/plantodo-renew/assets/91470133/11632caa-70d8-442d-bdd0-855b0f3b4ec4)
+
+<br>
 
 ## Link
 [테스트 링크](https://plantodo.site/swagger-ui/index.html)

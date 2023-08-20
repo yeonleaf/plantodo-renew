@@ -19,6 +19,6 @@
 - 할 일 관리
 
 ## Link
-[테스트 링크](http://43.201.196.191:8080/swagger-ui/index.html)
+[테스트 링크](https://plantodo.site/swagger-ui/index.html)
 
 [API 명세서](https://documenter.getpostman.com/view/16796529/2s9Y5SWRLp)

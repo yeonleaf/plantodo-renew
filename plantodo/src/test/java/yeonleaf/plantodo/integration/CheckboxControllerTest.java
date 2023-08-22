@@ -489,6 +489,7 @@ public class CheckboxControllerTest {
         LocalDate dateKey = LocalDate.of(2023, 7, 25);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/group/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .param("groupId", String.valueOf(groupResDto1.getId()))
                 .param("dateKey", dateKey.toString());
 
@@ -506,6 +507,7 @@ public class CheckboxControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/checkboxes/group/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("groupId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
 
@@ -538,6 +540,7 @@ public class CheckboxControllerTest {
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/plan/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .param("planId", String.valueOf(planId))
                 .param("dateKey", dateKey.toString());
 
@@ -555,6 +558,7 @@ public class CheckboxControllerTest {
 
         // given
         MockHttpServletRequestBuilder request = get("/checkboxes/group/date")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("groupId", String.valueOf(Long.MAX_VALUE))
                 .param("dateKey", LocalDate.of(2023, 7, 31).toString());
 
@@ -594,6 +598,7 @@ public class CheckboxControllerTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 22);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/group/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .param("groupId", String.valueOf(groupId))
                 .param("searchStart", searchStart.toString())
                 .param("searchEnd", searchEnd.toString());
@@ -616,6 +621,7 @@ public class CheckboxControllerTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 20);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/group/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("groupId", "1")
                 .param("searchStart", searchStart.toString())
                 .param("searchEnd", searchEnd.toString());
@@ -650,6 +656,7 @@ public class CheckboxControllerTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 22);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/plan/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(member.getId()))
                 .param("planId", String.valueOf(planId))
                 .param("searchStart", searchStart.toString())
                 .param("searchEnd", searchEnd.toString());
@@ -671,6 +678,7 @@ public class CheckboxControllerTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 20);
 
         MockHttpServletRequestBuilder request = get("/checkboxes/plan/range")
+                .header("Authorization", "Bearer " + jwtProvider.generateToken(1L))
                 .param("planId", "1")
                 .param("searchStart", searchStart.toString())
                 .param("searchEnd", searchEnd.toString());

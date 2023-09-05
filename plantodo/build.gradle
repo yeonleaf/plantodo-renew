@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.1'
 	id 'io.spring.dependency-management' version '1.1.0'
-	id 'org.flywaydb.flyway' version '9.19.0'
+//	id 'org.flywaydb.flyway' version '9.22.0'
 }
 
 group = 'yeonleaf'
@@ -26,7 +26,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
-	implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+//	implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
@@ -35,6 +36,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.flywaydb:flyway-mysql'
+	implementation 'org.flywaydb:flyway-core'
 
 	// Querydsl
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -46,6 +48,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 }
 
 tasks.named('test') {
@@ -60,7 +64,10 @@ task copyPrivate(type: Copy) {
 	}
 }
 
-flyway {
-	url = 'jdbc:mariadb://localhost:3306/ptd'
-	user = 'root'
+task copyEnv(type: Copy) {
+	copy {
+		from './plantodo-private'
+		include ".env"
+		into './'
+	}
 }

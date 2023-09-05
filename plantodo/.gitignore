@@ -40,3 +40,4 @@ out/
 application.yaml
 application-dev.yaml
 application-prod.yaml
+.env

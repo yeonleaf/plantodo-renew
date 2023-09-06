@@ -26,11 +26,11 @@ jobs:
       -
         name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        # working-directory: plantodo
+        working-directory: plantodo
       - 
         name: Build with Gradle
         run: ./gradlew build
-        # working-directory: plantodo
+        working-directory: plantodo
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2

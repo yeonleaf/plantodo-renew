@@ -22,6 +22,7 @@ jobs:
       #   uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
       - 
         name: Build JAR
+        working-directory: plantodo-renew/plantodo
         run: |
           cd plantodo-renew/plantodo
           ./gradlew bootJar

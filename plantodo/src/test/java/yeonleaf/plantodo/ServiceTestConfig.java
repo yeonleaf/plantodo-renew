@@ -22,6 +22,11 @@ public class ServiceTestConfig {
     }
 
     @Bean
+    public MemoryRepetitionRepository repetitionRepository() {
+        return new MemoryRepetitionRepository();
+    }
+
+    @Bean
     public MemoryGroupRepository groupRepository() {
         return new MemoryGroupRepository(repetitionRepository());
     }
@@ -29,11 +34,6 @@ public class ServiceTestConfig {
     @Bean
     public MemoryCheckboxRepository checkboxRepository() {
         return new MemoryCheckboxRepository();
-    }
-
-    @Bean
-    public MemoryRepetitionRepository repetitionRepository() {
-        return new MemoryRepetitionRepository();
     }
 
     @Bean
@@ -57,6 +57,16 @@ public class ServiceTestConfig {
     }
 
     @Bean
+    public RepInputValidator repInputValidator() {
+        return new RepInputValidator();
+    }
+
+    @Bean
+    public DateRange dateRange() {
+        return new DateRange();
+    }
+
+    @Bean
     public GroupServiceTestImpl groupService() {
         return new GroupServiceTestImpl(planRepository(), groupRepository(), checkboxRepository(),
                 repInToOutConverter(), repOutToInConverter(), repInputValidator(), dateRange());
@@ -70,16 +80,6 @@ public class ServiceTestConfig {
     @Bean
     public MemberServiceTestImpl memberService() {
         return new MemberServiceTestImpl(memberRepository());
-    }
-
-    @Bean
-    public RepInputValidator repInputValidator() {
-        return new RepInputValidator();
-    }
-
-    @Bean
-    public DateRange dateRange() {
-        return new DateRange();
     }
 
 }

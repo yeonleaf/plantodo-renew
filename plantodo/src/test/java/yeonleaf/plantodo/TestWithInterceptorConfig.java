@@ -26,14 +26,15 @@ public class TestWithInterceptorConfig {
     }
 
     @Bean
+    public JwtTestProvider jwtTestProvider() {
+        return new JwtTestProvider();
+    }
+
+    @Bean
     public SecretKey jwtTestSecretKey() {
         return jwtTestProvider().secretKey();
     }
 
-    @Bean
-    public JwtTestProvider jwtTestProvider() {
-        return new JwtTestProvider();
-    }
 
     @Bean
     public WebMvcConfigurer testWebMvcConfigurer() {

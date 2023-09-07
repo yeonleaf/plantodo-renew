@@ -34,13 +34,13 @@ public class TestConfig {
     }
 
     @Bean
-    public SecretKey jwtTestSecretKey() {
-        return jwtTestProvider().secretKey();
+    public JwtTestProvider jwtTestProvider() {
+        return new JwtTestProvider();
     }
 
     @Bean
-    public JwtTestProvider jwtTestProvider() {
-        return new JwtTestProvider();
+    public SecretKey jwtTestSecretKey() {
+        return jwtTestProvider().secretKey();
     }
 
     @Bean

@@ -40,4 +40,5 @@ out/
 application.yaml
 application-dev.yaml
 application-prod.yaml
+application-test.yaml
 .env

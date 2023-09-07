@@ -26,17 +26,17 @@ jobs:
       # - 
       #   name: Validate Gradle wrapper
       #   uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
-      - 
-        name: Setup MySQL
-        uses: samin/mysql-action@v1.3
-        with:
-          host port: 3306
-          container port: 3306
-          mysql version: '8.0'
-          mysql database: 'ptd'
-          mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          mysql user: 'admin'
-          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+      # - 
+      #   name: Setup MySQL
+      #   uses: samin/mysql-action@v1.3
+      #   with:
+      #     host port: 3306
+      #     container port: 3306
+      #     mysql version: '8.0'
+      #     mysql database: 'ptd'
+      #     mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      #     mysql user: 'admin'
+      #     mysql password: ${{ secrets.MYSQL_PASSWORD }}
       # -
       #   name: Grant execute permission for gradlew
       #   run: chmod +x gradlew

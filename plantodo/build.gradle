@@ -73,3 +73,7 @@ tasks.register('copyEnv', Copy) {
 		into './'
 	}
 }
+
+test {
+	systemProperty 'spring.profiles.active', 'test'
+}

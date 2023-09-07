@@ -43,7 +43,7 @@ jobs:
       #   working-directory: plantodo
       - 
         name: Build with Gradle
-        run: gradle build
+        run: gradle --debug build
         working-directory: plantodo
       -
         name: Set up QEMU

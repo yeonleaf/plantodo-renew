@@ -28,9 +28,9 @@ jobs:
       #   uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
       - 
         name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
+        uses: samin/mysql-action@v1.3
         with:
-          host port: 3307
+          host port: 3306
           container port: 3307
           mysql version: '8.0'
           mysql database: 'ptd'

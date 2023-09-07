@@ -28,7 +28,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	runtimeOnly 'com.h2database:h2'
+	implementation 'com.h2database:h2'
 	implementation 'org.flywaydb:flyway-mysql'
 	implementation 'org.flywaydb:flyway-core'
 
@@ -58,7 +58,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-task copyPrivate(type: Copy) {
+tasks.register('copyPrivate', Copy) {
 	copy {
 		from './plantodo-private'
 		include "*.yaml"
@@ -66,7 +66,7 @@ task copyPrivate(type: Copy) {
 	}
 }
 
-task copyEnv(type: Copy) {
+tasks.register('copyEnv', Copy) {
 	copy {
 		from './plantodo-private'
 		include ".env"

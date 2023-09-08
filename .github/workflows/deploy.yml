@@ -39,7 +39,7 @@ jobs:
       -
         name: List JAR files
         run: |
-          ls -al build/libs
+          ls -al ./plantodo/build/libs
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2

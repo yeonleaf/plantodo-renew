@@ -1,4 +1,4 @@
-name: CD using Github Actions and Docker
+name: deploy using Github actions, Gradle, Docker
 
 on:
   push:
@@ -54,24 +54,15 @@ jobs:
           docker build -t ptd .
           docker tag ptd yeonleaf/ptd:latest
           docker push yeonleaf/ptd:latest
-      # -
-      #   name: Build and push Docker image
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     path: plantodo
-      #     push: true
-      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
-      #     secrets: |
-      #       GIT_AUTH_TOKEN=${{ secrets.ACTION_TOKEN }}
-      # -
-      #   name: EC2 Docker run
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ubuntu
-      #     key: ${{ secrets.EC2_KEY }}
-      #     script: |
-      #       docker rm -f $(docker ps -qa)
-      #       docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
-      #       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
-      #       docker-compose up -d
+      -
+        name: EC2 Docker run
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            docker rm -f $(docker ps -qa)
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
+            docker-compose up -d

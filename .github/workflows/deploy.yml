@@ -37,7 +37,7 @@ jobs:
         run: ls -la ./plantodo/src/main/resources
       - 
         name: Build with Gradle
-        run: gradle clean build -x test
+        run: gradle clean build
         working-directory: plantodo
       -
         name: list Contents of src/main/resources (After build)

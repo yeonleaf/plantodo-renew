@@ -32,11 +32,17 @@ jobs:
         name: Grant execute permission for gradlew
         run: chmod +x gradlew
         working-directory: plantodo
+      -
+        name: list Contents of src/main/resources (Before build)
+        run: ls -la ./plantodo/src/main/resources
       - 
         name: Build with Gradle
         run: |
           cat src/main/resources/application-test.yaml
         working-directory: plantodo
+      -
+        name: list Contents of src/main/resources (After build)
+        run: ls -la ./plantodo/src/main/resources
       # -
       #   name: Set up QEMU
       #   uses: docker/setup-qemu-action@v2

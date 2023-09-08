@@ -74,6 +74,10 @@ tasks.register('copyEnv', Copy) {
 	}
 }
 
+tasks.named('build').configure {
+	dependsOn 'copyPrivate', 'copyEnv'
+}
+
 test {
 	systemProperty 'spring.profiles.active', 'test'
 }

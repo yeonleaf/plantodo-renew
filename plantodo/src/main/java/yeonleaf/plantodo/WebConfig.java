@@ -12,16 +12,11 @@ import yeonleaf.plantodo.interceptor.LoginCheckInterceptor;
 import javax.crypto.SecretKey;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig {
 
-    private SecretKey jwtSecretKey;
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    public WebConfig(SecretKey jwtSecretKey, ObjectMapper objectMapper) {
-        this.jwtSecretKey = jwtSecretKey;
-        this.objectMapper = objectMapper;
-    }
+    private final SecretKey jwtSecretKey;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {

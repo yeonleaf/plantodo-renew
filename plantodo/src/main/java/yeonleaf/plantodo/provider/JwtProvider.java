@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 
+@Component
 @NoArgsConstructor
 public class JwtProvider implements JwtBasicProvider {
 

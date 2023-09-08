@@ -2,6 +2,7 @@ package yeonleaf.plantodo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,11 +12,16 @@ import yeonleaf.plantodo.interceptor.LoginCheckInterceptor;
 import javax.crypto.SecretKey;
 
 @Configuration
-@RequiredArgsConstructor
 public class WebConfig {
 
-    private final SecretKey jwtSecretKey;
-    private final ObjectMapper objectMapper;
+    private SecretKey jwtSecretKey;
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    public WebConfig(SecretKey jwtSecretKey, ObjectMapper objectMapper) {
+        this.jwtSecretKey = jwtSecretKey;
+        this.objectMapper = objectMapper;
+    }
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {

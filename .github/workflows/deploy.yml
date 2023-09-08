@@ -37,6 +37,10 @@ jobs:
         run: gradle clean build
         working-directory: plantodo
       -
+        name: List JAR files
+        run: |
+          ls -al build/libs
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       -

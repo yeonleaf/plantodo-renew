@@ -15,11 +15,6 @@ public class JwtConfig {
 
     private final JwtProvider jwtProvider;
 
-//    @Bean
-//    public JwtBasicProvider jwtProvider() {
-//        return new JwtProvider();
-//    }
-
     @Bean
     public SecretKey jwtSecretKey() {
         return jwtProvider.secretKey();

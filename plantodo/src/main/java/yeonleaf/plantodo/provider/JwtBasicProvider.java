@@ -1,9 +1,11 @@
 package yeonleaf.plantodo.provider;
 
 import io.jsonwebtoken.JwtBuilder;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 
+@Component
 public interface JwtBasicProvider {
 
     JwtBuilder jwtBuilder();

@@ -37,8 +37,7 @@ jobs:
         run: ls -la ./plantodo/src/main/resources
       - 
         name: Build with Gradle
-        run: |
-          cat src/main/resources/application-test.yaml
+        run: gradle clean build -x test
         working-directory: plantodo
       -
         name: list Contents of src/main/resources (After build)

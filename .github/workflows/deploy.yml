@@ -63,10 +63,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
+            sudo docker image prune
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
-            sudo groupadd docker
-            sudo usermod -aG docker $USER
-            newgrp docker
-            docker compose up -d
-            docker image prune -f
+

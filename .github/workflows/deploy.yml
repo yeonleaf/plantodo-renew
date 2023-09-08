@@ -17,10 +17,6 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.ACTION_TOKEN }}
-      -
-        name: find path
-        run: |
-          ls
       # -
       #   name: Setup JDK 17
       #   uses: actions/setup-java@v3
@@ -56,15 +52,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
+      - 
         name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          path: plantodo
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
-          secrets: |
-            GIT_AUTH_TOKEN=${{ secrets.ACTION_TOKEN }}
+        run: |
+          docker build -t ptd .
+          docker images
+      # -
+      #   name: Build and push Docker image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     path: plantodo
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
+      #     secrets: |
+      #       GIT_AUTH_TOKEN=${{ secrets.ACTION_TOKEN }}
       # -
       #   name: EC2 Docker run
       #   uses: appleboy/ssh-action@master

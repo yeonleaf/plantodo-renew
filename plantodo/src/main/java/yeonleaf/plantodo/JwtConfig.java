@@ -13,7 +13,7 @@ import javax.crypto.SecretKey;
 @RequiredArgsConstructor
 public class JwtConfig {
 
-    private final JwtBasicProvider jwtProvider;
+    private final JwtProvider jwtProvider;
 
 //    @Bean
 //    public JwtBasicProvider jwtProvider() {

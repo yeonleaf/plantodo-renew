@@ -55,14 +55,15 @@ jobs:
           docker tag ptd yeonleaf/ptd:latest
           docker push yeonleaf/ptd:latest
       -
-        name: EC2 Docker run
+        name: Deploy to server
         uses: appleboy/ssh-action@master
+        id: deploy
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            docker rm -f $(docker ps -qa)
-            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:latest
             docker-compose up -d
+            docker image prune -f

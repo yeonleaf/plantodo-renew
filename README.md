@@ -6,14 +6,25 @@
 ## Environments
 
 <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white"/><img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
-<img src="https://img.shields.io/badge/intellijidea-000000?style=for-the-badge&logo=intellijidea&logoColor=white"><img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
-<img src="https://img.shields.io/badge/hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white"><img src="https://img.shields.io/badge/mariadb-003545?style=for-the-badge&logo=mariadb&logoColor=white">
+
+<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"><img src="https://img.shields.io/badge/hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white"><img src="https://img.shields.io/badge/flyway-CC0200?style=for-the-badge&logo=flyway&logoColor=white">
+
+<img src="https://img.shields.io/badge/ec2-FF9900?style=for-the-badge&logo=ec2&logoColor=white"><img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"><img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
+
+<img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white"><img src="https://img.shields.io/badge/intellijidea-000000?style=for-the-badge&logo=intellijidea&logoColor=white">
+
 
 - Language : java 17
-- IDE : IntelliJ Ultimate 2021.2
 - Framework : SpringBoot 3.1.1 
-- Database : MariaDB 10.11 (java-client 2.7.2)
+- Database :
+  - prod, dev : MySQL 8.0 (mysql-connector-j 8.1.0)
+  - test : H2 (embedded)
 - ORM : JPA (hibernate)
+- DB migration : flyway 9.22.0
+- Deployment : EC2, Github Actions, docker-compose 3.8
+- Others :
+  - IDE : IntelliJ Ultimate 2023.1.3
+  - Docs : swagger-ui (springdoc 2.1.0)
 
 <br>
 

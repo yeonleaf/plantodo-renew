@@ -1,9 +1,8 @@
 name: deploy using Github actions, Gradle, Docker
 
 on:
-  push:
-    branches:
-      - 'main'
+  pull_request:
+    types: [opened, reopened]
     
 jobs:
   build:

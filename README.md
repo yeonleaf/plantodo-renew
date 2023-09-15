@@ -29,9 +29,15 @@
 <br>
 
 ## Features
-- 회원가입, 로그인 (JWT Bearer)
-- 일정 관리
-- 할일 관리
+- 회원가입 / 로그인 POST API, 일정 / 그룹 / 할일 CRUD HTTP API, 날짜 / 기간 단위로 조회하는 Collection 조회 API
+  - 애플리케이션의 상태를 전이하기 위해 Spring HATEOAS를 적용
+  - 정상적인 요청은 EntityModel로 감싼 응답 객체를, 비정상적인 요청은 커스텀 에러 객체를 ResponseEntity에 담아 리턴
+  - 요청을 보낼 수 있는 Swagger-UI 기반 API 명세서를 제공
+
+- JWT 토큰 방식의 인증을 사용
+  - 회원가입, 로그인 외 모든 요청에 Bearer {토큰} 형태의 Authorization 헤더가 있는지 확인하고 토큰이 유효한지 검증
+  - 요청이 들어오면 인터셉터에서 검증하고 올바른 요청이라면 이어서 처리
+  - 올바른 요청이 아니라면 인터셉터에서 Error response 객체를 반환
 
 <br>
 

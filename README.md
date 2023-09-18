@@ -1,5 +1,11 @@
 # PLANTODO
-할 일 관리 웹 페이지
+일정 내에 할 일을 생성해서 관리할 수 있는 투두리스트 API입니다.
+
+할 일을 생성할 때 반복 옵션을 다양하게 설정할 수 있습니다. (반복 없음, 매일 반복, X일마다 반복, X요일마다 반복)<br>
+이 중 반복이 걸린 할 일은 할 일 그룹으로 관리되며 그룹 단위로 생성, 수정, 삭제를 할 수 있습니다.<br>
+날짜, 기간 단위로 생성한 일정이나 그룹의 할 일을 필터링해서 조회할 수 있습니다.<br>
+
+프론트엔드 코드 없이 HTTP API로만 구성되어 있으며 대신 API 요청을 보낼 수 있는 Swagger-UI 기반 [링크](https://plantodo.site/swagger-ui/index.html)를 제공합니다.
 
 <br>
 
@@ -29,15 +35,9 @@
 <br>
 
 ## Features
-- 회원가입 / 로그인 POST API, 일정 / 그룹 / 할일 CRUD HTTP API, 날짜 / 기간 단위로 조회하는 Collection 조회 API
-  - 애플리케이션의 상태를 전이하기 위해 Spring HATEOAS를 적용
-  - 정상적인 요청은 EntityModel로 감싼 응답 객체를, 비정상적인 요청은 커스텀 에러 객체를 ResponseEntity에 담아 리턴
-  - 요청을 보낼 수 있는 Swagger-UI 기반 API 명세서를 제공
-
-- JWT 토큰 방식의 인증을 사용
-  - 회원가입, 로그인 외 모든 요청에 Bearer {토큰} 형태의 Authorization 헤더가 있는지 확인하고 토큰이 유효한지 검증
-  - 요청이 들어오면 인터셉터에서 검증하고 올바른 요청이라면 이어서 처리
-  - 올바른 요청이 아니라면 인터셉터에서 Error response 객체를 반환
+- 회원가입 / 로그인 POST API
+- 일정 / 그룹 / 할일 CRUD HTTP API
+- 날짜 / 기간 단위로 조회하는 Collection 조회 API
 
 <br>
 

@@ -5,7 +5,7 @@
 이 중 반복이 걸린 할 일은 할 일 그룹으로 관리되며 그룹 단위로 생성, 수정, 삭제를 할 수 있습니다.<br>
 날짜, 기간 단위로 생성한 일정이나 그룹의 할 일을 필터링해서 조회할 수 있습니다.<br>
 
-프론트엔드 코드 없이 HTTP API로만 구성되어 있으며 대신 API 요청을 보낼 수 있는 Swagger-UI 기반 [링크](https://plantodo.site/swagger-ui/index.html)를 제공합니다.
+프론트엔드 코드 없이 HTTP API로만 구성되어 있으며 대신 요청을 보낼 수 있는 Swagger-UI 기반 [링크](https://plantodo.site/swagger-ui/index.html)를 제공합니다.
 
 <br>
 

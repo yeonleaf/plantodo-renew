@@ -41,9 +41,13 @@
 
 <br>
 
+## ERD
+![ptd-renew](https://github.com/yeonleaf/plantodo-renew/assets/91470133/d5007cfc-0330-4048-8d96-d764b1ffb94f)
+
+<br>
+
 ## Architecture
 ![ptd-architecture-230910](https://github.com/yeonleaf/plantodo-renew/assets/91470133/3a1a2050-43d4-4034-b643-1cfd207af373)
-
 
 <br>
 

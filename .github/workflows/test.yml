@@ -1,11 +1,11 @@
-name: Docker Image CI
+name: test removing flyway and docker-compose (docker image build)
 
 on:
   push:
-    branches: [ "delflyway" ]
-
+    branches:
+      - 'delflyway'
+    
 jobs:
-
   build:
 
     runs-on: ubuntu-latest
@@ -52,8 +52,8 @@ jobs:
         name: Build and push Docker image
         run: |
           docker build -t ptd .
-          docker tag ptd yeonleaf/ptd:delflyway
-          docker push yeonleaf/ptd:delflyway
+          docker tag ptd yeonleaf/ptd:dev-test
+          docker push yeonleaf/ptd:dev-test
       -
         name: Deploy to server
         uses: appleboy/ssh-action@master
@@ -65,4 +65,4 @@ jobs:
           script: |
             sudo docker image prune
             sudo docker rm -f $(docker ps -qa)
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:delflyway
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:dev-test

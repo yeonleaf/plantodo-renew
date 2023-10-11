@@ -36,9 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### don't have to add ###
-compose.yml
-
 ### contains sensitive info ###
 application.yaml
 application-dev.yaml

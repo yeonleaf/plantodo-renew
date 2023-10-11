@@ -1,3 +1,4 @@
+-- 23.10.11
 create table if not exists member (
     id bigint auto_increment not null primary key,
     email varchar(255),

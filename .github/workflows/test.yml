@@ -54,15 +54,6 @@ jobs:
           docker build -t ptd .
           docker tag ptd yeonleaf/ptd:dev-test
           docker push yeonleaf/ptd:dev-test
-      -
-        name: Deploy to server
-        uses: appleboy/ssh-action@master
-        id: deploy
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            sudo docker image prune
-            sudo docker rm -f $(docker ps -qa)
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ptd:dev-test
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 487437989384.dkr.ecr.ap-northeast-2.amazonaws.com
+          docker tag yeonleaf/ptd:dev-test 487437989384.dkr.ecr.ap-northeast-2.amazonaws.com/ptd:dev
+          docker push 487437989384.dkr.ecr.ap-northeast-2.amazonaws.com/ptd:dev

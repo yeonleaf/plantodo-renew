@@ -1,8 +1,9 @@
-name: deploy using Github actions, Gradle, Docker
+name: test removing flyway and docker-compose (docker image build)
 
 on:
-  pull_request:
-    types: [opened, reopened]
+  push:
+    branches:
+      - 'delflyway'
     
 jobs:
   build:
@@ -47,6 +48,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - 
+      #   name: Build and push Docker image
+      #   run: |
+      #     docker build -t ptd .
+      #     docker tag ptd yeonleaf/ptd:dev-test
+      #     docker push yeonleaf/ptd:dev-test
       -
         name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -63,8 +70,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ptd
-          IMAGE_TAG: prod
+          IMAGE_TAG: dev
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-

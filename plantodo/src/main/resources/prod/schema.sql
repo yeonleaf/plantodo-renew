@@ -1,4 +1,3 @@
-
 create table if not exists member (
     id bigint auto_increment not null primary key,
     email varchar(255),
@@ -22,12 +21,12 @@ create table if not exists repetition (
 );
 
 create table if not exists group_table (
-    id bigint auto_increment not null primary key,
-    title varchar(255),
-    rep_id bigint not null,
-    foreign key (rep_id) references repetition(id),
-    plan_id bigint not null,
-    foreign key (plan_id) references plan(id)
+   id bigint auto_increment not null primary key,
+   title varchar(255),
+   rep_id bigint not null,
+   foreign key (rep_id) references repetition(id),
+   plan_id bigint not null,
+   foreign key (plan_id) references plan(id)
 );
 
 
@@ -39,4 +38,3 @@ create table if not exists checkbox (
     group_id bigint not null,
     foreign key (group_id) references group_table(id)
 );
-

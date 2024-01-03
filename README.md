@@ -53,3 +53,5 @@
 [링크](https://plantodo.site/swagger-ui/index.html)
 
 [API 명세서](https://documenter.getpostman.com/view/16796529/2s9Y5SWRLp)
+
+[트러블슈팅 기록](https://erratic-leo-4a8.notion.site/PTD-53f9a611c0f341eaa644821ae97f4ee9)

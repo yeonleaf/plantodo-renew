@@ -2,6 +2,7 @@ package yeonleaf.plantodo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import yeonleaf.plantodo.domain.Member;
 import yeonleaf.plantodo.dto.MemberReqDto;
 import yeonleaf.plantodo.dto.MemberResDto;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -28,11 +30,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isNotNewMember(String email) {
         return memberRepository.findByEmail(email).size() > 0;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Long login(MemberReqDto memberReqDto) {
         List<Member> candidates = memberRepository.findByEmail(memberReqDto.getEmail());
         if (candidates.isEmpty()) {
@@ -45,6 +49,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MemberResDto findById(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         return new MemberResDto(member);

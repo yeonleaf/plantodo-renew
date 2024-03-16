@@ -41,4 +41,8 @@ application.yaml
 application-dev.yaml
 application-prod.yaml
 application-test.yaml
+application-con.yaml
 .env
+
+## mysql data files ##
+/data

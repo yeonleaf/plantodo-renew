@@ -2,6 +2,7 @@ package yeonleaf.plantodo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.Checkbox;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
@@ -61,6 +63,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GroupResDto> all(Long planId) {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
@@ -74,6 +77,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GroupResDto one(Long id) {
 
         Group group = groupRepository.findByIdEntityGraph(id).orElseThrow(ResourceNotFoundException::new);
@@ -155,6 +159,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GroupResDto> all(Long planId, LocalDate dateKey) {
 
         return all(planId).stream()
@@ -167,6 +172,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GroupResDto> all(Long planId, LocalDate searchStart, LocalDate searchEnd) {
 
         return all(planId).stream()

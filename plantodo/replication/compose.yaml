@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+    db-master:
+      image: mysql:latest
+      container_name: master-db
+      restart: unless-stopped
+      environment:
+        MYSQL_DATABASE: 'db'
+        MYSQL_USER: 'user'
+        MYSQL_PASSWORD: '1234'
+        MYSQL_ROOT_PASSWORD: '1234'
+#      command:
+#        - --default-authentication-plugin=mysql_native_password
+#        - --sql_mode=NO_ENGINE_SUBSTITUTION
+      ports:
+        - '3307:3306'
+      expose:
+        - '3307'
+      volumes:
+        - ./master/my.cnf:/etc/mysql/my.cnf
+        - my-db-master:/var/lib/mysql
+        - my-db-master:/var/lib/mysql-files
+    db-slave:
+      image: mysql:latest
+      restart: unless-stopped
+      container_name: slave-db
+      environment:
+        MYSQL_DATABASE: 'db'
+        MYSQL_USER: 'user'
+        MYSQL_PASSWORD: '1234'
+        MYSQL_ROOT_PASSWORD: '1234'
+#      command:
+#        - --default-authentication-plugin=mysql_native_password
+#        - --sql_mode=NO_ENGINE_SUBSTITUTION
+#        - --log-bin=mysql-bin
+      ports:
+        - '3308:3306'
+      expose:
+        - '3308'
+      volumes:
+        - ./slave/my.cnf:/etc/mysql/my.cnf
+        - my-db-slave:/var/lib/mysql
+        - my-db-slave:/var/lib/mysql-files
+
+volumes:
+  my-db-master:
+  my-db-slave:

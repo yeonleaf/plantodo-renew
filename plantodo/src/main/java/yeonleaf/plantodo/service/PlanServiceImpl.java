@@ -3,6 +3,7 @@ package yeonleaf.plantodo.service;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.Checkbox;
@@ -28,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
 
@@ -49,6 +51,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PlanResDto one(Long id) {
 
         Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -144,6 +147,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PlanResDto> all(Long memberId) {
 
         memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
@@ -161,6 +165,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PlanResDto> all(Long memberId, LocalDate dateKey) {
 
         memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
@@ -178,6 +183,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PlanResDto> all(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
 
         return all(memberId).stream()

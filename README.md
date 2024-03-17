@@ -44,8 +44,7 @@
 <br>
 
 ## Architecture
-![아키텍처_231015](https://github.com/yeonleaf/plantodo-renew/assets/91470133/0977a391-b9d6-44b7-8fde-7f6f8d484e32)
-
+![20240317아키텍처](https://github.com/yeonleaf/plantodo-renew/assets/91470133/a25ecd86-5aa1-4c82-b1ab-7aebb1777c9f)
 
 <br>
 

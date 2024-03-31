@@ -156,7 +156,7 @@ public class PlanController {
     @GetMapping(value = "/plans", params = {"memberId"})
     public ResponseEntity<?> all(@Parameter(description = "회원 ID", required = true, example = "1") @RequestParam Long memberId) {
 
-        List<EntityModel<PlanResDto>> all = planService.all(memberId).stream().map(planModelAssembler::toModel).toList();
+        List<EntityModel<PlanResDto>> all = planService.all(memberId).getWrap().stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all, linkTo(methodOn(PlanController.class)).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(collectionModel);
 
@@ -172,7 +172,7 @@ public class PlanController {
     public ResponseEntity<?> all(@Parameter(description = "회원 ID", required = true, example = "1") @RequestParam Long memberId,
                                  @Parameter(description = "검색일", required = true, example = "2023-08-04") @RequestParam LocalDate dateKey) {
 
-        List<EntityModel<PlanResDto>> all = planService.all(memberId, dateKey).stream().map(planModelAssembler::toModel).toList();
+        List<EntityModel<PlanResDto>> all = planService.all(memberId, dateKey).getWrap().stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
                 linkTo(methodOn(PlanController.class).all(memberId, dateKey)).withSelfRel(),
                 linkTo(methodOn(PlanController.class).all(memberId)).withRel("plans"));
@@ -194,7 +194,7 @@ public class PlanController {
 
         checkSearchDates(searchStart, searchEnd);
 
-        List<EntityModel<PlanResDto>> all = planService.all(memberId, searchStart, searchEnd).stream().map(planModelAssembler::toModel).toList();
+        List<EntityModel<PlanResDto>> all = planService.all(memberId, searchStart, searchEnd).getWrap().stream().map(planModelAssembler::toModel).toList();
         CollectionModel<EntityModel<PlanResDto>> collectionModel = CollectionModel.of(all,
                 linkTo(methodOn(PlanController.class).all(memberId, searchStart, searchEnd)).withSelfRel(),
                 linkTo(methodOn(PlanController.class).all(memberId)).withRel("plans"));

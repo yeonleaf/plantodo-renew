@@ -66,7 +66,7 @@ public class CalendarController {
         dateRange.between(searchStart, searchEnd).forEach(date -> {
             LinkedHashMap<PlanResDto, List<CheckboxResDto>> tmp = new LinkedHashMap<>();
 
-            List<PlanResDto> plans = planService.all(memberId, date);
+            List<PlanResDto> plans = planService.all(memberId, date).getWrap();
             plans.forEach(plan -> {
                 tmp.put(plan, checkboxService.allByPlan(plan.getId(), date));
             });

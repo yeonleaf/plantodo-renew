@@ -1,5 +1,5 @@
 use ptd;
-insert into member(email, password) values ('test@abc.co.kr', '15d2d4^$3');
+insert into member(email, password) values ('test@abc.co.kr', 'dw43%5e@');
 set @member_pk = LAST_INSERT_ID();
 insert into plan(member_id, start_date, end_date, status, title) values (@member_pk, '2023-11-01', '2023-11-11', 0, 'plan1');
 set @plan_pk = LAST_INSERT_ID();

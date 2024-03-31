@@ -933,7 +933,7 @@ public class PlanServiceUnitTest {
         Long memberId = member.getId();
 
         // when
-        List<PlanResDto> all = planService.all(memberId);
+        List<PlanResDto> all = planService.all(memberId).getWrap();
 
         // then
         assertThat(all.size()).isEqualTo(3);
@@ -968,7 +968,7 @@ public class PlanServiceUnitTest {
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, dateKey);
+        List<PlanResDto> filteredAll = planService.all(memberId, dateKey).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(3);
@@ -988,7 +988,7 @@ public class PlanServiceUnitTest {
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, dateKey);
+        List<PlanResDto> filteredAll = planService.all(memberId, dateKey).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(2);
@@ -1008,7 +1008,7 @@ public class PlanServiceUnitTest {
         LocalDate dateKey = LocalDate.of(2023, 7, 19);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, dateKey);
+        List<PlanResDto> filteredAll = planService.all(memberId, dateKey).getWrap();
 
         // then
         assertThat(filteredAll).isEmpty();
@@ -1078,7 +1078,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(3);
@@ -1105,7 +1105,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(3);
@@ -1132,7 +1132,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(3);
@@ -1155,7 +1155,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(1);
@@ -1178,7 +1178,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 20);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(1);
@@ -1201,7 +1201,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 23);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(1);
@@ -1224,7 +1224,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 23);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(1);
@@ -1251,7 +1251,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(2);
@@ -1279,7 +1279,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(2);
@@ -1304,7 +1304,7 @@ public class PlanServiceUnitTest {
         LocalDate searchEnd = LocalDate.of(2023, 7, 31);
 
         // when
-        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd);
+        List<PlanResDto> filteredAll = planService.all(memberId, searchStart, searchEnd).getWrap();
 
         // then
         assertThat(filteredAll.size()).isEqualTo(0);

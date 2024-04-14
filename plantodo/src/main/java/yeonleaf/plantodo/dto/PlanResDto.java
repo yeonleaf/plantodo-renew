@@ -8,6 +8,7 @@ import lombok.*;
 import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.domain.PlanStatus;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class PlanResDto {
+public class PlanResDto implements Serializable {
 
     private Long id;
     private String title;

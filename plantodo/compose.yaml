@@ -12,8 +12,8 @@ services:
     environment:
       MYSQL_DATABASE: 'ptd'
       MYSQL_USER: 'user'
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD_NOT_PROD}"
-      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD_NOT_PROD}"
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
     ports:
       - '3306:3306'
     volumes:
@@ -37,8 +37,8 @@ services:
     environment:
       MYSQL_DATABASE: 'ptd'
       MYSQL_USER: 'user'
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD_NOT_PROD}"
-      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD_NOT_PROD}"
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
     ports:
       - '3308:3306'
     volumes:
@@ -49,12 +49,6 @@ services:
     networks:
       dock_net:
         ipv4_address: 172.19.0.12
-  redis:
-    image: redis
-    profiles: ["con"]
-    ports:
-      - '6379:6379'
-
 
 volumes:
   my-db-master:

@@ -1,10 +1,15 @@
 package yeonleaf.plantodo.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.ClusterOperations;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
@@ -45,9 +50,8 @@ public class PlanServiceImpl implements PlanService {
     private final GroupService groupService;
 
     @Override
-    @CacheEvict(cacheNames = "plan", key = "#result.id")
+    @CacheEvict(cacheNames = "plan", key = "#result.id", cacheManager = "cacheManager")
     public PlanResDto save(PlanReqDto planReqDto) {
-
         Member member = memberRepository.findById(planReqDto.getMemberId()).orElseThrow(ResourceNotFoundException::new);
         Plan plan = planRepository.save(new Plan(planReqDto, member));
         groupRepository.save(new Group(plan, "DailyGroup"));

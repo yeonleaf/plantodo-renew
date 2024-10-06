@@ -2,6 +2,7 @@ package yeonleaf.plantodo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import yeonleaf.plantodo.domain.Checkbox;
 import yeonleaf.plantodo.domain.Group;
 import yeonleaf.plantodo.domain.Plan;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CheckboxServiceImpl implements CheckboxService {
 
@@ -38,6 +40,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CheckboxResDto one(Long id) {
         Checkbox checkbox = checkboxRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         return new CheckboxResDto(checkbox);
@@ -71,6 +74,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckboxResDto> allByGroup(Long groupId) {
 
         groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
@@ -80,6 +84,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckboxResDto> allByPlan(Long planId) {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
@@ -91,6 +96,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckboxResDto> allByGroup(Long groupId, LocalDate dateKey) {
 
         groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
@@ -99,6 +105,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckboxResDto> allByPlan(Long planId, LocalDate dateKey) {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);
@@ -107,6 +114,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckboxResDto> allByGroup(Long groupId, LocalDate searchStart, LocalDate searchEnd) {
 
         groupRepository.findById(groupId).orElseThrow(ResourceNotFoundException::new);
@@ -115,6 +123,7 @@ public class CheckboxServiceImpl implements CheckboxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CheckboxResDto> allByPlan(Long planId, LocalDate searchStart, LocalDate searchEnd) {
 
         planRepository.findById(planId).orElseThrow(ResourceNotFoundException::new);

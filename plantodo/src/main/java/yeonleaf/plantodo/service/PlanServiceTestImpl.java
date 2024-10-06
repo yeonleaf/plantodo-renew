@@ -8,6 +8,7 @@ import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.repository.*;
 import yeonleaf.plantodo.util.CheckboxDateCreator;
 import yeonleaf.plantodo.util.PlanDateRangeRevisionMaker;
+import yeonleaf.plantodo.wrapper.PlanResDtoWrap;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -130,10 +131,11 @@ public class PlanServiceTestImpl implements PlanService {
     }
 
     @Override
-    public List<PlanResDto> all(Long memberId) {
+    public PlanResDtoWrap all(Long memberId) {
 
         memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
-        return planRepository.findByMemberId(memberId).stream().map(PlanResDto::new).toList();
+        List<PlanResDto> planResDtoList = planRepository.findByMemberId(memberId).stream().map(PlanResDto::new).toList();
+        return new PlanResDtoWrap(planResDtoList);
 
     }
 
@@ -147,13 +149,13 @@ public class PlanServiceTestImpl implements PlanService {
     }
 
     @Override
-    public List<PlanResDto> all(Long memberId, LocalDate dateKey) {
+    public PlanResDtoWrap all(Long memberId, LocalDate dateKey) {
 
         memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
-
-        return planRepository.findByMemberId(memberId).stream()
+        List<PlanResDto> planResDtoList = planRepository.findByMemberId(memberId).stream()
                 .filter(plan -> hasDateKey(plan, dateKey))
                 .map(PlanResDto::new).toList();
+        return new PlanResDtoWrap(planResDtoList);
 
     }
 
@@ -164,11 +166,12 @@ public class PlanServiceTestImpl implements PlanService {
     }
 
     @Override
-    public List<PlanResDto> all(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
+    public PlanResDtoWrap all(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
 
-        return all(memberId).stream()
+        List<PlanResDto> planResDtoList = all(memberId).getWrap().stream()
                 .filter(planResDto -> new PlanDateRangeRevisionMaker().isInRange(searchStart, searchEnd, planResDto.getStart(), planResDto.getEnd()))
                 .toList();
+        return new PlanResDtoWrap(planResDtoList);
 
     }
 

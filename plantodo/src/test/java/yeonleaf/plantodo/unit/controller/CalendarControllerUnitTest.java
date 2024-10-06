@@ -21,13 +21,13 @@ import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.CheckboxService;
 import yeonleaf.plantodo.service.MemberService;
 import yeonleaf.plantodo.service.PlanService;
+import yeonleaf.plantodo.wrapper.PlanResDtoWrap;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,6 +72,8 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 30);
 
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap();
+        doReturn(planResDtoWrap).when(planService).all(any(), any());
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .param("memberId", "1")
                 .param("searchStart", searchStart.toString())
@@ -114,6 +116,8 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 30);
         LocalDate searchEnd = LocalDate.of(2023, 8, 15);
 
+//        doReturn().when(planService.all(any(), any(), any()));
+
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .param("memberId", "1")
                 .param("searchStart", searchStart.toString())
@@ -135,6 +139,8 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 15);
 
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap();
+        doReturn(planResDtoWrap).when(planService).all(any(), any());
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .param("memberId", "1")
                 .param("searchStart", searchStart.toString())
@@ -156,6 +162,8 @@ public class CalendarControllerUnitTest {
         LocalDate searchStart = LocalDate.of(2023, 8, 15);
         LocalDate searchEnd = LocalDate.of(2023, 8, 18);
 
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap();
+        doReturn(planResDtoWrap).when(planService).all(any(), any());
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .param("memberId", "1")
                 .param("searchStart", searchStart.toString())
@@ -182,9 +190,8 @@ public class CalendarControllerUnitTest {
 
         PlanResDto planResDto = new PlanResDto(1L, "planTitle",
                 LocalDate.of(2023, 8, 13), LocalDate.of(2023, 8, 20), PlanStatus.NOW);
-        List<PlanResDto> plans = List.of(planResDto);
-
-        when(planService.all(any(), any())).thenReturn(plans);
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap(List.of(planResDto));
+        doReturn(planResDtoWrap).when(planService).all(any(), any());
 
         MockHttpServletRequestBuilder request = get("/calendar/range")
                 .param("memberId", "1")
@@ -211,8 +218,9 @@ public class CalendarControllerUnitTest {
         PlanResDto planResDto = new PlanResDto(1L, "planTitle",
                 LocalDate.of(2023, 8, 13), LocalDate.of(2023, 8, 20), PlanStatus.NOW);
         List<PlanResDto> plans = List.of(planResDto);
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap(plans);
 
-        when(planService.all(any(), any())).thenReturn(plans);
+        when(planService.all(any(), any())).thenReturn(planResDtoWrap);
 
         CheckboxResDto checkboxResDto = new CheckboxResDto(1L, "checkboxTitle", LocalDate.of(2023, 8, 15), true);
         List<CheckboxResDto> checkboxes = List.of(checkboxResDto);

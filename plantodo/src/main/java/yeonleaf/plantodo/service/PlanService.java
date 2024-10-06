@@ -6,6 +6,7 @@ import yeonleaf.plantodo.domain.Plan;
 import yeonleaf.plantodo.dto.PlanReqDto;
 import yeonleaf.plantodo.dto.PlanResDto;
 import yeonleaf.plantodo.dto.PlanUpdateReqDto;
+import yeonleaf.plantodo.wrapper.PlanResDtoWrap;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,9 +18,9 @@ public interface PlanService {
     PlanResDto one(Long id);
     PlanResDto update(PlanUpdateReqDto planUpdateReqDto);
     void delete(Long id);
-    List<PlanResDto> all(Long memberId);
-    List<PlanResDto> all(Long memberId, LocalDate dateKey);
-    List<PlanResDto> all(Long memberId, LocalDate searchStart, LocalDate searchEnd);
+    PlanResDtoWrap all(Long memberId);
+    PlanResDtoWrap all(Long memberId, LocalDate dateKey);
+    PlanResDtoWrap all(Long memberId, LocalDate searchStart, LocalDate searchEnd);
     PlanResDto change(Long id);
 
 }

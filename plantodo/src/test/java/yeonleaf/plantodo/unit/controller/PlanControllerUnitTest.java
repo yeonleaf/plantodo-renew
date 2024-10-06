@@ -22,6 +22,7 @@ import yeonleaf.plantodo.exceptions.ResourceNotFoundException;
 import yeonleaf.plantodo.service.PlanService;
 import yeonleaf.plantodo.exceptions.ApiBindingError;
 import yeonleaf.plantodo.exceptions.ApiSimpleError;
+import yeonleaf.plantodo.wrapper.PlanResDtoWrap;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -434,12 +435,12 @@ public class PlanControllerUnitTest {
     void allTestNormal() throws Exception {
 
         // given
-        List<PlanResDto> plans = makeSamplePlans();
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap(makeSamplePlans());
         MockHttpServletRequestBuilder request = get("/plans")
                 .param("memberId", "1");
 
         // when
-        when(planService.all(any())).thenReturn(plans);
+        doReturn(planResDtoWrap).when(planService).all(any());
 
         // then
         mockMvc.perform(request)
@@ -478,14 +479,14 @@ public class PlanControllerUnitTest {
     void collectionFilteredByDateTestNormal() throws Exception {
 
         // given
-        List<PlanResDto> plans = makeSamplePlans();
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap(makeSamplePlans());
 
         MockHttpServletRequestBuilder request = get("/plans/date")
                 .param("memberId", "1")
                 .param("dateKey", LocalDate.of(2023, 7, 19).toString());
 
         // when
-        doReturn(plans).when(planService).all(any(), any());
+        doReturn(planResDtoWrap).when(planService).all(any(), any());
 
         // then
         mockMvc.perform(request)
@@ -524,14 +525,14 @@ public class PlanControllerUnitTest {
     void collectionFilteredByDateRangeTestNormal() throws Exception {
 
         // given
-        List<PlanResDto> plans = makeSamplePlans();
+        PlanResDtoWrap planResDtoWrap = new PlanResDtoWrap(makeSamplePlans());
         MockHttpServletRequestBuilder request = get("/plans/range")
                 .param("memberId", "1")
                 .param("searchStart", LocalDate.of(2023, 7, 19).toString())
                 .param("searchEnd", LocalDate.of(2023, 7, 25).toString());
 
         // when
-        when(planService.all(any(), any(), any())).thenReturn(plans);
+        doReturn(planResDtoWrap).when(planService).all(any(), any(), any());
 
         // then
         mockMvc.perform(request)

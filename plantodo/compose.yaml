@@ -1,0 +1,61 @@
+services:
+  master:
+    image: yeonleaf/master
+    profiles: [con, dev]
+    env_file:
+      - .env
+    build:
+      context: ./master
+      dockerfile: Dockerfile
+    container_name: master
+    environment:
+      MYSQL_DATABASE: 'ptd'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./master/my.cnf:/etc/mysql/my.cnf
+      - ./initdb.d/data.sql:/data.sql
+      - ./initdb.d/schema.sql:/docker-entrypoint-initdb.d/1.sql
+      - my-db-master:/var/lib/mysql
+      - my-db-master:/var/lib/mysql-files
+    networks:
+      dock_net:
+        ipv4_address: 172.19.0.11
+  slave:
+    image: yeonleaf/slave
+    profiles: [con]
+    env_file:
+      - .env
+    build:
+      context: ./slave
+      dockerfile: Dockerfile
+    container_name: slave
+    environment:
+      MYSQL_DATABASE: 'ptd'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_NOT_PROD}
+    ports:
+      - '3308:3306'
+    volumes:
+      - ./slave/my.cnf:/etc/mysql/my.cnf
+      - ./initdb.d/schema.sql:/docker-entrypoint-initdb.d/1.sql
+      - my-db-slave:/var/lib/mysql
+      - my-db-slave:/var/lib/mysql-files
+    networks:
+      dock_net:
+        ipv4_address: 172.19.0.12
+
+volumes:
+  my-db-master:
+  my-db-slave:
+
+networks:
+  dock_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16

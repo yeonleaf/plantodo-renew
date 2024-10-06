@@ -1,8 +1,17 @@
 package yeonleaf.plantodo.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.ClusterOperations;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import yeonleaf.plantodo.converter.RepInToOutConverter;
 import yeonleaf.plantodo.converter.RepOutToInConverter;
 import yeonleaf.plantodo.domain.Checkbox;
@@ -20,6 +29,7 @@ import yeonleaf.plantodo.repository.MemberRepository;
 import yeonleaf.plantodo.repository.PlanRepository;
 import yeonleaf.plantodo.util.CheckboxDateCreator;
 import yeonleaf.plantodo.util.PlanDateRangeRevisionMaker;
+import yeonleaf.plantodo.wrapper.PlanResDtoWrap;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -28,6 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService {
 
@@ -39,8 +50,8 @@ public class PlanServiceImpl implements PlanService {
     private final GroupService groupService;
 
     @Override
+    @CacheEvict(cacheNames = "plan", key = "#result.id", cacheManager = "cacheManager")
     public PlanResDto save(PlanReqDto planReqDto) {
-
         Member member = memberRepository.findById(planReqDto.getMemberId()).orElseThrow(ResourceNotFoundException::new);
         Plan plan = planRepository.save(new Plan(planReqDto, member));
         groupRepository.save(new Group(plan, "DailyGroup"));
@@ -49,6 +60,8 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "plan", key="#id", cacheManager = "cacheManager")
     public PlanResDto one(Long id) {
 
         Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -65,6 +78,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @CachePut(cacheNames = "plan", key = "#planUpdateReqDto.id", cacheManager = "cacheManager")
     public PlanResDto update(PlanUpdateReqDto planUpdateReqDto) {
 
         PlanDateRangeRevisionMaker planDateRangeRevisionMaker = new PlanDateRangeRevisionMaker();
@@ -135,6 +149,7 @@ public class PlanServiceImpl implements PlanService {
 
 
     @Override
+    @CacheEvict(cacheNames = "plan", key = "#id", cacheManager = "cacheManager")
     public void delete(Long id) {
 
         Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -144,14 +159,18 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public List<PlanResDto> all(Long memberId) {
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "plansByMemberId", key = "#memberId", cacheManager = "cacheManager")
+    public PlanResDtoWrap all(Long memberId) {
 
         memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
-        return planRepository.findByMemberId(memberId).stream().map(PlanResDto::new).toList();
+        List<PlanResDto> planResDtoList = planRepository.findByMemberId(memberId).stream().map(PlanResDto::new).toList();
+        return new PlanResDtoWrap(planResDtoList);
 
     }
 
     @Override
+    @CacheEvict(cacheNames = "plan", key = "#id", cacheManager = "cacheManager")
     public PlanResDto change(Long id) {
 
         Plan plan = planRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -161,13 +180,15 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public List<PlanResDto> all(Long memberId, LocalDate dateKey) {
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "plansByMemberIdAndDate", cacheManager = "cacheManager")
+    public PlanResDtoWrap all(Long memberId, LocalDate dateKey) {
 
         memberRepository.findById(memberId).orElseThrow(ResourceNotFoundException::new);
-
-        return planRepository.findByMemberId(memberId).stream()
+        List<PlanResDto> planResDtoList = planRepository.findByMemberId(memberId).stream()
                 .filter(plan -> hasDateKey(plan, dateKey))
                 .map(PlanResDto::new).toList();
+        return new PlanResDtoWrap(planResDtoList);
 
     }
 
@@ -178,11 +199,14 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public List<PlanResDto> all(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "plansByMemberIdAndRange", cacheManager = "cacheManager")
+    public PlanResDtoWrap all(Long memberId, LocalDate searchStart, LocalDate searchEnd) {
 
-        return all(memberId).stream()
+        List<PlanResDto> planResDtoList = all(memberId).getWrap().stream()
                 .filter(planResDto -> new PlanDateRangeRevisionMaker().isInRange(searchStart, searchEnd, planResDto.getStart(), planResDto.getEnd()))
                 .toList();
+        return new PlanResDtoWrap(planResDtoList);
 
     }
 
